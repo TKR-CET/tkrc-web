@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import  './Marking.css';
+import './Marking.css';
 import Header from '../../Components/Header/Header';
 import NavBar from '../../Components/NavBar/NavBar';
 import MobileNav from "../../Components/MobileNav/MobileNav.jsx"
 import { Link } from 'react-router-dom';
+
 
 const Marking = () => {
   const studentsData = [
@@ -28,7 +29,7 @@ const Marking = () => {
   };
 
   const handleSubmit = () => {
-    const submitButton = document.getElementById('submit-btn');
+    const submitButton = document.getElementById('btn-submit');
     submitButton.innerHTML = 'Submitted';
     submitButton.style.backgroundColor = '#FFA500';
     submitButton.style.color = '#003366';
@@ -37,40 +38,40 @@ const Marking = () => {
   return (
     <div>
       <Header />
-      <div className="navbar-container">
-        <NavBar />
+      <div class="nav">
+      <NavBar />
       </div>
-      <div className="mobile-navbar">
+      <div class="mob-nav">
         <MobileNav/>
       </div>
-      <div className="attendance-container">
-        <p className="mandatory-text">* You Must select Period and Write Topic Obligatory</p>
-        <h2 className="attendance-title">Attendance on 06-11-2024</h2>
+      <div className="attendance-wrapper">
+        <p className="text-mandatory">* You Must select Period and Write Topic Obligatory</p>
+        <h2 className="title-attendance">Attendance on 06-11-2024</h2>
 
         <div className="attendance-form">
-          <div className="period-section">
+          <div className="form-period-section">
             <label>Period :</label>
-            <input type="checkbox" id="period1" name="period" value="1" /> <label htmlFor="period1">1</label>
-            <input type="checkbox" id="period2" name="period" value="2" /> <label htmlFor="period2">2</label>
-            <input type="checkbox" id="period3" name="period" value="3" /> <label htmlFor="period3">3</label>
-            <input type="checkbox" id="period4" name="period" value="4" /> <label htmlFor="period4">4</label>
-            <input type="checkbox" id="period5" name="period" value="5" /> <label htmlFor="period5">5</label>
-            <input type="checkbox" id="period6" name="period" value="6" /> <label htmlFor="period6">6</label>
+            <input type="checkbox" id="chk-period1" name="period" value="1" /> <label htmlFor="chk-period1">1</label>
+            <input type="checkbox" id="chk-period2" name="period" value="2" /> <label htmlFor="chk-period2">2</label>
+            <input type="checkbox" id="chk-period3" name="period" value="3" /> <label htmlFor="chk-period3">3</label>
+            <input type="checkbox" id="chk-period4" name="period" value="4" /> <label htmlFor="chk-period4">4</label>
+            <input type="checkbox" id="chk-period5" name="period" value="5" /> <label htmlFor="chk-period5">5</label>
+            <input type="checkbox" id="chk-period6" name="period" value="6" /> <label htmlFor="chk-period6">6</label>
           </div>
 
-          <div className="subject-topic-section">
-            <label htmlFor="subject-input">Sub :</label>
-            <input type="text" id="subject-input" placeholder="Enter Subject" />
+          <div className="form-subject-topic">
+            <label htmlFor="input-subject">Sub :</label>
+            <input type="text" id="input-subject" placeholder="Enter Subject" />
 
-            <label htmlFor="topic-textarea">Topic :</label>
-            <textarea id="topic-textarea" placeholder="Enter Topic"></textarea>
+            <label htmlFor="textarea-topic">Topic :</label>
+            <textarea id="textarea-topic" placeholder="Enter Topic"></textarea>
 
-            <label htmlFor="remarks-textarea">Remarks :</label>
-            <textarea id="remarks-textarea" placeholder="Enter Remarks"></textarea>
+            <label htmlFor="textarea-remarks">Remarks :</label>
+            <textarea id="textarea-remarks" placeholder="Enter Remarks"></textarea>
           </div>
         </div>
 
-        <table className="attendance-table">
+        <table className="table-attendance">
           <thead>
             <tr>
               <th>Roll Number</th>
@@ -89,7 +90,7 @@ const Marking = () => {
                     type="radio"
                     checked={attendance[student.rollNumber] === 'present'}
                     onChange={() => handleAttendanceChange(student.rollNumber, 'present')}
-                    className={attendance[student.rollNumber] === 'present' ? 'present-radio' : ''}
+                    className={attendance[student.rollNumber] === 'present' ? 'radio-present' : ''}
                   />
                 </td>
                 <td>
@@ -97,7 +98,7 @@ const Marking = () => {
                     type="radio"
                     checked={attendance[student.rollNumber] === 'absent'}
                     onChange={() => handleAttendanceChange(student.rollNumber, 'absent')}
-                    className={attendance[student.rollNumber] === 'absent' ? 'absent-radio' : ''}
+                    className={attendance[student.rollNumber] === 'absent' ? 'radio-absent' : ''}
                   />
                 </td>
               </tr>
@@ -105,7 +106,7 @@ const Marking = () => {
           </tbody>
         </table>
 
-        <button id="submit-btn" onClick={handleSubmit}>
+        <button id="btn-submit" onClick={handleSubmit}>
           <Link to="/attendance">Submit</Link>
         </button>
       </div>
