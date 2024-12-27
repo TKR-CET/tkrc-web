@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './Marking.css';
+import styles from './Marking.module.css'; // Import CSS Module
 import Header from '../../Components/Header/Header';
 import NavBar from '../../Components/NavBar/NavBar';
 import MobileNav from "../../Components/MobileNav/MobileNav.jsx";
@@ -37,18 +37,18 @@ const Marking = () => {
   return (
     <div>
       <Header />
-      <div className="nav">
+      <div className={styles.nav}>
         <NavBar />
       </div>
-      <div className="mob-nav">
+      <div className={styles.mobNav}>
         <MobileNav />
       </div>
-      <div className="attendance-main">
-        <p className="compulsory-text">* You Must select Period and Write Topic Obligatory</p>
-        <h2 className="attendance-heading">Attendance on 06-11-2024</h2>
+      <div className={styles.attendanceMain}>
+        <p className={styles.compulsoryText}>* You Must select Period and Write Topic Obligatory</p>
+        <h2 className={styles.attendanceHeading}>Attendance on 06-11-2024</h2>
 
-        <div className="attendance-details">
-          <div className="period-selection">
+        <div className={styles.attendanceDetails}>
+          <div className={styles.periodSelection}>
             <label>Period :</label>
             <input type="checkbox" id="chk-period1" name="period" value="1" /> <label htmlFor="chk-period1">1</label>
             <input type="checkbox" id="chk-period2" name="period" value="2" /> <label htmlFor="chk-period2">2</label>
@@ -58,7 +58,7 @@ const Marking = () => {
             <input type="checkbox" id="chk-period6" name="period" value="6" /> <label htmlFor="chk-period6">6</label>
           </div>
 
-          <div className="subject-topic-entry">
+          <div className={styles.subjectTopicEntry}>
             <label htmlFor="input-subject">Sub :</label>
             <input type="text" id="input-subject" placeholder="Enter Subject" />
 
@@ -70,7 +70,7 @@ const Marking = () => {
           </div>
         </div>
 
-        <table className="attendance-list">
+        <table className={styles.attendanceList}>
           <thead>
             <tr>
               <th>Roll Number</th>
@@ -89,7 +89,7 @@ const Marking = () => {
                     type="radio"
                     checked={attendance[student.rollNumber] === 'present'}
                     onChange={() => handleAttendanceChange(student.rollNumber, 'present')}
-                    className={attendance[student.rollNumber] === 'present' ? 'present-status' : ''}
+                    className={attendance[student.rollNumber] === 'present' ? styles.presentStatus : ''}
                   />
                 </td>
                 <td>
@@ -97,7 +97,7 @@ const Marking = () => {
                     type="radio"
                     checked={attendance[student.rollNumber] === 'absent'}
                     onChange={() => handleAttendanceChange(student.rollNumber, 'absent')}
-                    className={attendance[student.rollNumber] === 'absent' ? 'absent-status' : ''}
+                    className={attendance[student.rollNumber] === 'absent' ? styles.absentStatus : ''}
                   />
                 </td>
               </tr>
@@ -105,9 +105,11 @@ const Marking = () => {
           </tbody>
         </table>
 
-        <Link to="/attendance">    <button id="btn-submit" onClick={handleSubmit}>
-      Submit
-        </button></Link>
+        <Link to="/attendance">
+          <button id="btn-submit" onClick={handleSubmit}>
+            Submit
+          </button>
+        </Link>
       </div>
     </div>
   );
