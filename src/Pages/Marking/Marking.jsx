@@ -2,9 +2,8 @@ import React, { useState } from 'react';
 import './Marking.css';
 import Header from '../../Components/Header/Header';
 import NavBar from '../../Components/NavBar/NavBar';
-import MobileNav from "../../Components/MobileNav/MobileNav.jsx"
+import MobileNav from "../../Components/MobileNav/MobileNav.jsx";
 import { Link } from 'react-router-dom';
-
 
 const Marking = () => {
   const studentsData = [
@@ -38,18 +37,18 @@ const Marking = () => {
   return (
     <div>
       <Header />
-      <div class="nav">
-      <NavBar />
+      <div className="nav">
+        <NavBar />
       </div>
-      <div class="mob-nav">
-        <MobileNav/>
+      <div className="mob-nav">
+        <MobileNav />
       </div>
-      <div className="attendance-wrapper">
-        <p className="text-mandatory">* You Must select Period and Write Topic Obligatory</p>
-        <h2 className="title-attendance">Attendance on 06-11-2024</h2>
+      <div className="attendance-main">
+        <p className="compulsory-text">* You Must select Period and Write Topic Obligatory</p>
+        <h2 className="attendance-heading">Attendance on 06-11-2024</h2>
 
-        <div className="attendance-form">
-          <div className="form-period-section">
+        <div className="attendance-details">
+          <div className="period-selection">
             <label>Period :</label>
             <input type="checkbox" id="chk-period1" name="period" value="1" /> <label htmlFor="chk-period1">1</label>
             <input type="checkbox" id="chk-period2" name="period" value="2" /> <label htmlFor="chk-period2">2</label>
@@ -59,7 +58,7 @@ const Marking = () => {
             <input type="checkbox" id="chk-period6" name="period" value="6" /> <label htmlFor="chk-period6">6</label>
           </div>
 
-          <div className="form-subject-topic">
+          <div className="subject-topic-entry">
             <label htmlFor="input-subject">Sub :</label>
             <input type="text" id="input-subject" placeholder="Enter Subject" />
 
@@ -71,7 +70,7 @@ const Marking = () => {
           </div>
         </div>
 
-        <table className="table-attendance">
+        <table className="attendance-list">
           <thead>
             <tr>
               <th>Roll Number</th>
@@ -90,7 +89,7 @@ const Marking = () => {
                     type="radio"
                     checked={attendance[student.rollNumber] === 'present'}
                     onChange={() => handleAttendanceChange(student.rollNumber, 'present')}
-                    className={attendance[student.rollNumber] === 'present' ? 'radio-present' : ''}
+                    className={attendance[student.rollNumber] === 'present' ? 'present-status' : ''}
                   />
                 </td>
                 <td>
@@ -98,7 +97,7 @@ const Marking = () => {
                     type="radio"
                     checked={attendance[student.rollNumber] === 'absent'}
                     onChange={() => handleAttendanceChange(student.rollNumber, 'absent')}
-                    className={attendance[student.rollNumber] === 'absent' ? 'radio-absent' : ''}
+                    className={attendance[student.rollNumber] === 'absent' ? 'absent-status' : ''}
                   />
                 </td>
               </tr>
@@ -106,9 +105,9 @@ const Marking = () => {
           </tbody>
         </table>
 
-        <button id="btn-submit" onClick={handleSubmit}>
-          <Link to="/attendance">Submit</Link>
-        </button>
+        <Link to="/attendance">    <button id="btn-submit" onClick={handleSubmit}>
+      Submit
+        </button></Link>
       </div>
     </div>
   );
