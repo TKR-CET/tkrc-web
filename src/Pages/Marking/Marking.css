@@ -1,153 +1,198 @@
-/* General Page Styles */
-.attendance-container {
-  max-width: 900px;
-  margin: 20px auto;
-  padding: 20px;
-  background-color: #f9f9f9;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+/* General Styles */
+body {
   font-family: Arial, sans-serif;
+  background-color: #eaeaea;
+  margin: 0;
+  padding: 0;
 }
 
-.mandatory-text {
+.attendance-main {
+  padding: 25px;
+  background-color: #fff;
+  margin: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.compulsory-text {
   color: red;
-  font-size: 14px;
-  margin-bottom: 10px;
   font-weight: bold;
 }
 
-.attendance-title {
+.attendance-heading {
+  font-size: 26px;
+  font-weight: bold;
+  margin-bottom: 20px;
   text-align: center;
-  font-size: 24px;
-  margin-bottom: 20px;
-  color: #333;
 }
 
-/* Period and Form Sections */
-.attendance-form {
+.attendance-details {
   margin-bottom: 20px;
 }
 
-.period-section {
+.period-selection {
   margin-bottom: 15px;
 }
 
-.period-section label {
-  font-weight: bold;
-  margin-right: 5px;
-  font-size: 14px;
+.period-selection label {
+  font-size: 18px;
+  margin-right: 12px;
 }
 
-.period-section input[type="checkbox"] {
-  margin: 0 5px;
+.period-selection input[type="checkbox"] {
+  margin-right: 7px;
 }
 
-.subject-topic-section {
-  display: grid;
-  grid-template-columns: 1fr 3fr;
-  row-gap: 10px;
-  column-gap: 15px;
-  margin-top: 10px;
-}
-
-.subject-topic-section label {
-  font-weight: bold;
-  font-size: 14px;
-}
-
-.subject-topic-section input,
-.subject-topic-section textarea {
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 14px;
-  width: 100%;
-}
-
-.subject-topic-section textarea {
-  resize: vertical;
-  height: 60px;
-}
-
-/* Table Styles */
-.attendance-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-  font-size: 14px;
-}
-
-.attendance-table th,
-.attendance-table td {
-  border: 1px solid #ddd;
-  text-align: center;
-  padding: 10px;
-}
-
-.attendance-table th {
-  background-color: #f4f4f4;
-  color: #333;
-  font-weight: bold;
-}
-
-.attendance-table tr:nth-child(even) {
-  background-color: #f9f9f9;
-}
-
-.attendance-table tr:hover {
-  background-color: #f1f1f1;
-}
-
-/* Radio Button Styles */
-.attendance-table input[type="radio"] {
-  appearance: none;
-  width: 28px;
-  height: 28px;
-  border: 2px solid #ccc;
-  border-radius: 50%;
-  cursor: pointer;
-  outline: none;
-}
-
-.attendance-table input[type="radio"]:hover {
-  border-color: #888;
-}
-
-/* Present Radio Button */
-.attendance-table input[type="radio"].present-radio:checked {
-  background-color: green;
-  border: 2px solid green;
-}
-
-/* Absent Radio Button */
-.attendance-table input[type="radio"].absent-radio:checked {
-  background-color: red;
-  border: 2px solid red;
-}
-
-/* Button Styles */
-#submit-btn {
+.subject-topic-entry label {
+  font-size: 18px;
+  margin-top: 12px;
   display: block;
-  width: 150px;
-  margin: 20px auto;
-  padding: 10px 20px;
-  font-size: 16px;
+}
+
+.subject-topic-entry input,
+.subject-topic-entry textarea {
+  width: 100%;
+  padding: 12px;
+  margin-top: 6px;
+  margin-bottom: 12px;
+  border-radius: 5px;
+  border: 1px solid #dcdcdc;
+}
+
+.subject-topic-entry textarea {
+  height: 120px;
+}
+
+#btn-submit {
+  background-color: #FF5733;
   color: white;
-  background-color: #007BFF;
+  padding: 12px 24px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  font-size: 18px;
+  align-items: center;
+  position: relative;
+  top: 10px;
+  left: 50%;
+  justify-content: center;
+}
+
+#btn-submit:hover {
+  background-color: #ff704d;
+}
+
+button:disabled {
+  background-color: #dcdcdc;
+  cursor: not-allowed;
+}
+
+button a {
+  color: white;
+  text-decoration: none;
+}
+
+/* Table Styles */
+.attendance-list {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 22px;
+}
+
+.attendance-list th,
+.attendance-list td {
   text-align: center;
-  transition: background-color 0.3s, transform 0.2s;
+  padding: 14px;
+  border: 1px solid #ddd;
 }
 
-#submit-btn:hover {
-  background-color: #0056b3;
-  transform: scale(1.05);
+.attendance-list th {
+  background-color: #f7f7f7;
+  font-weight: bold;
 }
 
-#submit-btn:active {
-  transform: scale(0.95);
+.attendance-list td {
+  background-color: #fff;
+}
+
+.attendance-list td input {
+  cursor: pointer;
+}
+
+/* Radio Button Styles */
+.attendance-list input[type="radio"] {
+  appearance: none;
+  width: 26px;
+  height: 26px;
+  border: 2px solid #ddd;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.attendance-list input[type="radio"]:checked {
+  background-color: #2ecc71;
+  border-color: #2ecc71;
+}
+
+/* Present Radio Button (Green) */
+.attendance-list input[type="radio"].present-status:checked {
+  background-color: #2ecc71;
+  border-color: #2ecc71;
+}
+
+/* Absent Radio Button (Red) */
+.attendance-list input[type="radio"].absent-status:checked {
+  background-color: #e74c3c;
+  border-color: #e74c3c;
+}
+
+/* Hover Effects for both */
+.attendance-list input[type="radio"]:hover {
+  border-color: #aaa;
+}
+
+/* Responsiveness */
+@media (max-width: 768px) {
+  .attendance-main {
+    margin: 15px;
+    padding: 20px;
+  }
+  
+  .attendance-list th,
+  .attendance-list td {
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  .attendance-list {
+    font-size: 14px;
+  }
+
+  .subject-topic-entry textarea {
+    height: 100px;
+  }
+
+  .subject-topic-entry input,
+  .subject-topic-entry textarea {
+    font-size: 14px;
+  }
+
+  button {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .attendance-list th,
+  .attendance-list td {
+    font-size: 12px;
+    padding: 8px;
+  }
+
+  #btn-submit {
+    font-size: 16px;
+    width: 100%;
+    left: 0;
+    top: 0;
   }
   
