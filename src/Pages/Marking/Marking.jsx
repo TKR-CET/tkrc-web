@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import '/Marking.css';
+import '/New.css';
 import Header from '../../Components/Header/Header';
 import NavBar from '../../Components/NavBar/NavBar';
 import MobileNav from "../../Components/MobileNav/MobileNav.jsx"
