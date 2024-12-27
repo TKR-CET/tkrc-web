@@ -1,0 +1,19 @@
+/* Hide nav on smaller screens */
+.nav {
+  display: block; /* Default behavior for larger screens */
+}
+
+.mob-nav {
+  display: none; /* Hide mobile nav by default */
+}
+
+/* Show/hide based on screen size */
+@media screen and (max-width: 768px) {
+  .nav {
+    display: none; /* Hide desktop nav on smaller screens */
+  }
+
+  .mob-nav {
+    display: block; /* Show mobile nav on smaller screens */
+  }
+}

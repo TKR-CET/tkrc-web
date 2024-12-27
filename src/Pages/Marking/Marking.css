@@ -1,0 +1,152 @@
+/* General Page Styles */
+.attendance-wrapper {
+  max-width: 900px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  font-family: Arial, sans-serif;
+}
+
+.text-mandatory {
+  color: red;
+  font-size: 14px;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.title-attendance {
+  text-align: center;
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+/* Period and Form Sections */
+.attendance-form {
+  margin-bottom: 20px;
+}
+
+.form-period-section {
+  margin-bottom: 15px;
+}
+
+.form-period-section label {
+  font-weight: bold;
+  margin-right: 5px;
+  font-size: 14px;
+}
+
+.form-period-section input[type="checkbox"] {
+  margin: 0 5px;
+}
+
+.form-subject-topic {
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+  row-gap: 10px;
+  column-gap: 15px;
+  margin-top: 10px;
+}
+
+.form-subject-topic label {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.form-subject-topic input,
+.form-subject-topic textarea {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+  width: 100%;
+}
+
+.form-subject-topic textarea {
+  resize: vertical;
+  height: 60px;
+}
+
+/* Table Styles */
+.table-attendance {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  font-size: 14px;
+}
+
+.table-attendance th,
+.table-attendance td {
+  border: 1px solid #ddd;
+  text-align: center;
+  padding: 10px;
+}
+
+.table-attendance th {
+  background-color: #f4f4f4;
+  color: #333;
+  font-weight: bold;
+}
+
+.table-attendance tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.table-attendance tr:hover {
+  background-color: #f1f1f1;
+}
+
+/* Radio Button Styles */
+.table-attendance input[type="radio"] {
+  appearance: none;
+  width: 28px;
+  height: 28px;
+  border: 2px solid #ccc;
+  border-radius: 50%;
+  cursor: pointer;
+  outline: none;
+}
+
+.table-attendance input[type="radio"]:hover {
+  border-color: #888;
+}
+
+/* Present Radio Button */
+.table-attendance input[type="radio"].radio-present:checked {
+  background-color: green;
+  border: 2px solid green;
+}
+
+/* Absent Radio Button */
+.table-attendance input[type="radio"].radio-absent:checked {
+  background-color: red;
+  border: 2px solid red;
+}
+
+/* Button Styles */
+#btn-submit {
+  display: block;
+  width: 150px;
+  margin: 20px auto;
+  padding: 10px 20px;
+  font-size: 16px;
+  color: white;
+  background-color: #007BFF;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  text-align: center;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+#btn-submit:hover {
+  background-color: #0056b3;
+  transform: scale(1.05);
+}
+
+#btn-submit:active {
+  transform: scale(0.95);
+}

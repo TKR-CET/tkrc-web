@@ -1,0 +1,42 @@
+/* Base styles for all devices */
+.footer {
+    background-color: #2c3e50; /* Dark background for contrast */
+    color: #ecf0f1; /* Light text color */
+    text-align: center; /* Center the text */
+    padding: 20px 10px; /* Add padding for spacing */
+    font-family: 'Arial', sans-serif; /* Use a clean font */
+    font-size: 14px; /* Set a readable font size */
+    border-top: 2px solid #34495e; /* Optional: Add a top border */
+}
+
+.footer p {
+    margin: 5px 0; /* Reduce margin between lines */
+}
+
+.footer p:last-child {
+    font-style: italic; /* Style the second line differently */
+}
+
+/* Tablet screens (768px to 1024px) */
+@media (min-width: 768px) and (max-width: 1024px) {
+    .footer {
+        font-size: 16px; /* Slightly larger font for tablets */
+        padding: 25px 15px; /* Adjust padding for better spacing */
+    }
+}
+
+/* Mobile screens (up to 767px) */
+@media (max-width: 767px) {
+    .footer {
+        font-size: 12px; /* Smaller font for mobiles */
+        padding: 15px 10px; /* Compact padding for small screens */
+    }
+}
+
+/* Large screens (above 1024px, e.g., laptops and desktops) */
+@media (min-width: 1025px) {
+    .footer {
+        font-size: 18px; /* Larger font for desktops */
+        padding: 10px 5px; /* Spacious padding for large screens */
+    }
+}

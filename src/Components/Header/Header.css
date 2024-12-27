@@ -1,0 +1,99 @@
+/* General Styles (For Both Desktop and Mobile) */
+.header-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #ffffff;
+  padding: 10px 15px;
+  border-bottom: 2px solid #ccc;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Left and Right Sections */
+.info-left,
+.info-right {
+  text-align: center;
+  width: 25%;
+  padding: 0 10px;
+}
+
+.info-left p,
+.info-right p {
+  font-size: 12px;
+  margin: 5px 0;
+  line-height: 1.4;
+}
+
+.college-code {
+  color: red;
+  font-weight: bold;
+}
+
+.website-link {
+  text-decoration: none;
+  color: #007bff;
+  font-weight: bold;
+}
+
+/* Center Section */
+.content-center {
+  text-align: center;
+  width: 50%;
+}
+
+.college-name {
+  font-size: 16px;
+  color: purple;
+  margin: 0;
+  font-family: "Times New Roman", Times, serif;
+}
+
+.college-logo {
+  margin-top: 5px;
+  width: 60px;
+  height: auto;
+}
+
+/* Right Section Specific Styles */
+.autonomous-text {
+  color: red;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.accreditation-info {
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+/* Mobile View Specific Adjustments */
+@media screen and (max-width: 768px) {
+  .header-container {
+    padding: 5px 10px;
+  }
+
+  .info-left,
+  .content-center,
+  .info-right {
+    width: auto;
+    padding: 0 5px;
+  }
+
+  .info-left p,
+  .info-right p {
+    font-size: 4.8px !important;
+    line-height: 1.2;
+  }
+
+  .college-name {
+    font-size: 9px;
+  }
+
+  .college-logo {
+    width: 50px;
+  }
+
+  .autonomous-text {
+    font-size: 6px;
+  }
+}

@@ -1,0 +1,134 @@
+/* General Styling */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.content {
+    padding: 10px;
+}
+.container{
+  display:flex;
+  flex-direction:row;
+  align-items:center;
+  justify-content:space-between;
+  background-color:#f2f2f2;
+}
+/* Edit button styling */
+.edit-button {
+    color: red;
+    cursor: pointer;
+    text-align: center;
+}
+
+.title-bar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.batch-date-selectors {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.batch-selector,
+.date-selector {
+    margin: 5px;
+    padding: 4px;
+    flex: 1;
+    min-width: 120px;
+}
+
+.go {
+    background-color: red;
+    color: white;
+    padding: 6px 10px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.go:hover {
+    background-color: #ffa500;
+    color: #003366;
+}
+
+.section {
+    color: #003366;
+    font-weight: bold;
+}
+
+/* Attendance Table Wrapper */
+.attendance-table-wrapper {
+    overflow-x: auto;
+    width: 100%;
+    margin-top: 15px;
+}
+
+/* Attendance Table Styling */
+.attendance-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: auto;
+}
+
+.attendance-table th,
+.attendance-table td {
+    padding: 6px;
+    text-align: left;
+    border: 1px solid black;
+    word-wrap: break-word;
+}
+
+.attendance-table th {
+    background-color: #f2f2f2;
+    text-align: center;
+}
+
+.attendance-table td {
+    font-size: 14px;
+    text-align: center;
+}
+
+.absentee-list {
+    color: purple;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .attendance-table th,
+    .attendance-table td {
+        font-size: 13px;
+        padding: 5px;
+    }
+
+    .batch-date-selectors {
+        flex-direction: column;
+    }
+
+    .go {
+        width: 100%;
+        margin-top: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .attendance-table th,
+    .attendance-table td {
+        font-size: 12px;
+        padding: 4px;
+    }
+
+    .go {
+        font-size: 12px;
+        padding: 5px 8px;
+    }
+}

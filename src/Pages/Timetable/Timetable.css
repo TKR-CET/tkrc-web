@@ -1,0 +1,103 @@
+/* Staff Details */
+.staff-details {
+  width: 80%;
+  margin: 20px auto;
+}
+
+.staff-details table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.staff-details th {
+  background-color: #e6adad;
+  color: #000;
+  padding: 10px;
+  font-size: 16px;
+  text-align: left;
+}
+
+.staff-details td {
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+}
+
+/* Timetable */
+.timetable {
+  width: 90%;
+  margin: 20px auto;
+  text-align: center;
+}
+
+.timetable h2 {
+  color: purple;
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.timetable table {
+  width: 100%;
+  border-collapse: collapse;
+  border: solid 1px black;
+  background-color: #fad9d9;
+}
+
+.timetable th, .timetable td {
+  padding: 8px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+}
+
+.timetable th {
+  color: purple;
+}
+
+.timetable td {
+  text-align: center;
+}
+
+.timetable td:first-child {
+  font-weight: bold;
+  color: purple;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .staff-details,
+  .timetable {
+    width: 95%; /* Reduce width on smaller screens */
+  }
+
+  .staff-details th,
+  .staff-details td,
+  .timetable th,
+  .timetable td {
+    font-size: 12px; /* Adjust font size for smaller screens */
+    padding: 6px;
+  }
+
+  .timetable h2 {
+    font-size: 16px; /* Adjust heading font size */
+  }
+}
+
+@media (max-width: 480px) {
+  .staff-details th,
+  .staff-details td,
+  .timetable th,
+  .timetable td {
+    font-size: 10px; /* Further reduce font size for smaller screens */
+    padding: 4px;
+  }
+
+  .staff-details table,
+  .timetable table {
+    font-size: 10px; /* Adjust overall table font size */
+  }
+
+  .timetable h2 {
+    font-size: 14px; /* Reduce heading font size */
+  }
+}
