@@ -1,5 +1,5 @@
 /* General Page Styles */
-.attendance-wrapper {
+.attendance-container {
   max-width: 900px;
   margin: 20px auto;
   padding: 20px;
@@ -10,14 +10,14 @@
   font-family: Arial, sans-serif;
 }
 
-.text-mandatory {
+.mandatory-text {
   color: red;
   font-size: 14px;
   margin-bottom: 10px;
   font-weight: bold;
 }
 
-.title-attendance {
+.attendance-title {
   text-align: center;
   font-size: 24px;
   margin-bottom: 20px;
@@ -29,21 +29,21 @@
   margin-bottom: 20px;
 }
 
-.form-period-section {
+.period-section {
   margin-bottom: 15px;
 }
 
-.form-period-section label {
+.period-section label {
   font-weight: bold;
   margin-right: 5px;
   font-size: 14px;
 }
 
-.form-period-section input[type="checkbox"] {
+.period-section input[type="checkbox"] {
   margin: 0 5px;
 }
 
-.form-subject-topic {
+.subject-topic-section {
   display: grid;
   grid-template-columns: 1fr 3fr;
   row-gap: 10px;
@@ -51,13 +51,13 @@
   margin-top: 10px;
 }
 
-.form-subject-topic label {
+.subject-topic-section label {
   font-weight: bold;
   font-size: 14px;
 }
 
-.form-subject-topic input,
-.form-subject-topic textarea {
+.subject-topic-section input,
+.subject-topic-section textarea {
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 5px;
@@ -65,42 +65,42 @@
   width: 100%;
 }
 
-.form-subject-topic textarea {
+.subject-topic-section textarea {
   resize: vertical;
   height: 60px;
 }
 
 /* Table Styles */
-.table-attendance {
+.attendance-table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
   font-size: 14px;
 }
 
-.table-attendance th,
-.table-attendance td {
+.attendance-table th,
+.attendance-table td {
   border: 1px solid #ddd;
   text-align: center;
   padding: 10px;
 }
 
-.table-attendance th {
+.attendance-table th {
   background-color: #f4f4f4;
   color: #333;
   font-weight: bold;
 }
 
-.table-attendance tr:nth-child(even) {
+.attendance-table tr:nth-child(even) {
   background-color: #f9f9f9;
 }
 
-.table-attendance tr:hover {
+.attendance-table tr:hover {
   background-color: #f1f1f1;
 }
 
 /* Radio Button Styles */
-.table-attendance input[type="radio"] {
+.attendance-table input[type="radio"] {
   appearance: none;
   width: 28px;
   height: 28px;
@@ -110,24 +110,24 @@
   outline: none;
 }
 
-.table-attendance input[type="radio"]:hover {
+.attendance-table input[type="radio"]:hover {
   border-color: #888;
 }
 
 /* Present Radio Button */
-.table-attendance input[type="radio"].radio-present:checked {
+.attendance-table input[type="radio"].present-radio:checked {
   background-color: green;
   border: 2px solid green;
 }
 
 /* Absent Radio Button */
-.table-attendance input[type="radio"].radio-absent:checked {
+.attendance-table input[type="radio"].absent-radio:checked {
   background-color: red;
   border: 2px solid red;
 }
 
 /* Button Styles */
-#btn-submit {
+#submit-btn {
   display: block;
   width: 150px;
   margin: 20px auto;
@@ -142,11 +142,11 @@
   transition: background-color 0.3s, transform 0.2s;
 }
 
-#btn-submit:hover {
+#submit-btn:hover {
   background-color: #0056b3;
   transform: scale(1.05);
 }
 
-#btn-submit:active {
+#submit-btn:active {
   transform: scale(0.95);
-}
+  }
