@@ -16,30 +16,18 @@ const Attendance = () => {
         fetchAttendanceData(batch, date);
     }, [batch, date]);
 
-    const fetchAttendanceData = async (selectedBatch, selectedDate) => {
-        console.log("Fetching attendance data for", selectedBatch, selectedDate);
-        const mockData = [
-            {
-                class: 26,
-                date: "28-10-24",
-                present: 6,
-                absentees: "20K91A0328, 20K91A0335, 20K91A0343",
-                topic: "CAD Basics",
-                remark: "",
-                no: 3,
-            },
-            {
-                class: 25,
-                date: "28-10-24",
-                present: 5,
-                absentees: "20K91A0328, 20K91A0335, 20K91A0343",
-                topic: "CAM Basics",
-                remark: "",
-                no: 2,
-            },
-        ];
-        setAttendanceData(mockData); // Simulated data
-    };
+   const fetchAttendanceData = async (selectedBatch, selectedDate) => {
+    try {
+        const response = await fetch(
+            `http://localhost:8000/api/attendance/?batch=${selectedBatch}&date=${selectedDate}`
+        );
+        const data = await response.json();
+        setAttendanceData(data);
+    } catch (error) {
+        console.error("Error fetching attendance data:", error);
+    }
+};
+
 
     const handleEdit = (row) => {
         console.log("Edit row:", row);
