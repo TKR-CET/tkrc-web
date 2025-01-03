@@ -171,93 +171,197 @@ const Marking = () => {
 };
 
 const styles = {
-  container: {
-    fontFamily: "Arial, sans-serif",
-    margin: 0,
-    padding: 0,
-    boxSizing: "border-box",
-  },
-  nav: {
-    display: "flex",
-    justifyContent: "space-between",
-    padding: "10px",
-    backgroundColor: "#333",
-    color: "white",
-  },
-  mobileNav: {
-    display: "none",
-  },
-  main: {
-    margin: "20px auto",
-    maxWidth: "900px",
-    padding: "20px",
-    border: "1px solid #ddd",
-    borderRadius: "8px",
-    backgroundColor: "#f9f9f9",
-  },
-  heading: {
-    fontSize: "24px",
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: "20px",
-  },
-  details: {
-    marginBottom: "20px",
-  },
-  periodSection: {
-    marginBottom: "10px",
-  },
-  periodLabel: {
-    marginRight: "10px",
-  },
-  inputSection: {
-    display: "flex",
-    flexDirection: "column",
-    marginBottom: "20px",
-  },
-  label: {
-    fontWeight: "bold",
-    marginBottom: "5px",
-  },
-  input: {
-    marginBottom: "10px",
-    padding: "8px",
-    borderRadius: "4px",
-    border: "1px solid #ccc",
-    width: "100%",
-  },
-  textarea: {
-    marginBottom: "10px",
-    padding: "8px",
-    borderRadius: "4px",
-    border: "1px solid #ccc",
-    width: "100%",
-    resize: "none",
-  },
-  table: {
-    width: "100%",
-    borderCollapse: "collapse",
-    marginBottom: "20px",
-  },
-  tableHeader: {
-    border: "1px solid #ddd",
-    padding: "8px",
-    backgroundColor: "#333",
-    color: "white",
-    textAlign: "left",
-  },
-  tableCell: {
-    border: "1px solid #ddd",
-    padding: "8px",
-  },
-  submitButton: {
-    padding: "10px 20px",
-    backgroundColor: "#28a745",
-    color: "white",
-    border: "none",
-    borderRadius: "4px",
-    cursor: "pointer",
-  },
+/* Marking.module.css */
+.attendanceMain {
+  padding: 25px;
+  background-color: #fff;
+  margin: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.compulsoryText {
+  color: red;
+  font-weight: bold;
+}
+
+.attendanceHeading {
+  font-size: 26px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.attendanceDetails {
+  margin-bottom: 20px;
+}
+
+.periodSelection {
+  margin-bottom: 15px;
+}
+
+.periodSelection label {
+  font-size: 18px;
+  margin-right: 12px;
+}
+
+.periodSelection input[type="checkbox"] {
+  margin-right: 7px;
+}
+
+.subjectTopicEntry label {
+  font-size: 18px;
+  margin-top: 12px;
+  display: block;
+}
+
+.subjectTopicEntry input,
+.subjectTopicEntry textarea {
+  width: 100%;
+  padding: 12px;
+  margin-top: 6px;
+  margin-bottom: 12px;
+  border-radius: 5px;
+  border: 1px solid #dcdcdc;
+}
+
+.subjectTopicEntry textarea {
+  height: 120px;
+}
+
+#btn-submit {
+  background-color: #FF5733;
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 18px;
+  align-items: center;
+  position: relative;
+  top: 10px;
+  left: 50%;
+  justify-content: center;
+}
+
+#btn-submit:hover {
+  background-color: #ff704d;
+}
+
+button:disabled {
+  background-color: #dcdcdc;
+  cursor: not-allowed;
+}
+
+button a {
+  color: white;
+  text-decoration: none;
+}
+
+/* Table Styles */
+.attendanceList {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 22px;
+}
+
+.attendanceList th,
+.attendanceList td {
+  text-align: center;
+  padding: 14px;
+  border: 1px solid #ddd;
+}
+
+.attendanceList th {
+  background-color: #f7f7f7;
+  font-weight: bold;
+}
+
+.attendanceList td {
+  background-color: #fff;
+}
+
+.attendanceList td input {
+  cursor: pointer;
+}
+
+/* Radio Button Styles */
+.attendanceList input[type="radio"] {
+  appearance: none;
+  width: 26px;
+  height: 26px;
+  border: 2px solid #ddd;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.attendanceList input[type="radio"]:checked {
+  background-color: #2ecc71;
+  border-color: #2ecc71;
+}
+
+/* Present Radio Button (Green) */
+.attendanceList input[type="radio"].presentStatus:checked {
+  background-color: #2ecc71;
+  border-color: #2ecc71;
+}
+
+/* Absent Radio Button (Red) */
+.attendanceList input[type="radio"].absentStatus:checked {
+  background-color: #e74c3c;
+  border-color: #e74c3c;
+}
+
+/* Hover Effects for both */
+.attendanceList input[type="radio"]:hover {
+  border-color: #aaa;
+}
+
+/* Responsiveness */
+@media (max-width: 768px) {
+  .attendanceMain {
+    margin: 15px;
+    padding: 20px;
+  }
+  
+  .attendanceList th,
+  .attendanceList td {
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  .attendanceList {
+    font-size: 14px;
+  }
+
+  .subjectTopicEntry textarea {
+    height: 100px;
+  }
+
+  .subjectTopicEntry input,
+  .subjectTopicEntry textarea {
+    font-size: 14px;
+  }
+
+  button {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .attendanceList th,
+  .attendanceList td {
+    font-size: 12px;
+    padding: 8px;
+  }
+
+  #btn-submit {
+    font-size: 16px;
+    width: 100%;
+    left: 0;
+    top: 0;
+  }
+    }
 };
 
 export default Marking;
