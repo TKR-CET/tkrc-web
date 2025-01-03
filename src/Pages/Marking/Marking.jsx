@@ -79,71 +79,6 @@ const Marking = () => {
     <div>
       <style>
         {`
-          .attendanceMain {
-            padding: 20px;
-            background-color: #fff;
-            margin: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-          }
-
-          .attendanceHeading {
-            font-size: 19px;
-            font-weight: bold;
-            text-align: center;
-            margin-bottom: 15px;
-          }
-
-          .periodSelection label {
-            font-size: 14px;
-            margin-right: 10px;
-          }
-
-          .subjectTopicEntry input,
-          .subjectTopicEntry textarea {
-            width: 100%;
-            padding: 8px;
-            margin: 6px 0 12px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-          }
-
-          #btn-submit {
-            background-color: #FF5733;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            margin-top: 10px;
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-          }
-
-          #btn-submit:hover {
-            background-color: #ff704d;
-          }
-
-          .attendanceList {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-          }
-
-          .attendanceList th,
-          .attendanceList td {
-            text-align: center;
-            padding: 10px;
-            border: 1px solid #ddd;
-          }
-
-          .attendanceList th {
-            background-color: #f7f7f7;
-            font-weight: bold;
-          }
-
           .attendanceList input[type="radio"] {
             appearance: none;
             width: 25px;
@@ -154,12 +89,12 @@ const Marking = () => {
           }
 
           .attendanceList input[type="radio"]:checked {
-            background-color: #2ecc71;
+            background-color: #2ecc71; /* Green for Present */
             border-color: #2ecc71;
           }
 
           .attendanceList input[type="radio"].absentStatus:checked {
-            background-color: #e74c3c;
+            background-color: #e74c3c; /* Red for Absent */
             border-color: #e74c3c;
           }
         `}
