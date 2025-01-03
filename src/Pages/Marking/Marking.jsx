@@ -41,11 +41,6 @@ const Marking = () => {
   };
 
   const handleSubmit = async () => {
-    if (!subject || !topic || !remarks) {
-      alert("Please fill in all the fields.");
-      return;
-    }
-
     const data = {
       date,
       periods,
@@ -68,6 +63,11 @@ const Marking = () => {
         throw new Error("Failed to submit attendance");
       }
 
+      const submitButton = document.getElementById("btn-submit");
+      submitButton.innerHTML = "Submitted";
+      submitButton.style.backgroundColor = "#FFA500";
+      submitButton.style.color = "#003366";
+
       alert("Attendance submitted successfully!");
     } catch (error) {
       console.error(error);
@@ -76,21 +76,210 @@ const Marking = () => {
   };
 
   return (
-    <div style={styles.attendanceMain}>
+    <div>
+      <style>
+        {`
+        .attendanceMain {
+          padding: 20px;
+          background-color: #fff;
+          margin: 20px;
+          border-radius: 8px;
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .compulsoryText {
+          color: red;
+          font-weight: bold;
+        }
+
+        .attendanceHeading {
+          font-size: 19px;
+          font-weight: bold;
+          padding-top: 5px;
+          margin-top: 4px;
+          margin-bottom: 15px;
+          text-align: center;
+        }
+
+        .attendanceDetails {
+          margin-bottom: 20px;
+        }
+
+        .periodSelection {
+          margin-bottom: 15px;
+        }
+
+        .periodSelection label {
+          font-size: 14px;
+          margin-right: 10px;
+        }
+
+        .periodSelection input[type="checkbox"] {
+          margin-right: 6px;
+          width: 18px;
+          height: 18px;
+          cursor: pointer;
+        }
+
+        .subjectTopicEntry label {
+          font-size: 14px;
+          margin-top: 8px;
+          display: block;
+        }
+
+        .subjectTopicEntry input,
+        .subjectTopicEntry textarea {
+          font-size: 14px;
+          padding: 8px;
+          margin-top: 6px;
+          margin-bottom: 12px;
+          border-radius: 4px;
+          border: 1px solid #ccc;
+          width: 100%;
+        }
+
+        .subjectTopicEntry textarea {
+          height: 80px;
+          resize: vertical;
+        }
+
+        #btn-submit {
+          background-color: #FF5733;
+          color: white;
+          padding: 10px 20px;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+          font-size: 16px;
+          position: relative;
+          top: 10px;
+          left: 50%;
+          transform: translateX(-50%);
+          text-align: center;
+        }
+
+        #btn-submit:hover {
+          background-color: #ff704d;
+        }
+
+        .attendanceList {
+          width: 100%;
+          border-collapse: collapse;
+          margin-top: 20px;
+        }
+
+        .attendanceList th,
+        .attendanceList td {
+          text-align: center;
+          padding: 10px;
+          border: 1.5px solid #ddd;
+        }
+
+        .attendanceList th {
+          background-color: #f7f7f7;
+          font-weight: bold;
+        }
+
+        .attendanceList td {
+          background-color: #fff;
+        }
+
+        .attendanceList input[type="radio"] {
+          appearance: none;
+          width: 25px;
+          height: 25px;
+          border: 1.5px solid #aaa;
+          border-radius: 50%;
+          cursor: pointer;
+        }
+
+        .attendanceList input[type="radio"]:checked {
+          background-color: #2ecc71;
+          border-color: #2ecc71;
+        }
+
+        .attendanceList input[type="radio"].absentStatus:checked {
+          background-color: #e74c3c;
+          border-color: #e74c3c;
+        }
+
+        .attendanceList input[type="radio"]:hover {
+          border-color: #555;
+        }
+
+        @media (max-width: 768px) {
+          .attendanceMain {
+            margin: 15px;
+            padding: 20px;
+          }
+
+          .periodSelection label {
+            margin-right: 4px;
+          }
+
+          .attendanceList th,
+          .attendanceList td {
+            font-size: 12px;
+            padding: 8px;
+          }
+
+          .subjectTopicEntry textarea {
+            height: 70px;
+          }
+
+          #btn-submit {
+            font-size: 14px;
+            position: relative;
+            padding-top: 5px;
+          }
+
+          .attendanceList input[type="radio"] {
+            width: 25px !important;
+            height: 25px !important;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .attendanceList th,
+          .attendanceList td {
+            font-size: 11px;
+            padding: 6px;
+          }
+
+          .attendanceList input[type="radio"] {
+            width: 20px;
+            height: 20px;
+          }
+
+          .subjectTopicEntry textarea {
+            height: 60px;
+          }
+
+          #btn-submit {
+            font-size: 14px;
+            padding: 8px;
+            width: 100%;
+            left: 0;
+            transform: none;
+            top: 0;
+          }
+        }
+      `}
+      </style>
       <Header />
-      <div style={styles.nav}>
+      <div className="nav">
         <NavBar />
       </div>
-      <div style={styles.mobileNav}>
+      <div className="mob-nav">
         <MobileNav />
       </div>
-      <div style={styles.main}>
-        <h2 style={styles.attendanceHeading}>Attendance on {date}</h2>
-        <div style={styles.attendanceDetails}>
-          <div style={styles.periodSelection}>
-            <label style={styles.label}>Periods:</label>
+      <div className="attendanceMain">
+        <h2 className="attendanceHeading">Attendance on {date}</h2>
+        <div className="attendanceDetails">
+          <div className="periodSelection">
+            <label>Periods:</label>
             {[1, 2, 3, 4, 5, 6].map((period) => (
-              <label key={period} style={styles.periodLabel}>
+              <label key={period}>
                 <input
                   type="checkbox"
                   checked={periods.includes(period)}
@@ -100,52 +289,43 @@ const Marking = () => {
               </label>
             ))}
           </div>
-          <div style={styles.subjectTopicEntry}>
-            <label style={styles.label} htmlFor="subject">
-              Subject:
-            </label>
+          <div className="subjectTopicEntry">
+            <label htmlFor="subject">Subject:</label>
             <input
               type="text"
               id="subject"
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
-              style={styles.input}
             />
-            <label style={styles.label} htmlFor="topic">
-              Topic:
-            </label>
+            <label htmlFor="topic">Topic:</label>
             <textarea
               id="topic"
               value={topic}
               onChange={(e) => setTopic(e.target.value)}
-              style={styles.textarea}
             />
-            <label style={styles.label} htmlFor="remarks">
-              Remarks:
-            </label>
+            <label htmlFor="remarks">Remarks:</label>
             <textarea
               id="remarks"
               value={remarks}
               onChange={(e) => setRemarks(e.target.value)}
-              style={styles.textarea}
             />
           </div>
         </div>
-        <table style={styles.attendanceList}>
+        <table className="attendanceList">
           <thead>
             <tr>
-              <th style={styles.tableHeader}>Roll Number</th>
-              <th style={styles.tableHeader}>Student Name</th>
-              <th style={styles.tableHeader}>Present</th>
-              <th style={styles.tableHeader}>Absent</th>
+              <th>Roll Number</th>
+              <th>Student Name</th>
+              <th>Present</th>
+              <th>Absent</th>
             </tr>
           </thead>
           <tbody>
             {studentsData.map((student) => (
               <tr key={student.rollNumber}>
-                <td style={styles.tableCell}>{student.rollNumber}</td>
-                <td style={styles.tableCell}>{student.name}</td>
-                <td style={styles.tableCell}>
+                <td>{student.rollNumber}</td>
+                <td>{student.name}</td>
+                <td>
                   <input
                     type="radio"
                     checked={attendance[student.rollNumber] === "present"}
@@ -154,7 +334,7 @@ const Marking = () => {
                     }
                   />
                 </td>
-                <td style={styles.tableCell}>
+                <td>
                   <input
                     type="radio"
                     checked={attendance[student.rollNumber] === "absent"}
@@ -167,85 +347,12 @@ const Marking = () => {
             ))}
           </tbody>
         </table>
-        <button style={styles.submitButton} onClick={handleSubmit}>
+        <button id="btn-submit" onClick={handleSubmit}>
           Submit
         </button>
       </div>
     </div>
   );
-};
-
-const styles = {
-  attendanceMain: {
-    padding: "25px",
-    backgroundColor: "#fff",
-    margin: "20px",
-    borderRadius: "8px",
-    boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
-  },
-  attendanceHeading: {
-    fontSize: "26px",
-    fontWeight: "bold",
-    marginBottom: "20px",
-    textAlign: "center",
-  },
-  attendanceDetails: {
-    marginBottom: "20px",
-  },
-  periodSelection: {
-    marginBottom: "15px",
-  },
-  label: {
-    fontSize: "18px",
-  },
-  periodLabel: {
-    fontSize: "18px",
-    marginRight: "12px",
-  },
-  input: {
-    width: "100%",
-    padding: "12px",
-    marginTop: "6px",
-    marginBottom: "12px",
-    borderRadius: "5px",
-    border: "1px solid #dcdcdc",
-  },
-  textarea: {
-    width: "100%",
-    height: "120px",
-    padding: "12px",
-    marginTop: "6px",
-    marginBottom: "12px",
-    borderRadius: "5px",
-    border: "1px solid #dcdcdc",
-  },
-  attendanceList: {
-    width: "100%",
-    borderCollapse: "collapse",
-    marginTop: "22px",
-  },
-  tableHeader: {
-    textAlign: "center",
-    padding: "14px",
-    border: "1px solid #ddd",
-    backgroundColor: "#f7f7f7",
-    fontWeight: "bold",
-  },
-  tableCell: {
-    textAlign: "center",
-    padding: "14px",
-    border: "1px solid #ddd",
-  },
-  submitButton: {
-    backgroundColor: "#FF5733",
-    color: "white",
-    padding: "12px 24px",
-    border: "none",
-    borderRadius: "5px",
-    cursor: "pointer",
-    fontSize: "18px",
-    marginTop: "10px",
-  },
 };
 
 export default Marking;
