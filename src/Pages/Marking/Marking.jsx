@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Header from "../../Components/Header/Header";
 import NavBar from "../../Components/NavBar/NavBar";
 import MobileNav from "../../Components/MobileNav/MobileNav";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 const Marking = () => {
   const location = useLocation();
@@ -26,12 +26,7 @@ const Marking = () => {
   const [subject, setSubject] = useState("");
   const [topic, setTopic] = useState("");
   const [remarks, setRemarks] = useState("");
-
-  const handlePeriodChange = (period) => {
-    setPeriods((prev) =>
-      prev.includes(period) ? prev.filter((p) => p !== period) : [...prev, period]
-    );
-  };
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleAttendanceChange = (rollNumber, status) => {
     setAttendance((prevState) => ({
@@ -40,8 +35,21 @@ const Marking = () => {
     }));
   };
 
+  const handlePeriodChange = (period) => {
+    setPeriods((prev) =>
+      prev.includes(period) ? prev.filter((p) => p !== period) : [...prev, period]
+    );
+  };
+
   const handleSubmit = async () => {
-    const data = {
+    if (!subject || !topic || periods.length === 0) {
+      alert("Please fill in all mandatory fields (Periods, Subject, Topic).");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    const attendanceData = {
       date,
       periods,
       subject,
@@ -56,151 +64,163 @@ const Marking = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(attendanceData),
       });
 
       if (!response.ok) {
         throw new Error("Failed to submit attendance");
       }
 
-      const submitButton = document.getElementById("btn-submit");
-      submitButton.innerHTML = "Submitted";
-      submitButton.style.backgroundColor = "#FFA500";
-      submitButton.style.color = "#003366";
-
       alert("Attendance submitted successfully!");
     } catch (error) {
-      console.error(error);
-      alert("An error occurred while submitting attendance");
+      console.error("Error submitting attendance:", error);
+      alert("An error occurred while submitting attendance.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
     <div>
-      <style>
-        {`
-         .attendanceMain {
-           padding: 20px;
-           background-color: #fff;
-           margin: 20px;
-           border-radius: 8px;
-           box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-         }
+      <style>{`
+        .attendanceMain {
+          padding: 20px;
+          background-color: #fff;
+          margin: 20px;
+          border-radius: 8px;
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .compulsoryText {
+          color: red;
+          font-weight: bold;
+        }
+        .attendanceHeading {
+          font-size: 19px;
+          font-weight: bold;
+          margin: 10px 0 15px;
+          text-align: center;
+        }
+        .attendanceDetails {
+          margin-bottom: 20px;
+        }
+        .periodSelection label {
+          font-size: 14px;
+          margin-right: 10px;
+        }
+        .periodSelection input[type="checkbox"] {
+          margin-right: 6px;
+          cursor: pointer;
+        }
+        .subjectTopicEntry label {
+          font-size: 14px;
+          margin-top: 8px;
+          display: block;
+        }
+        .subjectTopicEntry input,
+        .subjectTopicEntry textarea {
+          font-size: 14px;
+          padding: 8px;
+          margin-top: 6px;
+          margin-bottom: 12px;
+          border-radius: 4px;
+          border: 1px solid #ccc;
+          width: 100%;
+        }
+        .subjectTopicEntry textarea {
+          height: 80px;
+          resize: vertical;
+        }
+        #btn-submit {
+          background-color: #FF5733;
+          color: white;
+          padding: 10px 20px;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+          font-size: 16px;
+          text-align: center;
+          display: block;
+          margin: 0 auto;
+        }
+        #btn-submit:hover {
+          background-color: #ff704d;
+        }
+        button:disabled {
+          background-color: #dcdcdc;
+          cursor: not-allowed;
+        }
+        .attendanceList {
+          width: 100%;
+          border-collapse: collapse;
+          margin-top: 20px;
+        }
+        .attendanceList th,
+        .attendanceList td {
+          text-align: center;
+          padding: 10px;
+          border: 1.5px solid #ddd;
+        }
+        .attendanceList th {
+          background-color: #f7f7f7;
+          font-weight: bold;
+        }
+        .attendanceList input[type="radio"] {
+          appearance: none;
+          width: 25px;
+          height: 25px;
+          border: 1.5px solid #aaa;
+          border-radius: 50%;
+          cursor: pointer;
+        }
+        .attendanceList input[type="radio"]:checked {
+          background-color: #2ecc71;
+          border-color: #2ecc71;
+        }
+        .attendanceList input[type="radio"].absentStatus:checked {
+          background-color: #e74c3c;
+          border-color: #e74c3c;
+        }
+        .attendanceList input[type="radio"]:hover {
+          border-color: #555;
+        }
+        @media (max-width: 768px) {
+          .attendanceMain {
+            margin: 15px;
+            padding: 20px;
+          }
+          .attendanceList th,
+          .attendanceList td {
+            font-size: 12px;
+            padding: 8px;
+          }
+          .subjectTopicEntry textarea {
+            height: 70px;
+          }
+          #btn-submit {
+            font-size: 14px;
+          }
+        }
+        @media (max-width: 480px) {
+          .attendanceList th,
+          .attendanceList td {
+            font-size: 11px;
+            padding: 6px;
+          }
+          .attendanceList input[type="radio"] {
+            width: 20px;
+            height: 20px;
+          }
+          .subjectTopicEntry textarea {
+            height: 60px;
+          }
+          #btn-submit {
+            font-size: 14px;
+            padding: 8px;
+            width: 100%;
+          }
+        }
+      `}</style>
 
-         .attendanceHeading {
-           font-size: 19px;
-           font-weight: bold;
-           text-align: center;
-           margin-bottom: 15px;
-         }
-
-         .attendanceDetails label {
-           display: block;
-           margin: 8px 0 4px;
-         }
-
-         .attendanceDetails input,
-         .attendanceDetails textarea {
-           width: 100%;
-           padding: 8px;
-           margin-bottom: 10px;
-           border: 1px solid #ccc;
-           border-radius: 4px;
-         }
-
-         .periodSelection {
-           display: flex;
-           flex-wrap: wrap;
-           gap: 10px;
-           margin-bottom: 15px;
-         }
-
-         .periodSelection label {
-           display: flex;
-           align-items: center;
-           font-size: 14px;
-           cursor: pointer;
-         }
-
-         .periodSelection input {
-           margin-right: 8px;
-         }
-
-         .tableWrapper {
-           overflow-x: auto;
-           margin-top: 20px;
-         }
-
-         .attendanceList {
-           width: 100%;
-           border-collapse: collapse;
-           min-width: 600px;
-         }
-
-         .attendanceList th,
-         .attendanceList td {
-           text-align: center;
-           padding: 10px;
-           border: 1.5px solid #ddd;
-         }
-
-         .attendanceList th {
-           background-color: #f7f7f7;
-           font-weight: bold;
-         }
-
-         .attendanceList input[type="radio"] {
-           appearance: none;
-           width: 25px;
-           height: 25px;
-           border: 2px solid #aaa;
-           border-radius: 50%;
-           cursor: pointer;
-         }
-
-         .attendanceList input[type="radio"]:checked {
-           background-color: #2ecc71; /* Green for Present */
-           border-color: #2ecc71;
-         }
-
-         .attendanceList input[type="radio"].absentStatus:checked {
-           background-color: #e74c3c; /* Red for Absent */
-           border-color: #e74c3c;
-         }
-
-         #btn-submit {
-           background-color: #FF5733;
-           color: white;
-           padding: 10px 20px;
-           border: none;
-           border-radius: 5px;
-           cursor: pointer;
-           font-size: 16px;
-           margin: 20px 0;
-         }
-
-         #btn-submit:hover {
-           background-color: #ff704d;
-         }
-
-         @media (max-width: 768px) {
-           .periodSelection {
-             gap: 5px;
-           }
-
-           .attendanceList th,
-           .attendanceList td {
-             font-size: 12px;
-             padding: 8px;
-           }
-
-           .attendanceList input[type="radio"] {
-             width: 20px;
-             height: 20px;
-           }
-         }
-        `}
-      </style>
       <Header />
       <div className="nav">
         <NavBar />
@@ -209,78 +229,96 @@ const Marking = () => {
         <MobileNav />
       </div>
       <div className="attendanceMain">
+        <p className="compulsoryText">
+          * You must select Period(s) and provide a Topic.
+        </p>
         <h2 className="attendanceHeading">Attendance on {date}</h2>
         <div className="attendanceDetails">
           <div className="periodSelection">
+            <label>Period:</label>
             {[1, 2, 3, 4, 5, 6].map((period) => (
               <label key={period}>
                 <input
                   type="checkbox"
+                  value={period}
                   checked={periods.includes(period)}
                   onChange={() => handlePeriodChange(period)}
                 />
-                Period {period}
+                {period}
               </label>
             ))}
           </div>
-          <label>Subject:</label>
-          <input
-            type="text"
-            value={subject}
-            onChange={(e) => setSubject(e.target.value)}
-          />
-          <label>Topic:</label>
-          <textarea
-            value={topic}
-            onChange={(e) => setTopic(e.target.value)}
-          />
-          <label>Remarks:</label>
-          <textarea
-            value={remarks}
-            onChange={(e) => setRemarks(e.target.value)}
-          />
+          <div className="subjectTopicEntry">
+            <label htmlFor="input-subject">Subject:</label>
+            <input
+              type="text"
+              id="input-subject"
+              placeholder="Enter Subject"
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+            />
+            <label htmlFor="textarea-topic">Topic:</label>
+            <textarea
+              id="textarea-topic"
+              placeholder="Enter Topic"
+              value={topic}
+              onChange={(e) => setTopic(e.target.value)}
+            />
+            <label htmlFor="textarea-remarks">Remarks:</label>
+            <textarea
+              id="textarea-remarks"
+              placeholder="Enter Remarks"
+              value={remarks}
+              onChange={(e) => setRemarks(e.target.value)}
+            />
+          </div>
         </div>
-        <div className="tableWrapper">
-          <table className="attendanceList">
-            <thead>
-              <tr>
-                <th>Roll Number</th>
-                <th>Student Name</th>
-                <th>Present</th>
-                <th>Absent</th>
+        <table className="attendanceList">
+          <thead>
+            <tr>
+              <th>Roll Number</th>
+              <th>Student Name</th>
+              <th>Present</th>
+              <th>Absent</th>
+            </tr>
+          </thead>
+          <tbody>
+            {studentsData.map((student) => (
+              <tr key={student.rollNumber}>
+                <td>{student.rollNumber}</td>
+                <td>{student.name}</td>
+                <td>
+                  <input
+                    type="radio"
+                    checked={attendance[student.rollNumber] === "present"}
+                    onChange={() =>
+                      handleAttendanceChange(student.rollNumber, "present")
+                    }
+                  />
+                </td>
+                <td>
+                  <input
+                    type="radio"
+                    checked={attendance[student.rollNumber] === "absent"}
+                    onChange={() =>
+                      handleAttendanceChange(student.rollNumber, "absent")
+                    }
+                  />
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {studentsData.map((student) => (
-                <tr key={student.rollNumber}>
-                  <td>{student.rollNumber}</td>
-                  <td>{student.name}</td>
-                  <td>
-                    <input
-                      type="radio"
-                      checked={attendance[student.rollNumber] === "present"}
-                      onChange={() =>
-                        handleAttendanceChange(student.rollNumber, "present")
-                      }
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="radio"
-                      className="absentStatus"
-                      checked={attendance[student.rollNumber] === "absent"}
-                      onChange={() =>
-                        handleAttendanceChange(student.rollNumber, "absent")
-                      }
-                    />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <button id="btn-submit" onClick={handleSubmit}>
-          Submit
+            ))}
+          </tbody>
+        </table>
+        <button
+          id="btn-submit"
+          onClick={handleSubmit}
+          disabled={isSubmitting}
+          style={{
+            backgroundColor: isSubmitting ? "#dcdcdc" : "#FF5733",
+            cursor: isSubmitting ? "not-allowed" : "pointer",
+          }}
+        >
+          {isSubmitting ? "Submitting..." : "Submit"}
         </button>
       </div>
     </div>
