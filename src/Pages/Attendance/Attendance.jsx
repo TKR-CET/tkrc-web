@@ -9,42 +9,38 @@ const Attendance = () => {
     const [date, setDate] = useState("2024-11-06");
     const [batch, setBatch] = useState("ALL");
     const [attendanceData, setAttendanceData] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
 
-    // Placeholder: Simulate fetching data from the backend
     useEffect(() => {
-        // Simulated API call to fetch attendance data
         fetchAttendanceData(batch, date);
     }, [batch, date]);
 
-  const fetchAttendanceData = async (selectedBatch, selectedDate) => {
-        console.log("Fetching attendance data for", selectedBatch, selectedDate);
-        const mockData = [
-            {
-                class: 26,
-                date: "28-10-24",
-                present: 6,
-                absentees: "20K91A0328, 20K91A0335, 20K91A0343",
-                topic: "CAD Basics",
-                remark: "",
-                no: 3,
-            },
-            {
-                class: 25,
-                date: "28-10-24",
-                present: 5,
-                absentees: "20K91A0328, 20K91A0335, 20K91A0343",
-                topic: "CAM Basics",
-                remark: "",
-                no: 2,
-            },
-        ];
-        setAttendanceData(mockData); // Simulated data
+    const fetchAttendanceData = async (selectedBatch, selectedDate) => {
+        setLoading(true);
+        setError("");
+
+        try {
+            const response = await fetch(
+                http://your-backend-url/api/attendance?batch=${selectedBatch}&date=${selectedDate}
+            );
+            
+            if (!response.ok) {
+                throw new Error("Failed to fetch attendance data");
+            }
+
+            const data = await response.json();
+            setAttendanceData(data);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
     };
 
-
-    const handleEdit = (row) => {
-        console.log("Edit row:", row);
-        alert(`Edit functionality is not implemented yet for class ${row.class}.`);
+    const handleEdit = async (row) => {
+        alert(Edit functionality for class ${row.class} is not yet implemented.);
+        // Future: Implement editing logic to send data to the backend
     };
 
     return (
@@ -83,42 +79,47 @@ const Attendance = () => {
                         </Link>
                     </div>
                 </div>
-                <ul className="container">
-                    <li className="section">Subject: CAD/CAM Lab</li>
-                    <li className="section">Section: IV ME I A (2024-25)</li>
-                </ul>
-                <div className="attendance-table-wrapper">
-                    <table className="attendance-table">
-                        <thead>
-                            <tr>
-                                <th>Class</th>
-                                <th>Date</th>
-                                <th>P</th>
-                                <th>Absentees</th>
-                                <th>Topic</th>
-                                <th>Remark</th>
-                                <th>No.</th>
-                                <th>Update</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {attendanceData.map((row, index) => (
-                                <tr key={index}>
-                                    <td>{row.class}</td>
-                                    <td>{row.date}</td>
-                                    <td>{row.present}</td>
-                                    <td className="absentee-list">{row.absentees}</td>
-                                    <td>{row.topic}</td>
-                                    <td>{row.remark}</td>
-                                    <td>{row.no}</td>
-                                    <td className="edit-button" onClick={() => handleEdit(row)}>
-                                        Edit
-                                    </td>
+                {loading ? (
+                    <p>Loading...</p>
+                ) : error ? (
+                    <p className="error">{error}</p>
+                ) : (
+                    <div className="attendance-table-wrapper">
+                        <table className="attendance-table">
+                            <thead>
+                                <tr>
+                                    <th>Class</th>
+                                    <th>Date</th>
+                                    <th>P</th>
+                                    <th>Absentees</th>
+                                    <th>Topic</th>
+                                    <th>Remark</th>
+                                    <th>No.</th>
+                                    <th>Update</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
+                            </thead>
+                            <tbody>
+                                {attendanceData.map((row, index) => (
+                                    <tr key={index}>
+                                        <td>{row.class}</td>
+                                        <td>{row.date}</td>
+                                        <td>{row.present}</td>
+                                        <td className="absentee-list">{row.absentees}</td>
+                                        <td>{row.topic}</td>
+                                        <td>{row.remark}</td>
+                                        <td>{row.no}</td>
+                                        <td
+                                            className="edit-button"
+                                            onClick={() => handleEdit(row)}
+                                        >
+                                            Edit
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
             </div>
         </div>
     );
