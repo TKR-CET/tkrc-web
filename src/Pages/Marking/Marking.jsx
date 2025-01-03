@@ -71,21 +71,21 @@ const Marking = () => {
   };
 
   return (
-    <div>
+    <div style={styles.container}>
       <Header />
-      <div className="nav">
+      <div style={styles.nav}>
         <NavBar />
       </div>
-      <div className="mob-nav">
+      <div style={styles.mobileNav}>
         <MobileNav />
       </div>
-      <div className="attendanceMain">
-        <h2 className="attendanceHeading">Attendance on {date}</h2>
-        <div className="attendanceDetails">
-          <div className="periodSelection">
-            <label>Periods:</label>
+      <div style={styles.main}>
+        <h2 style={styles.heading}>Attendance on {date}</h2>
+        <div style={styles.details}>
+          <div style={styles.periodSection}>
+            <label style={styles.label}>Periods:</label>
             {[1, 2, 3, 4, 5, 6].map((period) => (
-              <label key={period}>
+              <label key={period} style={styles.periodLabel}>
                 <input
                   type="checkbox"
                   checked={periods.includes(period)}
@@ -95,43 +95,52 @@ const Marking = () => {
               </label>
             ))}
           </div>
-          <div className="subjectTopicEntry">
-            <label htmlFor="subject">Subject:</label>
+          <div style={styles.inputSection}>
+            <label style={styles.label} htmlFor="subject">
+              Subject:
+            </label>
             <input
               type="text"
               id="subject"
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
+              style={styles.input}
             />
-            <label htmlFor="topic">Topic:</label>
+            <label style={styles.label} htmlFor="topic">
+              Topic:
+            </label>
             <textarea
               id="topic"
               value={topic}
               onChange={(e) => setTopic(e.target.value)}
+              style={styles.textarea}
             />
-            <label htmlFor="remarks">Remarks:</label>
+            <label style={styles.label} htmlFor="remarks">
+              Remarks:
+            </label>
             <textarea
               id="remarks"
               value={remarks}
               onChange={(e) => setRemarks(e.target.value)}
+              style={styles.textarea}
             />
           </div>
         </div>
-        <table className="attendanceList">
+        <table style={styles.table}>
           <thead>
             <tr>
-              <th>Roll Number</th>
-              <th>Student Name</th>
-              <th>Present</th>
-              <th>Absent</th>
+              <th style={styles.tableHeader}>Roll Number</th>
+              <th style={styles.tableHeader}>Student Name</th>
+              <th style={styles.tableHeader}>Present</th>
+              <th style={styles.tableHeader}>Absent</th>
             </tr>
           </thead>
           <tbody>
             {studentsData.map((student) => (
               <tr key={student.rollNumber}>
-                <td>{student.rollNumber}</td>
-                <td>{student.name}</td>
-                <td>
+                <td style={styles.tableCell}>{student.rollNumber}</td>
+                <td style={styles.tableCell}>{student.name}</td>
+                <td style={styles.tableCell}>
                   <input
                     type="radio"
                     checked={attendance[student.rollNumber] === "present"}
@@ -140,7 +149,7 @@ const Marking = () => {
                     }
                   />
                 </td>
-                <td>
+                <td style={styles.tableCell}>
                   <input
                     type="radio"
                     checked={attendance[student.rollNumber] === "absent"}
@@ -153,12 +162,102 @@ const Marking = () => {
             ))}
           </tbody>
         </table>
-        <button id="btn-submit" onClick={handleSubmit}>
+        <button style={styles.submitButton} onClick={handleSubmit}>
           Submit
         </button>
       </div>
     </div>
   );
+};
+
+const styles = {
+  container: {
+    fontFamily: "Arial, sans-serif",
+    margin: 0,
+    padding: 0,
+    boxSizing: "border-box",
+  },
+  nav: {
+    display: "flex",
+    justifyContent: "space-between",
+    padding: "10px",
+    backgroundColor: "#333",
+    color: "white",
+  },
+  mobileNav: {
+    display: "none",
+  },
+  main: {
+    margin: "20px auto",
+    maxWidth: "900px",
+    padding: "20px",
+    border: "1px solid #ddd",
+    borderRadius: "8px",
+    backgroundColor: "#f9f9f9",
+  },
+  heading: {
+    fontSize: "24px",
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: "20px",
+  },
+  details: {
+    marginBottom: "20px",
+  },
+  periodSection: {
+    marginBottom: "10px",
+  },
+  periodLabel: {
+    marginRight: "10px",
+  },
+  inputSection: {
+    display: "flex",
+    flexDirection: "column",
+    marginBottom: "20px",
+  },
+  label: {
+    fontWeight: "bold",
+    marginBottom: "5px",
+  },
+  input: {
+    marginBottom: "10px",
+    padding: "8px",
+    borderRadius: "4px",
+    border: "1px solid #ccc",
+    width: "100%",
+  },
+  textarea: {
+    marginBottom: "10px",
+    padding: "8px",
+    borderRadius: "4px",
+    border: "1px solid #ccc",
+    width: "100%",
+    resize: "none",
+  },
+  table: {
+    width: "100%",
+    borderCollapse: "collapse",
+    marginBottom: "20px",
+  },
+  tableHeader: {
+    border: "1px solid #ddd",
+    padding: "8px",
+    backgroundColor: "#333",
+    color: "white",
+    textAlign: "left",
+  },
+  tableCell: {
+    border: "1px solid #ddd",
+    padding: "8px",
+  },
+  submitButton: {
+    padding: "10px 20px",
+    backgroundColor: "#28a745",
+    color: "white",
+    border: "none",
+    borderRadius: "4px",
+    cursor: "pointer",
+  },
 };
 
 export default Marking;
