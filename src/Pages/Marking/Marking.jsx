@@ -108,10 +108,33 @@ const Marking = () => {
            border-radius: 4px;
          }
 
+         .periodSelection {
+           display: flex;
+           flex-wrap: wrap;
+           gap: 10px;
+           margin-bottom: 15px;
+         }
+
+         .periodSelection label {
+           display: flex;
+           align-items: center;
+           font-size: 14px;
+           cursor: pointer;
+         }
+
+         .periodSelection input {
+           margin-right: 8px;
+         }
+
+         .tableWrapper {
+           overflow-x: auto;
+           margin-top: 20px;
+         }
+
          .attendanceList {
            width: 100%;
            border-collapse: collapse;
-           margin-top: 20px;
+           min-width: 600px;
          }
 
          .attendanceList th,
@@ -159,6 +182,23 @@ const Marking = () => {
          #btn-submit:hover {
            background-color: #ff704d;
          }
+
+         @media (max-width: 768px) {
+           .periodSelection {
+             gap: 5px;
+           }
+
+           .attendanceList th,
+           .attendanceList td {
+             font-size: 12px;
+             padding: 8px;
+           }
+
+           .attendanceList input[type="radio"] {
+             width: 20px;
+             height: 20px;
+           }
+         }
         `}
       </style>
       <Header />
@@ -171,8 +211,7 @@ const Marking = () => {
       <div className="attendanceMain">
         <h2 className="attendanceHeading">Attendance on {date}</h2>
         <div className="attendanceDetails">
-          <div>
-            <label>Periods:</label>
+          <div className="periodSelection">
             {[1, 2, 3, 4, 5, 6].map((period) => (
               <label key={period}>
                 <input
@@ -180,7 +219,7 @@ const Marking = () => {
                   checked={periods.includes(period)}
                   onChange={() => handlePeriodChange(period)}
                 />
-                {period}
+                Period {period}
               </label>
             ))}
           </div>
@@ -201,43 +240,45 @@ const Marking = () => {
             onChange={(e) => setRemarks(e.target.value)}
           />
         </div>
-        <table className="attendanceList">
-          <thead>
-            <tr>
-              <th>Roll Number</th>
-              <th>Student Name</th>
-              <th>Present</th>
-              <th>Absent</th>
-            </tr>
-          </thead>
-          <tbody>
-            {studentsData.map((student) => (
-              <tr key={student.rollNumber}>
-                <td>{student.rollNumber}</td>
-                <td>{student.name}</td>
-                <td>
-                  <input
-                    type="radio"
-                    checked={attendance[student.rollNumber] === "present"}
-                    onChange={() =>
-                      handleAttendanceChange(student.rollNumber, "present")
-                    }
-                  />
-                </td>
-                <td>
-                  <input
-                    type="radio"
-                    className="absentStatus"
-                    checked={attendance[student.rollNumber] === "absent"}
-                    onChange={() =>
-                      handleAttendanceChange(student.rollNumber, "absent")
-                    }
-                  />
-                </td>
+        <div className="tableWrapper">
+          <table className="attendanceList">
+            <thead>
+              <tr>
+                <th>Roll Number</th>
+                <th>Student Name</th>
+                <th>Present</th>
+                <th>Absent</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {studentsData.map((student) => (
+                <tr key={student.rollNumber}>
+                  <td>{student.rollNumber}</td>
+                  <td>{student.name}</td>
+                  <td>
+                    <input
+                      type="radio"
+                      checked={attendance[student.rollNumber] === "present"}
+                      onChange={() =>
+                        handleAttendanceChange(student.rollNumber, "present")
+                      }
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="radio"
+                      className="absentStatus"
+                      checked={attendance[student.rollNumber] === "absent"}
+                      onChange={() =>
+                        handleAttendanceChange(student.rollNumber, "absent")
+                      }
+                    />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
         <button id="btn-submit" onClick={handleSubmit}>
           Submit
         </button>
