@@ -22,9 +22,9 @@ const Attendance = () => {
 
         try {
             const response = await fetch(
-                http:http://127.0.0.1:8000/api/attendance/?batch=${selectedBatch}&date=${selectedDate}
+                http://localhost:5000/attendance/attendance-get?batch=${selectedBatch}&date=${selectedDate}
             );
-            
+
             if (!response.ok) {
                 throw new Error("Failed to fetch attendance data");
             }
@@ -38,9 +38,9 @@ const Attendance = () => {
         }
     };
 
-    const handleEdit = async (row) => {
-        alert(Edit functionality for class ${row.class} is not yet implemented.);
-        // Future: Implement editing logic to send data to the backend
+    const handleEdit = (row) => {
+        alert(Edit functionality is not yet implemented for class ${row.class}.);
+        // You can add logic to send updates to the backend here
     };
 
     return (
@@ -79,6 +79,10 @@ const Attendance = () => {
                         </Link>
                     </div>
                 </div>
+                <ul className="container">
+                    <li className="section">Subject: CAD/CAM Lab</li>
+                    <li className="section">Section: IV ME I A (2024-25)</li>
+                </ul>
                 {loading ? (
                     <p>Loading...</p>
                 ) : error ? (
