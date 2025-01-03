@@ -87,6 +87,45 @@ const Marking = () => {
            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
          }
 
+         .attendanceHeading {
+           font-size: 19px;
+           font-weight: bold;
+           text-align: center;
+           margin-bottom: 15px;
+         }
+
+         .attendanceDetails label {
+           display: block;
+           margin: 8px 0 4px;
+         }
+
+         .attendanceDetails input,
+         .attendanceDetails textarea {
+           width: 100%;
+           padding: 8px;
+           margin-bottom: 10px;
+           border: 1px solid #ccc;
+           border-radius: 4px;
+         }
+
+         .attendanceList {
+           width: 100%;
+           border-collapse: collapse;
+           margin-top: 20px;
+         }
+
+         .attendanceList th,
+         .attendanceList td {
+           text-align: center;
+           padding: 10px;
+           border: 1.5px solid #ddd;
+         }
+
+         .attendanceList th {
+           background-color: #f7f7f7;
+           font-weight: bold;
+         }
+
          .attendanceList input[type="radio"] {
            appearance: none;
            width: 25px;
@@ -105,6 +144,21 @@ const Marking = () => {
            background-color: #e74c3c; /* Red for Absent */
            border-color: #e74c3c;
          }
+
+         #btn-submit {
+           background-color: #FF5733;
+           color: white;
+           padding: 10px 20px;
+           border: none;
+           border-radius: 5px;
+           cursor: pointer;
+           font-size: 16px;
+           margin: 20px 0;
+         }
+
+         #btn-submit:hover {
+           background-color: #ff704d;
+         }
         `}
       </style>
       <Header />
@@ -115,7 +169,38 @@ const Marking = () => {
         <MobileNav />
       </div>
       <div className="attendanceMain">
-        <h2>Attendance on {date}</h2>
+        <h2 className="attendanceHeading">Attendance on {date}</h2>
+        <div className="attendanceDetails">
+          <div>
+            <label>Periods:</label>
+            {[1, 2, 3, 4, 5, 6].map((period) => (
+              <label key={period}>
+                <input
+                  type="checkbox"
+                  checked={periods.includes(period)}
+                  onChange={() => handlePeriodChange(period)}
+                />
+                {period}
+              </label>
+            ))}
+          </div>
+          <label>Subject:</label>
+          <input
+            type="text"
+            value={subject}
+            onChange={(e) => setSubject(e.target.value)}
+          />
+          <label>Topic:</label>
+          <textarea
+            value={topic}
+            onChange={(e) => setTopic(e.target.value)}
+          />
+          <label>Remarks:</label>
+          <textarea
+            value={remarks}
+            onChange={(e) => setRemarks(e.target.value)}
+          />
+        </div>
         <table className="attendanceList">
           <thead>
             <tr>
