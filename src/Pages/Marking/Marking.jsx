@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Header from "../../Components/Header/Header";
 import NavBar from "../../Components/NavBar/NavBar";
 import MobileNav from "../../Components/MobileNav/MobileNav";
-import { Link, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 const Marking = () => {
   const location = useLocation();
@@ -55,8 +55,14 @@ const Marking = () => {
       subject,
       topic,
       remarks,
-      attendance,
+      attendance: studentsData.map((student) => ({
+        rollNumber: student.rollNumber,
+        name: student.name,
+        status: attendance[student.rollNumber],
+      })),
     };
+
+    console.log("Submitting Data:", attendanceData); // Debugging output
 
     try {
       const response = await fetch("http://localhost:5000/attendance/mark-attendance", {
@@ -67,8 +73,12 @@ const Marking = () => {
         body: JSON.stringify(attendanceData),
       });
 
+      console.log("API Response Status:", response.status);
+
       if (!response.ok) {
-        throw new Error("Failed to submit attendance");
+        const errorDetails = await response.json();
+        console.error("Error from API:", errorDetails);
+        throw new Error(errorDetails.message || "Failed to submit attendance");
       }
 
       alert("Attendance submitted successfully!");
@@ -82,7 +92,7 @@ const Marking = () => {
 
   return (
     <div>
-      <style>{`
+            <style>{`
     .attendanceMain {
     padding: 20px;
     background-color: #fff;
@@ -279,7 +289,6 @@ const Marking = () => {
     }
   }
       `}</style>
-
       <Header />
       <div className="nav">
         <NavBar />
@@ -288,9 +297,7 @@ const Marking = () => {
         <MobileNav />
       </div>
       <div className="attendanceMain">
-        <p className="compulsoryText">
-          * You must select Period(s) and provide a Topic.
-        </p>
+        <p className="compulsoryText">* You must select Period(s) and provide a Topic.</p>
         <h2 className="attendanceHeading">Attendance on {date}</h2>
         <div className="attendanceDetails">
           <div className="periodSelection">
@@ -350,21 +357,17 @@ const Marking = () => {
                   <input
                     type="radio"
                     checked={attendance[student.rollNumber] === "present"}
-                    onChange={() =>
-                      handleAttendanceChange(student.rollNumber, "present")
-                    }
+                    onChange={() => handleAttendanceChange(student.rollNumber, "present")}
                   />
                 </td>
-<td>
-  <input
-    type="radio"
-    className={attendance[student.rollNumber] === "absent" ? "absentStatus" : ""}
-    checked={attendance[student.rollNumber] === "absent"}
-    onChange={() =>
-      handleAttendanceChange(student.rollNumber, "absent")
-    }
-  />
-</td>
+                <td>
+                  <input
+                    type="radio"
+                    className={attendance[student.rollNumber] === "absent" ? "absentStatus" : ""}
+                    checked={attendance[student.rollNumber] === "absent"}
+                    onChange={() => handleAttendanceChange(student.rollNumber, "absent")}
+                  />
+                </td>
               </tr>
             ))}
           </tbody>
@@ -373,10 +376,6 @@ const Marking = () => {
           id="btn-submit"
           onClick={handleSubmit}
           disabled={isSubmitting}
-          style={{
-            backgroundColor: isSubmitting ? "#dcdcdc" : "#FF5733",
-            cursor: isSubmitting ? "not-allowed" : "pointer",
-          }}
         >
           {isSubmitting ? "Submitting..." : "Submit"}
         </button>
