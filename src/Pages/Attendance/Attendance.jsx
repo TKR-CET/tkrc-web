@@ -22,7 +22,7 @@ const Attendance = () => {
 
     try {
       const response = await fetch(
-        ` http://127.0.0.1:8000/api/attendance?batch=${selectedBatch}&date=${selectedDate}
+        ` https://tkrcet-backend.onrender.com/attendance/fetch-attendance?batch=${selectedBatch}&date=${selectedDate}
 `
       );
 
