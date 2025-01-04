@@ -1,13 +1,16 @@
-import BASE_URL from './config';
+import React, { useEffect, useState } from 'react';
 
-const fetchData = async () => {
-  try {
-    const response = await fetch(`${BASE_URL}/api/example/`);
-    const data = await response.json();
-    console.log(data);
-  } catch (error) {
-    console.error("Error fetching data:", error);
-  }
+const App = () => {
+    const [message, setMessage] = useState('');
+
+    useEffect(() => {
+        fetch('http://127.0.0.1:8000/api/hello/')
+            .then((response) => response.json())
+            .then((data) => setMessage(data.message))
+            .catch((error) => console.error('Error:', error));
+    }, []);
+
+    return <div>{message}</div>;
 };
 
-fetchData();
+export default App;
