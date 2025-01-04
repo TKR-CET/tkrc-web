@@ -22,7 +22,8 @@ const Attendance = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/attendance/fetch-attendance?date=${selectedDate}`
+        ` http://127.0.0.1:8000/api/attendance?batch=${selectedBatch}&date=${selectedDate}
+`
       );
 
       if (!response.ok) {
