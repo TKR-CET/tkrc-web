@@ -26,13 +26,19 @@ const Attendance = () => {
       );
 
       if (!response.ok) {
-        throw new Error("Failed to fetch attendance data");
+        throw new Error(`Failed to fetch attendance data: ${response.status}`);
       }
 
       const data = await response.json();
+
+      if (!Array.isArray(data)) {
+        throw new Error("Invalid data format: Expected an array.");
+      }
+
       setAttendanceData(data);
     } catch (err) {
-      setError(err.message);
+      console.error("Fetch error:", err);
+      setError(err.message || "An unknown error occurred.");
     } finally {
       setLoading(false);
     }
@@ -84,30 +90,34 @@ const Attendance = () => {
           <p className="error">{error}</p>
         ) : (
           <div className="attendance-table-wrapper">
-            <table className="attendance-table">
-              <thead>
-                <tr>
-                  <th>Class</th>
-                  <th>Date</th>
-                  <th>P</th>
-                  <th>Absentees</th>
-                  <th>Topic</th>
-                  <th>Remark</th>
-                </tr>
-              </thead>
-              <tbody>
-                {attendanceData.map((record, index) => (
-                  <tr key={index}>
-                    <td>{record.class}</td>
-                    <td>{record.date}</td>
-                    <td>{record.present}</td>
-                    <td>{record.absentees}</td>
-                    <td>{record.topic}</td>
-                    <td>{record.remark}</td>
+            {attendanceData.length > 0 ? (
+              <table className="attendance-table">
+                <thead>
+                  <tr>
+                    <th>Class</th>
+                    <th>Date</th>
+                    <th>P</th>
+                    <th>Absentees</th>
+                    <th>Topic</th>
+                    <th>Remark</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {attendanceData.map((record, index) => (
+                    <tr key={index}>
+                      <td>{record.class}</td>
+                      <td>{record.date}</td>
+                      <td>{record.present}</td>
+                      <td>{record.absentees}</td>
+                      <td>{record.topic}</td>
+                      <td>{record.remark}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <p>No attendance data available for the selected date.</p>
+            )}
           </div>
         )}
       </div>
