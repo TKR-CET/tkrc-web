@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import "./Attendance.css"; 
+import "./Attendance.css";
 import Header from "../../Components/Header/Header";
 import NavBar from "../../Components/NavBar/NavBar";
 import MobileNav from "../../Components/MobileNav/MobileNav.jsx";
@@ -29,15 +29,16 @@ const Attendance = () => {
         throw new Error(`Failed to fetch attendance data: ${response.status}`);
       }
 
-      const data = await response.json();
+      const { data } = await response.json();
+      console.log("Fetched Data:", data);
 
-      if (!Array.isArray(data)) {
+      if (Array.isArray(data)) {
+        setAttendanceData(data);
+      } else {
         throw new Error("Invalid data format: Expected an array.");
       }
-
-      setAttendanceData(data);
     } catch (err) {
-      console.error("Fetch error:", err);
+      console.error(err);
       setError(err.message || "An unknown error occurred.");
     } finally {
       setLoading(false);
@@ -90,34 +91,33 @@ const Attendance = () => {
           <p className="error">{error}</p>
         ) : (
           <div className="attendance-table-wrapper">
-            {attendanceData.length > 0 ? (
-              <table className="attendance-table">
-                <thead>
-                  <tr>
-                    <th>Class</th>
-                    <th>Date</th>
-                    <th>P</th>
-                    <th>Absentees</th>
-                    <th>Topic</th>
-                    <th>Remark</th>
+            <table className="attendance-table">
+              <thead>
+                <tr>
+                  <th>Subject</th>
+                  <th>Date</th>
+                  <th>Absentees</th>
+                  <th>Topic</th>
+                  <th>Remarks</th>
+                </tr>
+              </thead>
+              <tbody>
+                {attendanceData.map((record, index) => (
+                  <tr key={index}>
+                    <td>{record.subject}</td>
+                    <td>{record.date}</td>
+                    <td>
+                      {record.attendance
+                        .filter((att) => att.status === "absent")
+                        .map((att) => att.rollNumber)
+                        .join(", ")}
+                    </td>
+                    <td>{record.topic}</td>
+                    <td>{record.remarks}</td>
                   </tr>
-                </thead>
-                <tbody>
-                  {attendanceData.map((record, index) => (
-                    <tr key={index}>
-                      <td>{record.class}</td>
-                      <td>{record.date}</td>
-                      <td>{record.present}</td>
-                      <td>{record.absentees}</td>
-                      <td>{record.topic}</td>
-                      <td>{record.remark}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            ) : (
-              <p>No attendance data available for the selected date.</p>
-            )}
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
       </div>
