@@ -2,6 +2,8 @@ import React, { useState , useEffect } from 'react';
 import './Homepage.css';
 import { Link } from "react-router-dom";
 
+import FetchExampleComponent from '../components/FetchExampleComponent'
+
 const Homepage = () => {
     const delegateInfo = {
         chairman: {
@@ -150,7 +152,9 @@ const Homepage = () => {
                     </div>
                 </div>
                   </div>
-
+             <div>
+              <FetchExampleComponent/>
+             </div>
 
 
          <footer className="footer">
