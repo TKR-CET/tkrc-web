@@ -5,7 +5,7 @@ import MobileNav from "../../Components/MobileNav/MobileNav";
 import { useLocation } from "react-router-dom";
 
 const Marking = () => {
-  const location = useLocation();
+   const location = useLocation();
   const query = new URLSearchParams(location.search);
   const date = query.get("date") || new Date().toISOString().split("T")[0];
 
