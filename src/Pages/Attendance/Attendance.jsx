@@ -22,8 +22,7 @@ const Attendance = () => {
 
     try {
       const response = await fetch(
-        ` https://tkrcet-backend.onrender.com/attendance/fetch-attendance?batch=${selectedBatch}&date=${selectedDate}
-`
+        `https://tkrcet-backend.onrender.com/attendance/fetch-attendance?batch=${selectedBatch}&date=${selectedDate}`
       );
 
       if (!response.ok) {
@@ -31,19 +30,28 @@ const Attendance = () => {
       }
 
       const { data } = await response.json();
-      console.log("Fetched Data:", data);
-
       if (Array.isArray(data)) {
         setAttendanceData(data);
       } else {
         throw new Error("Invalid data format: Expected an array.");
       }
     } catch (err) {
-      console.error(err);
       setError(err.message || "An unknown error occurred.");
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleEdit = (row) => {
+    const queryParams = new URLSearchParams({
+      date: row.date,
+      periods: row.periods.join(","),
+    }).toString();
+    window.location.href = `/mark?${queryParams}`;
+  };
+
+  const isPeriodTaken = (period) => {
+    return attendanceData.some((record) => record.periods.includes(period));
   };
 
   return (
@@ -82,10 +90,6 @@ const Attendance = () => {
             </Link>
           </div>
         </div>
-        <ul className="container">
-          <li className="section">Subject: CAD/CAM Lab</li>
-          <li className="section">Section: IV ME I A (2024-25)</li>
-        </ul>
         {loading ? (
           <p>Loading...</p>
         ) : error ? (
@@ -97,9 +101,10 @@ const Attendance = () => {
                 <tr>
                   <th>Subject</th>
                   <th>Date</th>
-                  <th>Absentees</th>
+                  <th>Periods</th>
                   <th>Topic</th>
                   <th>Remarks</th>
+                  <th>Edit</th>
                 </tr>
               </thead>
               <tbody>
@@ -107,14 +112,12 @@ const Attendance = () => {
                   <tr key={index}>
                     <td>{record.subject}</td>
                     <td>{record.date}</td>
-                    <td>
-                      {record.attendance
-                        .filter((att) => att.status === "absent")
-                        .map((att) => att.rollNumber)
-                        .join(", ")}
-                    </td>
+                    <td>{record.periods.join(", ")}</td>
                     <td>{record.topic}</td>
                     <td>{record.remarks}</td>
+                    <td>
+                      <button onClick={() => handleEdit(record)}>Edit</button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
