@@ -187,8 +187,12 @@ const Marking = () => {
           }
         }
       `}</style>
+      <div class="nav">
       <NavBar />
+        </div>
+      <div class="mob-nav">
       <MobileNav />
+        </div>
       <div className="attendanceMain">
         <h2 className="attendanceHeading">Mark Attendance for {date}</h2>
         <div>
