@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import Header from "../../Components/Header/Header";
 import NavBar from "../../Components/NavBar/NavBar";
 import MobileNav from "../../Components/MobileNav/MobileNav";
-
+import "./Attendance.css";
 const Attendance = () => {
   const [attendanceData, setAttendanceData] = useState([]);
 
