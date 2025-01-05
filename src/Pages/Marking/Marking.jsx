@@ -74,7 +74,7 @@ const Marking = () => {
     };
 
     try {
-      const response = await fetch("http://localhost:5000/attendance/mark-attendance", {
+      const response = await fetch("https://tkrcet-backend.onrender.com/attendance/mark-attendance", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
