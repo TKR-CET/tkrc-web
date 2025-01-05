@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./Attendance.css";
 import Header from "../../Components/Header/Header";
 import NavBar from "../../Components/NavBar/NavBar";
-import MobileNav from "../../Components/MobileNav/MobileNav.jsx";
+import MobileNav from "../../Components/MobileNav/MobileNav";
 
 const Attendance = () => {
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
@@ -11,6 +11,7 @@ const Attendance = () => {
   const [attendanceData, setAttendanceData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchAttendanceData(batch, date);
@@ -19,6 +20,7 @@ const Attendance = () => {
   const fetchAttendanceData = async (selectedBatch, selectedDate) => {
     setLoading(true);
     setError("");
+    setAttendanceData([]); // Clear data while loading new data.
 
     try {
       const response = await fetch(
@@ -47,22 +49,14 @@ const Attendance = () => {
       date: row.date,
       periods: row.periods.join(","),
     }).toString();
-    window.location.href = `/mark?${queryParams}`;
-  };
-
-  const isPeriodTaken = (period) => {
-    return attendanceData.some((record) => record.periods.includes(period));
+    navigate(`/mark?${queryParams}`);
   };
 
   return (
     <div>
       <Header />
-      <div className="nav">
-        <NavBar />
-      </div>
-      <div className="mob-nav">
-        <MobileNav />
-      </div>
+      <NavBar />
+      <MobileNav />
       <div className="content">
         <div className="title-bar">
           <div className="batch-date-selectors">
@@ -94,7 +88,7 @@ const Attendance = () => {
           <p>Loading...</p>
         ) : error ? (
           <p className="error">{error}</p>
-        ) : (
+        ) : attendanceData.length > 0 ? (
           <div className="attendance-table-wrapper">
             <table className="attendance-table">
               <thead>
@@ -123,6 +117,8 @@ const Attendance = () => {
               </tbody>
             </table>
           </div>
+        ) : (
+          <p>No attendance records found for the selected batch and date.</p>
         )}
       </div>
     </div>
