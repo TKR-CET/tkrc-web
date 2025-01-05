@@ -1,10 +1,8 @@
- import React, { useState, useEffect } from "react";
-import Header from "../../Components/Header/Header";
-import NavBar from "../../Components/NavBar/NavBar";
-import MobileNav from "../../Components/MobileNav/MobileNav";
-import { useLocation } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const Marking = () => {
+  const navigate = useNavigate();
   const location = useLocation();
   const query = new URLSearchParams(location.search);
   const date = query.get("date") || new Date().toISOString().split("T")[0];
@@ -47,6 +45,13 @@ const Marking = () => {
 
   const isPeriodDisabled = (period) => existingData.includes(period);
 
+  const handleAttendanceChange = (rollNumber, status) => {
+    setAttendance((prev) => ({
+      ...prev,
+      [rollNumber]: status,
+    }));
+  };
+
   const handleSubmit = async () => {
     if (!subject || !topic || periods.length === 0) {
       alert("Please fill in all mandatory fields (Periods, Subject, Topic).");
@@ -69,7 +74,7 @@ const Marking = () => {
     };
 
     try {
-      const response = await fetch("https://tkrcet-backend.onrender.com/attendance/mark-attendance", {
+      const response = await fetch("http://localhost:5000/attendance/mark-attendance", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -83,104 +88,16 @@ const Marking = () => {
       }
 
       alert("Attendance submitted successfully!");
+      navigate("/attendance"); // Redirect to Attendance.js
     } catch (error) {
       alert(error.message || "An error occurred while submitting attendance.");
     } finally {
       setIsSubmitting(false);
     }
   };
- const handleAttendanceChange = (rollNumber, status) => {
-  setAttendance((prev) => ({
-    ...prev,
-    [rollNumber]: status,
-  }));
-};
 
   return (
     <>
-      <div>
-    <div>
-        <style>{`
-    .attendanceMain {
-    padding: 20px;
-    background-color: #fff;
-    margin: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  }
-
-  .compulsoryText {
-    color: red;
-    font-weight: bold;
-  }
-
-  .attendanceHeading {
-    font-size: 19px;
-    font-weight: bold;
-    padding-top:5px;
-    margin-top:4px;
-    margin-bottom: 15px;
-    text-align: center;
-  }
-
-  .attendanceDetails {
-    margin-bottom: 20px;
-  }
-
-  .periodSelection {
-    margin-bottom: 15px;
-  }
-
-  .periodSelection label {
-    font-size: 14px;
-    margin-right: 10px;
-  }
-
-  .periodSelection input[type="checkbox"] {
-    margin-right: 6px;
-    width: 18px;
-    height: 18px;
-    cursor: pointer;
-    display: inline-block;
-  }
-
-  .subjectTopicEntry label {
-    font-size: 14px;
-    margin-top: 8px;
-    display: block;
-  }
-
-  .subjectTopicEntry input,
-  .subjectTopicEntry textarea {
-    font-size: 14px;
-    padding: 8px;
-    margin-top: 6px;
-    margin-bottom: 12px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    width: 100%;
-  }
-
-  .subjectTopicEntry textarea {
-    height: 80px;
-    resize: vertical;
-  }
-
-  #btn-submit {
-    background-color: #FF5733;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    position: relative;
-    top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    text-align: center;
-  }
-
   #btn-submit:hover {
     background-color: #ff704d;
   }
@@ -297,6 +214,14 @@ const Marking = () => {
     }
   }
       `}</style>
+      <div>
+        width: 100%;
+      left: 0;
+      transform: none;
+      top: 0;
+    }
+  }
+      `}</style>
       <Header />
       <div className="nav">
         <NavBar />
@@ -387,7 +312,6 @@ const Marking = () => {
           {isSubmitting ? "Submitting..." : "Submit"}
         </button>
       </div>
-    </div>
     </>
   );
 };
