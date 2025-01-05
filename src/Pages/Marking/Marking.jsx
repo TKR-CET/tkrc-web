@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import Header from "../../Components/Header/Header";
+import NavBar from "../../Components/NavBar/NavBar";
+import MobileNav from "../../Components/MobileNav/MobileNav";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const Marking = () => {
   const navigate = useNavigate();
@@ -97,10 +100,89 @@ const Marking = () => {
   };
 
   return (
-
     <>
-      <div>
+      <Header />
 <style>{`
+    .attendanceMain {
+    padding: 20px;
+    background-color: #fff;
+    margin: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+
+  .compulsoryText {
+    color: red;
+    font-weight: bold;
+  }
+
+  .attendanceHeading {
+    font-size: 19px;
+    font-weight: bold;
+    padding-top:5px;
+    margin-top:4px;
+    margin-bottom: 15px;
+    text-align: center;
+  }
+
+  .attendanceDetails {
+    margin-bottom: 20px;
+  }
+
+  .periodSelection {
+    margin-bottom: 15px;
+  }
+
+  .periodSelection label {
+    font-size: 14px;
+    margin-right: 10px;
+  }
+
+  .periodSelection input[type="checkbox"] {
+    margin-right: 6px;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    display: inline-block;
+  }
+
+  .subjectTopicEntry label {
+    font-size: 14px;
+    margin-top: 8px;
+    display: block;
+  }
+
+  .subjectTopicEntry input,
+  .subjectTopicEntry textarea {
+    font-size: 14px;
+    padding: 8px;
+    margin-top: 6px;
+    margin-bottom: 12px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    width: 100%;
+  }
+
+  .subjectTopicEntry textarea {
+    height: 80px;
+    resize: vertical;
+  }
+
+  #btn-submit {
+    background-color: #FF5733;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    position: relative;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+  }
+
   #btn-submit:hover {
     background-color: #ff704d;
   }
@@ -217,9 +299,6 @@ const Marking = () => {
     }
   }
       `}</style>
-     
-      
-      <Header />
       <div className="nav">
         <NavBar />
       </div>
@@ -243,34 +322,33 @@ const Marking = () => {
                   );
                 }}
               />
-              {period} {isPeriodDisabled(period) && "marked"}
+              {period} {isPeriodDisabled(period) && "(Already marked)"}
             </label>
           ))}
         </div>
-         <div className="subjectTopicEntry">
-            <label htmlFor="input-subject">Subject:</label>
-            <input
-              type="text"
-              id="input-subject"
-              placeholder="Enter Subject"
-              value={subject}
-              onChange={(e) => setSubject(e.target.value)}
-            />
-            <label htmlFor="textarea-topic">Topic:</label>
-            <textarea
-              id="textarea-topic"
-              placeholder="Enter Topic"
-              value={topic}
-              onChange={(e) => setTopic(e.target.value)}
-            />
-            <label htmlFor="textarea-remarks">Remarks:</label>
-            <textarea
-              id="textarea-remarks"
-              placeholder="Enter Remarks"
-              value={remarks}
-              onChange={(e) => setRemarks(e.target.value)}
-            />
-          </div>
+        <div className="subjectTopicEntry">
+          <label htmlFor="input-subject">Subject:</label>
+          <input
+            type="text"
+            id="input-subject"
+            placeholder="Enter Subject"
+            value={subject}
+            onChange={(e) => setSubject(e.target.value)}
+          />
+          <label htmlFor="textarea-topic">Topic:</label>
+          <textarea
+            id="textarea-topic"
+            placeholder="Enter Topic"
+            value={topic}
+            onChange={(e) => setTopic(e.target.value)}
+          />
+          <label htmlFor="textarea-remarks">Remarks:</label>
+          <textarea
+            id="textarea-remarks"
+            placeholder="Enter Remarks"
+            value={remarks}
+            onChange={(e) => setRemarks(e.target.value)}
+          />
         </div>
         <table className="attendanceList">
           <thead>
@@ -287,20 +365,20 @@ const Marking = () => {
                 <td>{student.rollNumber}</td>
                 <td>{student.name}</td>
                 <td>
-  <input
-    type="radio"
-    checked={attendance[student.rollNumber] === "present"}
-    onChange={() => handleAttendanceChange(student.rollNumber, "present")}
-  />
-</td>
-<td>
-  <input
-    type="radio"
-    className={attendance[student.rollNumber] === "absent" ? "absentStatus" : ""}
-    checked={attendance[student.rollNumber] === "absent"}
-    onChange={() => handleAttendanceChange(student.rollNumber, "absent")}
-  />
-</td>
+                  <input
+                    type="radio"
+                    checked={attendance[student.rollNumber] === "present"}
+                    onChange={() => handleAttendanceChange(student.rollNumber, "present")}
+                  />
+                </td>
+                <td>
+                  <input
+                    type="radio"
+                    className={attendance[student.rollNumber] === "absent" ? "absentStatus" : ""}
+                    checked={attendance[student.rollNumber] === "absent"}
+                    onChange={() => handleAttendanceChange(student.rollNumber, "absent")}
+                  />
+                </td>
               </tr>
             ))}
           </tbody>
