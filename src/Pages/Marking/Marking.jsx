@@ -99,6 +99,7 @@ const Marking = () => {
   return (
 
     <>
+      <div>
 <style>{`
   #btn-submit:hover {
     background-color: #ff704d;
@@ -242,7 +243,7 @@ const Marking = () => {
                   );
                 }}
               />
-              {period} {isPeriodDisabled(period) && "(Already marked)"}
+              {period} {isPeriodDisabled(period) && " "}
             </label>
           ))}
         </div>
