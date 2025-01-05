@@ -243,7 +243,7 @@ const Marking = () => {
                   );
                 }}
               />
-              {period} {isPeriodDisabled(period) && " "}
+              {period} {isPeriodDisabled(period) && "marked"}
             </label>
           ))}
         </div>
