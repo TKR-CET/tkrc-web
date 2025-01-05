@@ -43,12 +43,13 @@ const Attendance = () => {
   };
 
   const handleEdit = (row) => {
-    const queryParams = new URLSearchParams({
-      date: row.date,
-      periods: row.periods.join(","),
-    }).toString();
-    window.location.href = `/mark?${queryParams}`;
-  };
+  const queryParams = new URLSearchParams({
+    id: row._id,
+    date: row.date,
+    periods: row.periods.join(","),
+  }).toString();
+  window.location.href = `/mark?${queryParams}`;
+};
 
   const isPeriodTaken = (period) => {
     return attendanceData.some((record) => record.periods.includes(period));
