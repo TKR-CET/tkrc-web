@@ -1,15 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import Header from "../../Components/Header/Header";
 import NavBar from "../../Components/NavBar/NavBar";
 import MobileNav from "../../Components/MobileNav/MobileNav";
-import { useLocation, useNavigate } from "react-router-dom";
 
 const Marking = () => {
   const location = useLocation();
-  const navigate = useNavigate(); // Initialize the navigate function
+  const navigate = useNavigate();
   const query = new URLSearchParams(location.search);
   const date = query.get("date") || new Date().toISOString().split("T")[0];
-  const selectedPeriods = query.get("periods")?.split(",") || [];
 
   const studentsData = [
     { rollNumber: "23891A6XYZ", name: "Name 1" },
@@ -24,49 +23,23 @@ const Marking = () => {
   }, {});
 
   const [attendance, setAttendance] = useState(initialAttendance);
-  const [periods, setPeriods] = useState(selectedPeriods);
+  const [periods, setPeriods] = useState([]);
   const [subject, setSubject] = useState("");
   const [topic, setTopic] = useState("");
   const [remarks, setRemarks] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [existingData, setExistingData] = useState([]);
-  const [editable, setEditable] = useState(false);
-
-  useEffect(() => {
-    const fetchExistingData = async () => {
-      try {
-        const response = await fetch(`https://tkrcet-backend.onrender.com/attendance/check?date=${date}`);
-        if (!response.ok) throw new Error("Failed to fetch existing data.");
-        const data = await response.json();
-
-        if (data && data.periods && data.attendance) {
-          setExistingData(data.periods || []);
-          setAttendance(
-            data.attendance.reduce((acc, student) => {
-              acc[student.rollNumber] = student.status;
-              return acc;
-            }, {})
-          );
-          setSubject(data.subject || "");
-          setTopic(data.topic || "");
-          setRemarks(data.remarks || "");
-          setEditable(true);
-        }
-      } catch (error) {
-        console.error(error.message);
-      }
-    };
-
-    fetchExistingData();
-  }, [date]);
-
-  const isPeriodDisabled = (period) => existingData.includes(period);
 
   const handleAttendanceChange = (rollNumber, status) => {
     setAttendance((prev) => ({
       ...prev,
       [rollNumber]: status,
     }));
+  };
+
+  const handlePeriodChange = (period) => {
+    setPeriods((prev) =>
+      prev.includes(period) ? prev.filter((p) => p !== period) : [...prev, period]
+    );
   };
 
   const handleSubmit = async () => {
@@ -92,7 +65,7 @@ const Marking = () => {
 
     try {
       const response = await fetch("https://tkrcet-backend.onrender.com/attendance/mark-attendance", {
-        method: editable ? "PUT" : "POST",
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
@@ -101,22 +74,21 @@ const Marking = () => {
 
       if (!response.ok) {
         const errorDetails = await response.json();
-        throw new Error(errorDetails.message || "Failed to submit attendance.");
+        throw new Error(errorDetails.message || "Failed to submit attendance");
       }
 
       alert("Attendance submitted successfully!");
-
-      // Redirect to the Attendance page
-      navigate(`/attendance`);
+      navigate("/attendance");
     } catch (error) {
-      alert(error.message || "An error occurred while submitting attendance.");
+      console.error("Error submitting attendance:", error);
+      alert("An error occurred while submitting attendance.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <>
+    <div>
             <style>{`
     .attendanceMain {
     padding: 20px;
@@ -314,11 +286,12 @@ const Marking = () => {
     }
   }
       `}</style>
+      
       <Header />
       <NavBar />
       <MobileNav />
       <div className="attendanceMain">
-        <h2>Mark Attendance for {date}</h2>
+        <h2>Attendance on {date}</h2>
         <div>
           <label>Periods:</label>
           {[1, 2, 3, 4, 5, 6].map((period) => (
@@ -326,15 +299,10 @@ const Marking = () => {
               <input
                 type="checkbox"
                 value={period}
-                disabled={isPeriodDisabled(period)}
                 checked={periods.includes(period)}
-                onChange={() => {
-                  setPeriods((prev) =>
-                    prev.includes(period) ? prev.filter((p) => p !== period) : [...prev, period]
-                  );
-                }}
+                onChange={() => handlePeriodChange(period)}
               />
-              {period} {isPeriodDisabled(period) && "(Already marked)"}
+              {period}
             </label>
           ))}
         </div>
@@ -342,19 +310,20 @@ const Marking = () => {
           <label>Subject:</label>
           <input
             type="text"
-            placeholder="Enter Subject"
             value={subject}
             onChange={(e) => setSubject(e.target.value)}
           />
+        </div>
+        <div>
           <label>Topic:</label>
           <textarea
-            placeholder="Enter Topic"
             value={topic}
             onChange={(e) => setTopic(e.target.value)}
           />
+        </div>
+        <div>
           <label>Remarks:</label>
           <textarea
-            placeholder="Enter Remarks"
             value={remarks}
             onChange={(e) => setRemarks(e.target.value)}
           />
@@ -363,7 +332,7 @@ const Marking = () => {
           <thead>
             <tr>
               <th>Roll Number</th>
-              <th>Student Name</th>
+              <th>Name</th>
               <th>Present</th>
               <th>Absent</th>
             </tr>
@@ -391,11 +360,11 @@ const Marking = () => {
             ))}
           </tbody>
         </table>
-        <button onClick={handleSubmit} disabled={isSubmitting || periods.length === 0}>
+        <button onClick={handleSubmit} disabled={isSubmitting}>
           {isSubmitting ? "Submitting..." : "Submit"}
         </button>
       </div>
-    </>
+    </div>
   );
 };
 
