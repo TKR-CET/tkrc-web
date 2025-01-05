@@ -44,6 +44,10 @@ const Attendance = () => {
     }
   };
 
+  const handleEdit = (record, period) => {
+    navigate(`/mark?date=${record.date}&period=${period}`);
+  };
+
   const handleUpdate = async (rollNumber, updatedData, period) => {
     try {
       const response = await fetch("https://tkrcet-backend.onrender.com/attendance/update-attendance", {
@@ -76,10 +80,6 @@ const Attendance = () => {
       .map((entry) => entry.rollNumber);
   };
 
-  const handleEditOrUpdate = (record, period) => {
-    navigate(`/mark-attendance?date=${record.date}&period=${period}`);
-  };
-
   return (
     <div>
       <Header />
@@ -107,7 +107,7 @@ const Attendance = () => {
               value={date}
               onChange={(e) => setDate(e.target.value)}
             />
-            <Link to={`/mark-attendance?date=${date}`} className="go">
+            <Link to={`/mark?date=${date}`} className="go">
               GO
             </Link>
           </div>
@@ -126,7 +126,7 @@ const Attendance = () => {
                   <th>Date</th>
                   <th>Periods</th>
                   <th>Topic</th>
-                  <th>Edit/Update</th>
+                  <th>Edit</th>
                 </tr>
               </thead>
               <tbody>
@@ -142,7 +142,10 @@ const Attendance = () => {
                             <td>{period.period}</td>
                             <td>{period.topic}</td>
                             <td>
-                              <button onClick={() => handleEditOrUpdate(record, period)}>Edit/Update</button>
+                              <button onClick={() => handleEdit(record, period)}>Edit</button>
+                              <button onClick={() => handleUpdate(period.rollNumber, { topic: "Updated Topic" }, period.period)}>
+                                Update
+                              </button>
                             </td>
                           </tr>
                         )}
