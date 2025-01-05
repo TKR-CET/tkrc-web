@@ -20,23 +20,20 @@ const Attendance = () => {
   const fetchAttendanceData = async (selectedBatch, selectedDate) => {
     setLoading(true);
     setError("");
-    setAttendanceData([]); // Clear data while loading new data.
+    setAttendanceData([]);
 
     try {
       const response = await fetch(
-        `https://tkrcet-backend.onrender.com/attendance/fetch-attendance?batch=${selectedBatch}&date=${selectedDate}`
+        `https://tkrcet-backend.onrender.com/attendance/fetch-attendance?date=${selectedDate}`
       );
 
       if (!response.ok) {
-        throw new Error(`Failed to fetch attendance data: ${response.status}`);
+        const errorDetails = await response.json();
+        throw new Error(errorDetails.message || "Failed to fetch attendance data.");
       }
 
       const { data } = await response.json();
-      if (Array.isArray(data)) {
-        setAttendanceData(data);
-      } else {
-        throw new Error("Invalid data format: Expected an array.");
-      }
+      setAttendanceData(data);
     } catch (err) {
       setError(err.message || "An unknown error occurred.");
     } finally {
@@ -56,15 +53,16 @@ const Attendance = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          rollNumber,
-          ...updatedData,
           date,
-          period,
+          periods: [period],
+          rollNumbers: [rollNumber],
+          ...updatedData,
         }),
       });
 
       if (!response.ok) {
-        throw new Error(`Failed to update attendance: ${response.status}`);
+        const errorDetails = await response.json();
+        throw new Error(errorDetails.message || "Failed to update attendance.");
       }
 
       // Refresh data after update
@@ -133,23 +131,27 @@ const Attendance = () => {
                 {attendanceData.map((record, index) => (
                   <React.Fragment key={index}>
                     {record.periods.map((period, idx) => (
-                      <React.Fragment key={idx}>
-                        {getAbsentRollNumbers(record).includes(period.rollNumber) && (
-                          <tr>
-                            <td>{period.rollNumber}</td>
-                            <td>{record.subject}</td>
-                            <td>{record.date}</td>
-                            <td>{period.period}</td>
-                            <td>{period.topic}</td>
-                            <td>
-                              <button onClick={() => handleEdit(record, period)}>Edit</button>
-                              <button onClick={() => handleUpdate(period.rollNumber, { topic: "Updated Topic" }, period.period)}>
-                                Update
-                              </button>
-                            </td>
-                          </tr>
-                        )}
-                      </React.Fragment>
+                      <tr key={idx}>
+                        <td>{getAbsentRollNumbers(record).join(", ")}</td>
+                        <td>{record.subject}</td>
+                        <td>{record.date}</td>
+                        <td>{period}</td>
+                        <td>{record.topic}</td>
+                        <td>
+                          <button onClick={() => handleEdit(record, period)}>Edit</button>
+                          <button
+                            onClick={() =>
+                              handleUpdate(
+                                getAbsentRollNumbers(record)[0],
+                                { topic: "Updated Topic", subject: "Updated Subject" },
+                                period
+                              )
+                            }
+                          >
+                            Update
+                          </button>
+                        </td>
+                      </tr>
                     ))}
                   </React.Fragment>
                 ))}
