@@ -44,15 +44,7 @@ const Attendance = () => {
     }
   };
 
-  const handleEdit = (row) => {
-    const queryParams = new URLSearchParams({
-      date: row.date,
-      periods: row.periods.join(","),
-    }).toString();
-    navigate(`/mark?${queryParams}`);
-  };
-
-  const handleUpdate = async (rollNumber, updatedData) => {
+  const handleUpdate = async (rollNumber, updatedData, period) => {
     try {
       const response = await fetch("https://tkrcet-backend.onrender.com/attendance/update-attendance", {
         method: "PUT",
@@ -63,7 +55,7 @@ const Attendance = () => {
           rollNumber,
           ...updatedData,
           date,
-          periods: attendanceData.find((record) => record.rollNumber === rollNumber).periods,
+          period,
         }),
       });
 
@@ -82,6 +74,10 @@ const Attendance = () => {
     return record.attendance
       .filter((entry) => entry.status === "absent")
       .map((entry) => entry.rollNumber);
+  };
+
+  const handleEditOrUpdate = (record, period) => {
+    navigate(`/mark-attendance?date=${record.date}&period=${period}`);
   };
 
   return (
@@ -111,7 +107,7 @@ const Attendance = () => {
               value={date}
               onChange={(e) => setDate(e.target.value)}
             />
-            <Link to={`/mark?date=${date}`} className="go">
+            <Link to={`/mark-attendance?date=${date}`} className="go">
               GO
             </Link>
           </div>
@@ -130,26 +126,27 @@ const Attendance = () => {
                   <th>Date</th>
                   <th>Periods</th>
                   <th>Topic</th>
-                  <th>Edit</th>
+                  <th>Edit/Update</th>
                 </tr>
               </thead>
               <tbody>
                 {attendanceData.map((record, index) => (
                   <React.Fragment key={index}>
-                    {getAbsentRollNumbers(record).map((rollNumber) => (
-                      <tr key={rollNumber}>
-                        <td>{rollNumber}</td>
-                        <td>{record.subject}</td>
-                        <td>{record.date}</td>
-                        <td>{record.periods.join(", ")}</td>
-                        <td>{record.topic}</td>
-                        <td>
-                          <button onClick={() => handleEdit(record)}>Edit</button>
-                          <button onClick={() => handleUpdate(rollNumber, { topic: "New Topic", subject: "New Subject" })}>
-                            Update
-                          </button>
-                        </td>
-                      </tr>
+                    {record.periods.map((period, idx) => (
+                      <React.Fragment key={idx}>
+                        {getAbsentRollNumbers(record).includes(period.rollNumber) && (
+                          <tr>
+                            <td>{period.rollNumber}</td>
+                            <td>{record.subject}</td>
+                            <td>{record.date}</td>
+                            <td>{period.period}</td>
+                            <td>{period.topic}</td>
+                            <td>
+                              <button onClick={() => handleEditOrUpdate(record, period)}>Edit/Update</button>
+                            </td>
+                          </tr>
+                        )}
+                      </React.Fragment>
                     ))}
                   </React.Fragment>
                 ))}
