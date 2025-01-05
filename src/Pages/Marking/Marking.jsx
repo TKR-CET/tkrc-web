@@ -1,5 +1,4 @@
-      
-      import React, { useState, useEffect } from "react";
+ import React, { useState, useEffect } from "react";
 import Header from "../../Components/Header/Header";
 import NavBar from "../../Components/NavBar/NavBar";
 import MobileNav from "../../Components/MobileNav/MobileNav";
@@ -34,7 +33,7 @@ const Marking = () => {
   useEffect(() => {
     const fetchExistingData = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/attendance/check?date=${date}`);
+        const response = await fetch(`https://tkrcet-backend.onrender.com/attendance/check?date=${date}`);
         if (!response.ok) throw new Error("Failed to fetch existing data.");
         const data = await response.json();
         setExistingData(data.periods || []);
