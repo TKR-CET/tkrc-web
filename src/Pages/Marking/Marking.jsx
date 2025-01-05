@@ -1,14 +1,15 @@
-import React, { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+      
+      import React, { useState, useEffect } from "react";
 import Header from "../../Components/Header/Header";
 import NavBar from "../../Components/NavBar/NavBar";
 import MobileNav from "../../Components/MobileNav/MobileNav";
+import { useLocation } from "react-router-dom";
 
 const Marking = () => {
   const location = useLocation();
-  const navigate = useNavigate();
   const query = new URLSearchParams(location.search);
   const date = query.get("date") || new Date().toISOString().split("T")[0];
+  const selectedPeriods = query.get("periods")?.split(",") || [];
 
   const studentsData = [
     { rollNumber: "23891A6XYZ", name: "Name 1" },
@@ -23,24 +24,29 @@ const Marking = () => {
   }, {});
 
   const [attendance, setAttendance] = useState(initialAttendance);
-  const [periods, setPeriods] = useState([]);
+  const [periods, setPeriods] = useState(selectedPeriods);
   const [subject, setSubject] = useState("");
   const [topic, setTopic] = useState("");
   const [remarks, setRemarks] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [existingData, setExistingData] = useState([]);
 
-  const handleAttendanceChange = (rollNumber, status) => {
-    setAttendance((prev) => ({
-      ...prev,
-      [rollNumber]: status,
-    }));
-  };
+  useEffect(() => {
+    const fetchExistingData = async () => {
+      try {
+        const response = await fetch(`http://localhost:5000/attendance/check?date=${date}`);
+        if (!response.ok) throw new Error("Failed to fetch existing data.");
+        const data = await response.json();
+        setExistingData(data.periods || []);
+      } catch (error) {
+        console.error(error.message);
+      }
+    };
 
-  const handlePeriodChange = (period) => {
-    setPeriods((prev) =>
-      prev.includes(period) ? prev.filter((p) => p !== period) : [...prev, period]
-    );
-  };
+    fetchExistingData();
+  }, [date]);
+
+  const isPeriodDisabled = (period) => existingData.includes(period);
 
   const handleSubmit = async () => {
     if (!subject || !topic || periods.length === 0) {
@@ -64,7 +70,7 @@ const Marking = () => {
     };
 
     try {
-      const response = await fetch("https://tkrcet-backend.onrender.com/attendance/mark-attendance", {
+      const response = await fetch("http://localhost:5000/attendance/mark-attendance", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -74,22 +80,22 @@ const Marking = () => {
 
       if (!response.ok) {
         const errorDetails = await response.json();
-        throw new Error(errorDetails.message || "Failed to submit attendance");
+        throw new Error(errorDetails.message || "Failed to submit attendance.");
       }
 
       alert("Attendance submitted successfully!");
-      navigate("/attendance");
     } catch (error) {
-      console.error("Error submitting attendance:", error);
-      alert("An error occurred while submitting attendance.");
+      alert(error.message || "An error occurred while submitting attendance.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
+    <>
+      <div>
     <div>
-            <style>{`
+        <style>{`
     .attendanceMain {
     padding: 20px;
     background-color: #fff;
@@ -286,12 +292,15 @@ const Marking = () => {
     }
   }
       `}</style>
-      
       <Header />
-      <NavBar />
-      <MobileNav />
+      <div className="nav">
+        <NavBar />
+      </div>
+      <div className="mob-nav">
+        <MobileNav />
+      </div>
       <div className="attendanceMain">
-        <h2>Attendance on {date}</h2>
+        <h2>Mark Attendance for {date}</h2>
         <div>
           <label>Periods:</label>
           {[1, 2, 3, 4, 5, 6].map((period) => (
@@ -299,40 +308,48 @@ const Marking = () => {
               <input
                 type="checkbox"
                 value={period}
+                disabled={isPeriodDisabled(period)}
                 checked={periods.includes(period)}
-                onChange={() => handlePeriodChange(period)}
+                onChange={() => {
+                  setPeriods((prev) =>
+                    prev.includes(period) ? prev.filter((p) => p !== period) : [...prev, period]
+                  );
+                }}
               />
-              {period}
+              {period} {isPeriodDisabled(period) && "(Already marked)"}
             </label>
           ))}
         </div>
-        <div>
-          <label>Subject:</label>
-          <input
-            type="text"
-            value={subject}
-            onChange={(e) => setSubject(e.target.value)}
-          />
+         <div className="subjectTopicEntry">
+            <label htmlFor="input-subject">Subject:</label>
+            <input
+              type="text"
+              id="input-subject"
+              placeholder="Enter Subject"
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+            />
+            <label htmlFor="textarea-topic">Topic:</label>
+            <textarea
+              id="textarea-topic"
+              placeholder="Enter Topic"
+              value={topic}
+              onChange={(e) => setTopic(e.target.value)}
+            />
+            <label htmlFor="textarea-remarks">Remarks:</label>
+            <textarea
+              id="textarea-remarks"
+              placeholder="Enter Remarks"
+              value={remarks}
+              onChange={(e) => setRemarks(e.target.value)}
+            />
+          </div>
         </div>
-        <div>
-          <label>Topic:</label>
-          <textarea
-            value={topic}
-            onChange={(e) => setTopic(e.target.value)}
-          />
-        </div>
-        <div>
-          <label>Remarks:</label>
-          <textarea
-            value={remarks}
-            onChange={(e) => setRemarks(e.target.value)}
-          />
-        </div>
-        <table>
+        <table className="attendanceList">
           <thead>
             <tr>
               <th>Roll Number</th>
-              <th>Name</th>
+              <th>Student Name</th>
               <th>Present</th>
               <th>Absent</th>
             </tr>
@@ -352,6 +369,7 @@ const Marking = () => {
                 <td>
                   <input
                     type="radio"
+                    className={attendance[student.rollNumber] === "absent" ? "absentStatus" : ""}
                     checked={attendance[student.rollNumber] === "absent"}
                     onChange={() => handleAttendanceChange(student.rollNumber, "absent")}
                   />
@@ -360,11 +378,12 @@ const Marking = () => {
             ))}
           </tbody>
         </table>
-        <button onClick={handleSubmit} disabled={isSubmitting}>
+        <button onClick={handleSubmit} disabled={isSubmitting || periods.length === 0}>
           {isSubmitting ? "Submitting..." : "Submit"}
         </button>
       </div>
     </div>
+    </>
   );
 };
 
