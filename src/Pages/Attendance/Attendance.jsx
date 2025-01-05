@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import "./Attendance.css";
 import Header from "../../Components/Header/Header";
 import NavBar from "../../Components/NavBar/NavBar";
@@ -11,7 +11,6 @@ const Attendance = () => {
   const [attendanceData, setAttendanceData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const navigate = useNavigate();
 
   useEffect(() => {
     fetchAttendanceData(batch, date);
@@ -24,7 +23,7 @@ const Attendance = () => {
 
     try {
       const response = await fetch(
-        `https://tkrcet-backend.onrender.com/attendance/fetch-attendance?date=${selectedDate}`
+        `https://tkrcet-backend.onrender.com/attendance/fetch-attendance?date=${selectedDate}&batch=${selectedBatch}`
       );
 
       if (!response.ok) {
@@ -32,50 +31,13 @@ const Attendance = () => {
         throw new Error(errorDetails.message || "Failed to fetch attendance data.");
       }
 
-      const { data } = await response.json();
+      const data = await response.json();
       setAttendanceData(data);
     } catch (err) {
       setError(err.message || "An unknown error occurred.");
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleEdit = (record, period) => {
-    navigate(`/mark?date=${record.date}&period=${period}`);
-  };
-
-  const handleUpdate = async (rollNumber, updatedData, period) => {
-    try {
-      const response = await fetch("https://tkrcet-backend.onrender.com/attendance/update-attendance", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          date,
-          periods: [period],
-          rollNumbers: [rollNumber],
-          ...updatedData,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorDetails = await response.json();
-        throw new Error(errorDetails.message || "Failed to update attendance.");
-      }
-
-      // Refresh data after update
-      fetchAttendanceData(batch, date);
-    } catch (err) {
-      setError(err.message || "An unknown error occurred.");
-    }
-  };
-
-  const getAbsentRollNumbers = (record) => {
-    return record.attendance
-      .filter((entry) => entry.status === "absent")
-      .map((entry) => entry.rollNumber);
   };
 
   return (
@@ -122,38 +84,19 @@ const Attendance = () => {
                   <th>Absentees</th>
                   <th>Subject</th>
                   <th>Date</th>
-                  <th>Periods</th>
+                  <th>Period</th>
                   <th>Topic</th>
-                  <th>Edit</th>
                 </tr>
               </thead>
               <tbody>
                 {attendanceData.map((record, index) => (
-                  <React.Fragment key={index}>
-                    {record.periods.map((period, idx) => (
-                      <tr key={idx}>
-                        <td>{getAbsentRollNumbers(record).join(", ")}</td>
-                        <td>{record.subject}</td>
-                        <td>{record.date}</td>
-                        <td>{period}</td>
-                        <td>{record.topic}</td>
-                        <td>
-                          <button onClick={() => handleEdit(record, period)}>Edit</button>
-                          <button
-                            onClick={() =>
-                              handleUpdate(
-                                getAbsentRollNumbers(record)[0],
-                                { topic: "Updated Topic", subject: "Updated Subject" },
-                                period
-                              )
-                            }
-                          >
-                            Update
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </React.Fragment>
+                  <tr key={index}>
+                    <td>{record.absentees.join(", ")}</td>
+                    <td>{record.subject}</td>
+                    <td>{record.date}</td>
+                    <td>{record.period}</td>
+                    <td>{record.topic}</td>
+                  </tr>
                 ))}
               </tbody>
             </table>
