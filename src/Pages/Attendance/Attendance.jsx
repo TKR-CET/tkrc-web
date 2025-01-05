@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import "./Attendance.css";
 import Header from "../../Components/Header/Header";
 import NavBar from "../../Components/NavBar/NavBar";
-import MobileNav from "../../Components/MobileNav/MobileNav.jsx";
+import MobileNav from "../../Components/MobileNav/MobileNav";
 
 const Attendance = () => {
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
@@ -22,8 +22,7 @@ const Attendance = () => {
 
     try {
       const response = await fetch(
-        ` https://tkrcet-backend.onrender.com/attendance/fetch-attendance?batch=${selectedBatch}&date=${selectedDate}
-`
+        `https://tkrcet-backend.onrender.com/attendance/fetch-attendance?batch=${selectedBatch}&date=${selectedDate}`
       );
 
       if (!response.ok) {
@@ -31,13 +30,7 @@ const Attendance = () => {
       }
 
       const { data } = await response.json();
-      console.log("Fetched Data:", data);
-
-      if (Array.isArray(data)) {
-        setAttendanceData(data);
-      } else {
-        throw new Error("Invalid data format: Expected an array.");
-      }
+      setAttendanceData(data || []);
     } catch (err) {
       console.error(err);
       setError(err.message || "An unknown error occurred.");
@@ -49,19 +42,14 @@ const Attendance = () => {
   return (
     <div>
       <Header />
-      <div className="nav">
-        <NavBar />
-      </div>
-      <div className="mob-nav">
-        <MobileNav />
-      </div>
+      <NavBar />
+      <MobileNav />
       <div className="content">
         <div className="title-bar">
           <div className="batch-date-selectors">
             <label htmlFor="batch">Batch: </label>
             <select
               id="batch"
-              className="batch-selector"
               value={batch}
               onChange={(e) => setBatch(e.target.value)}
             >
@@ -73,7 +61,6 @@ const Attendance = () => {
             <input
               type="date"
               id="date"
-              className="date-selector"
               value={date}
               onChange={(e) => setDate(e.target.value)}
             />
@@ -82,10 +69,6 @@ const Attendance = () => {
             </Link>
           </div>
         </div>
-        <ul className="container">
-          <li className="section">Subject: CAD/CAM Lab</li>
-          <li className="section">Section: IV ME I A (2024-25)</li>
-        </ul>
         {loading ? (
           <p>Loading...</p>
         ) : error ? (
@@ -100,6 +83,7 @@ const Attendance = () => {
                   <th>Absentees</th>
                   <th>Topic</th>
                   <th>Remarks</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -115,6 +99,14 @@ const Attendance = () => {
                     </td>
                     <td>{record.topic}</td>
                     <td>{record.remarks}</td>
+                    <td>
+                      <Link
+                        to={`/mark?date=${record.date}&edit=true`}
+                        className="edit-link"
+                      >
+                        Edit
+                      </Link>
+                    </td>
                   </tr>
                 ))}
               </tbody>
