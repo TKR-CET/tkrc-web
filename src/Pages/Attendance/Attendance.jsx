@@ -44,7 +44,6 @@ const Attendance = () => {
 
   const handleEdit = (row) => {
   const queryParams = new URLSearchParams({
-    id: row._id,
     date: row.date,
     periods: row.periods.join(","),
   }).toString();
