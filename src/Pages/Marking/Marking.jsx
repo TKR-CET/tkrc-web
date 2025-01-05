@@ -322,7 +322,7 @@ const Marking = () => {
                   );
                 }}
               />
-              {period} {isPeriodDisabled(period) && "(Already marked)"}
+              {period} {isPeriodDisabled(period) && " "}
             </label>
           ))}
         </div>
