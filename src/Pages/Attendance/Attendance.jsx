@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import Header from "../../Components/Header/Header";
 import NavBar from "../../Components/NavBar/NavBar";
 import MobileNav from "../../Components/MobileNav/MobileNav";
-
+import "./Attendance.css"
 const Attendance = () => {
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
   const [batch, setBatch] = useState("ALL");
