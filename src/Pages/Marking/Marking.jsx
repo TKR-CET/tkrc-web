@@ -30,6 +30,7 @@ const Marking = () => {
   const [remarks, setRemarks] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [existingData, setExistingData] = useState([]);
+  const [isEditMode, setIsEditMode] = useState(false);
 
   useEffect(() => {
     const fetchExistingData = async () => {
@@ -53,6 +54,45 @@ const Marking = () => {
       ...prev,
       [rollNumber]: status,
     }));
+  };
+
+  const handleEditToggle = () => {
+    setIsEditMode(!isEditMode);
+  };
+
+  const handleSaveChanges = async () => {
+    try {
+      const updatedAttendanceData = {
+        date,
+        periods,
+        subject,
+        topic,
+        remarks,
+        attendance: studentsData.map((student) => ({
+          rollNumber: student.rollNumber,
+          name: student.name,
+          status: attendance[student.rollNumber],
+        })),
+      };
+
+      const response = await fetch("https://tkrcet-backend.onrender.com/attendance/update-attendance", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedAttendanceData),
+      });
+
+      if (!response.ok) {
+        const errorDetails = await response.json();
+        throw new Error(errorDetails.message || "Failed to save changes.");
+      }
+
+      alert("Changes saved successfully!");
+      setIsEditMode(false); // Exit edit mode
+    } catch (error) {
+      alert(error.message || "An error occurred while saving changes.");
+    }
   };
 
   const handleSubmit = async () => {
@@ -101,7 +141,6 @@ const Marking = () => {
 
   return (
     <>
-      <Header />
 <style>{`
     .attendanceMain {
     padding: 20px;
@@ -299,6 +338,7 @@ const Marking = () => {
     }
   }
       `}</style>
+      <Header />
       <div className="nav">
         <NavBar />
       </div>
@@ -369,6 +409,7 @@ const Marking = () => {
                     type="radio"
                     checked={attendance[student.rollNumber] === "present"}
                     onChange={() => handleAttendanceChange(student.rollNumber, "present")}
+                    disabled={!isEditMode}
                   />
                 </td>
                 <td>
@@ -377,15 +418,24 @@ const Marking = () => {
                     className={attendance[student.rollNumber] === "absent" ? "absentStatus" : ""}
                     checked={attendance[student.rollNumber] === "absent"}
                     onChange={() => handleAttendanceChange(student.rollNumber, "absent")}
+                    disabled={!isEditMode}
                   />
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
-        <button onClick={handleSubmit} disabled={isSubmitting || periods.length === 0}>
-          {isSubmitting ? "Submitting..." : "Submit"}
-        </button>
+        {isEditMode && (
+          <div>
+            <button onClick={handleSaveChanges} disabled={isSubmitting || periods.length === 0}>
+              {isSubmitting ? "Saving..." : "Save Changes"}
+            </button>
+            <button onClick={handleEditToggle}>Cancel Edit</button>
+          </div>
+        )}
+        {!isEditMode && (
+          <button onClick={handleEditToggle}>Edit Attendance</button>
+        )}
       </div>
     </>
   );
