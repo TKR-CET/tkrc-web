@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import "./Attendance.css";
 import Header from "../../Components/Header/Header";
 import NavBar from "../../Components/NavBar/NavBar";
-import MobileNav from "../../Components/MobileNav/MobileNav";
+import MobileNav from "../../Components/MobileNav/MobileNav.jsx";
 
 const Attendance = () => {
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
@@ -19,21 +19,27 @@ const Attendance = () => {
   const fetchAttendanceData = async (selectedBatch, selectedDate) => {
     setLoading(true);
     setError("");
-    setAttendanceData([]);
 
     try {
       const response = await fetch(
-        `https://tkrcet-backend.onrender.com/attendance/fetch-attendance?date=${selectedDate}&batch=${selectedBatch}`
+        ` https://tkrcet-backend.onrender.com/attendance/fetch-attendance?batch=${selectedBatch}&date=${selectedDate}
+`
       );
 
       if (!response.ok) {
-        const errorDetails = await response.json();
-        throw new Error(errorDetails.message || "Failed to fetch attendance data.");
+        throw new Error(`Failed to fetch attendance data: ${response.status}`);
       }
 
-      const data = await response.json();
-      setAttendanceData(data);
+      const { data } = await response.json();
+      console.log("Fetched Data:", data);
+
+      if (Array.isArray(data)) {
+        setAttendanceData(data);
+      } else {
+        throw new Error("Invalid data format: Expected an array.");
+      }
     } catch (err) {
+      console.error(err);
       setError(err.message || "An unknown error occurred.");
     } finally {
       setLoading(false);
@@ -43,8 +49,12 @@ const Attendance = () => {
   return (
     <div>
       <Header />
-      <NavBar />
-      <MobileNav />
+      <div className="nav">
+        <NavBar />
+      </div>
+      <div className="mob-nav">
+        <MobileNav />
+      </div>
       <div className="content">
         <div className="title-bar">
           <div className="batch-date-selectors">
@@ -72,37 +82,44 @@ const Attendance = () => {
             </Link>
           </div>
         </div>
+        <ul className="container">
+          <li className="section">Subject: CAD/CAM Lab</li>
+          <li className="section">Section: IV ME I A (2024-25)</li>
+        </ul>
         {loading ? (
           <p>Loading...</p>
         ) : error ? (
           <p className="error">{error}</p>
-        ) : attendanceData.length > 0 ? (
+        ) : (
           <div className="attendance-table-wrapper">
             <table className="attendance-table">
               <thead>
                 <tr>
-                  <th>Absentees</th>
                   <th>Subject</th>
                   <th>Date</th>
-                  <th>Period</th>
+                  <th>Absentees</th>
                   <th>Topic</th>
+                  <th>Remarks</th>
                 </tr>
               </thead>
               <tbody>
                 {attendanceData.map((record, index) => (
                   <tr key={index}>
-                    <td>{record.absentees.join(", ")}</td>
                     <td>{record.subject}</td>
                     <td>{record.date}</td>
-                    <td>{record.period}</td>
+                    <td>
+                      {record.attendance
+                        .filter((att) => att.status === "absent")
+                        .map((att) => att.rollNumber)
+                        .join(", ")}
+                    </td>
                     <td>{record.topic}</td>
+                    <td>{record.remarks}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-        ) : (
-          <p>No attendance records found for the selected batch and date.</p>
         )}
       </div>
     </div>
