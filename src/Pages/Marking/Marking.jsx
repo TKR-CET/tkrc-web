@@ -97,7 +97,9 @@ const Marking = () => {
   };
 
   return (
+
     <>
+<style>{`
   #btn-submit:hover {
     background-color: #ff704d;
   }
@@ -214,14 +216,8 @@ const Marking = () => {
     }
   }
       `}</style>
-      <div>
-        width: 100%;
-      left: 0;
-      transform: none;
-      top: 0;
-    }
-  }
-      `}</style>
+     
+      
       <Header />
       <div className="nav">
         <NavBar />
