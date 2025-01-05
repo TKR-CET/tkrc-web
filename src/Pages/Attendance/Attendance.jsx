@@ -1,113 +1,129 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import "./Attendance.css";
 import Header from "../../Components/Header/Header";
 import NavBar from "../../Components/NavBar/NavBar";
-import MobileNav from "../../Components/MobileNav/MobileNav";
-import "./Attendance.css";
+import MobileNav from "../../Components/MobileNav/MobileNav.jsx";
+
 const Attendance = () => {
+  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
+  const [batch, setBatch] = useState("ALL");
   const [attendanceData, setAttendanceData] = useState([]);
-  const [filteredData, setFilteredData] = useState([]);
-  const [batches, setBatches] = useState(["Batch A", "Batch B", "Batch C"]); // Example batches
-  const [selectedBatch, setSelectedBatch] = useState("");
-  const [selectedDate, setSelectedDate] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    const fetchAttendance = async () => {
-      try {
-        const response = await fetch("https://tkrcet-backend.onrender.com/attendance/all");
-        const data = await response.json();
-        setAttendanceData(data);
-        setFilteredData(data);
-      } catch (error) {
-        console.error("Error fetching attendance data:", error);
+    fetchAttendanceData(batch, date);
+  }, [batch, date]);
+
+  const fetchAttendanceData = async (selectedBatch, selectedDate) => {
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await fetch(
+        `https://localhost:5173/attendance/fetch-attendance?batch=${selectedBatch}&date=${selectedDate}`
+      );
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch attendance data: ${response.status}`);
       }
-    };
 
-    fetchAttendance();
-  }, []);
+      const { data } = await response.json();
+      if (Array.isArray(data)) {
+        setAttendanceData(data);
+      } else {
+        throw new Error("Invalid data format: Expected an array.");
+      }
+    } catch (err) {
+      setError(err.message || "An unknown error occurred.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const handleFilter = () => {
-    const filtered = attendanceData.filter((record) => {
-      const matchesBatch = selectedBatch ? record.batch === selectedBatch : true;
-      const matchesDate = selectedDate ? record.date === selectedDate : true;
-      return matchesBatch && matchesDate;
-    });
-    setFilteredData(filtered);
+  const handleEdit = (row) => {
+    const queryParams = new URLSearchParams({
+      date: row.date,
+      periods: row.periods.join(","),
+    }).toString();
+    window.location.href = `/mark?${queryParams}`;
+  };
+
+  const isPeriodTaken = (period) => {
+    return attendanceData.some((record) => record.periods.includes(period));
   };
 
   return (
     <div>
       <Header />
-      <NavBar />
-      <MobileNav />
-      <div className="attendanceMain">
-        <h2>Attendance Records</h2>
-        <div className="filterSection">
-          <label>
-            Batch:
+      <div className="nav">
+        <NavBar />
+      </div>
+      <div className="mob-nav">
+        <MobileNav />
+      </div>
+      <div className="content">
+        <div className="title-bar">
+          <div className="batch-date-selectors">
+            <label htmlFor="batch">Batch: </label>
             <select
-              value={selectedBatch}
-              onChange={(e) => setSelectedBatch(e.target.value)}
+              id="batch"
+              className="batch-selector"
+              value={batch}
+              onChange={(e) => setBatch(e.target.value)}
             >
-              <option value="">All</option>
-              {batches.map((batch, index) => (
-                <option key={index} value={batch}>
-                  {batch}
-                </option>
-              ))}
+              <option value="ALL">ALL</option>
+              <option value="Batch1">Batch 1</option>
+              <option value="Batch2">Batch 2</option>
             </select>
-          </label>
-          <label>
-            Date:
+            <label htmlFor="date">Date: </label>
             <input
               type="date"
-              value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
+              id="date"
+              className="date-selector"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
             />
-          </label>
-          <button onClick={handleFilter}>Go</button>
+            <Link to={`/mark?date=${date}`} className="go">
+              GO
+            </Link>
+          </div>
         </div>
-        <table>
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Batch</th>
-              <th>Periods</th>
-              <th>Subject</th>
-              <th>Absent Roll Numbers</th>
-              <th>Topic</th>
-              <th>Remarks</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredData.map((record, index) => (
-              <tr key={index}>
-                <td>{record.date}</td>
-                <td>{record.batch}</td>
-                <td>{record.periods.join(", ")}</td>
-                <td>{record.subject}</td>
-                <td>
-                  {record.attendance
-                    .filter((att) => att.status === "absent")
-                    .map((att) => att.rollNumber)
-                    .join(", ")}
-                </td>
-                <td>{record.topic}</td>
-                <td>{record.remarks}</td>
-                <td>
-                  <Link
-                    to={`/mark?date=${record.date}&batch=${record.batch}&periods=${record.periods.join(
-                      ","
-                    )}&subject=${record.subject}&topic=${record.topic}&remarks=${record.remarks}`}
-                  >
-                    Edit
-                  </Link>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        {loading ? (
+          <p>Loading...</p>
+        ) : error ? (
+          <p className="error">{error}</p>
+        ) : (
+          <div className="attendance-table-wrapper">
+            <table className="attendance-table">
+              <thead>
+                <tr>
+                  <th>Subject</th>
+                  <th>Date</th>
+                  <th>Periods</th>
+                  <th>Topic</th>
+                  <th>Remarks</th>
+                  <th>Edit</th>
+                </tr>
+              </thead>
+              <tbody>
+                {attendanceData.map((record, index) => (
+                  <tr key={index}>
+                    <td>{record.subject}</td>
+                    <td>{record.date}</td>
+                    <td>{record.periods.join(", ")}</td>
+                    <td>{record.topic}</td>
+                    <td>{record.remarks}</td>
+                    <td>
+                      <button onClick={() => handleEdit(record)}>Edit</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );
