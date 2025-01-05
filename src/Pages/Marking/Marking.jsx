@@ -89,6 +89,12 @@ const Marking = () => {
       setIsSubmitting(false);
     }
   };
+ const handleAttendanceChange = (rollNumber, status) => {
+  setAttendance((prev) => ({
+    ...prev,
+    [rollNumber]: status,
+  }));
+};
 
   return (
     <>
@@ -359,20 +365,20 @@ const Marking = () => {
                 <td>{student.rollNumber}</td>
                 <td>{student.name}</td>
                 <td>
-                  <input
-                    type="radio"
-                    checked={attendance[student.rollNumber] === "present"}
-                    onChange={() => handleAttendanceChange(student.rollNumber, "present")}
-                  />
-                </td>
-                <td>
-                  <input
-                    type="radio"
-                    className={attendance[student.rollNumber] === "absent" ? "absentStatus" : ""}
-                    checked={attendance[student.rollNumber] === "absent"}
-                    onChange={() => handleAttendanceChange(student.rollNumber, "absent")}
-                  />
-                </td>
+  <input
+    type="radio"
+    checked={attendance[student.rollNumber] === "present"}
+    onChange={() => handleAttendanceChange(student.rollNumber, "present")}
+  />
+</td>
+<td>
+  <input
+    type="radio"
+    className={attendance[student.rollNumber] === "absent" ? "absentStatus" : ""}
+    checked={attendance[student.rollNumber] === "absent"}
+    onChange={() => handleAttendanceChange(student.rollNumber, "absent")}
+  />
+</td>
               </tr>
             ))}
           </tbody>
