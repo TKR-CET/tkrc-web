@@ -22,7 +22,7 @@ const Attendance = () => {
 
     try {
       const response = await fetch(
-        `https://localhost:5173/attendance/fetch-attendance?batch=${selectedBatch}&date=${selectedDate}`
+      `https://tkrcet-backend.onrender.com/attendance/fetch-attendance?batch=${selectedBatch}&date=${selectedDate}`
       );
 
       if (!response.ok) {
