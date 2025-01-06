@@ -9,7 +9,7 @@ const Marking = () => {
   const location = useLocation();
   const query = new URLSearchParams(location.search);
   const date = query.get("date") || new Date().toISOString().split("T")[0];
-  const selectedPeriods = query.get("periods")?.split(",") || [];
+  const selectedPeriods = query.get("periods")?.split(",").map(Number) || [];
 
   const studentsData = [
     { rollNumber: "23891A6XYZ", name: "Name 1" },
@@ -49,9 +49,8 @@ const Marking = () => {
   }, [date]);
 
   const isPeriodDisabled = (period) => {
-  // Disable periods only if they are in existingData and not in selectedPeriods
-  return existingData.includes(period) && !selectedPeriods.includes(period);
-};
+    return existingData.includes(period) && !selectedPeriods.includes(period);
+  };
 
   const handleAttendanceChange = (rollNumber, status) => {
     setAttendance((prev) => ({
@@ -109,8 +108,7 @@ const Marking = () => {
 
   return (
     <>
-      <Header />
-      <style>{`
+          <style>{`
         .attendanceMain {
           padding: 20px;
           background-color: #fff;
@@ -190,12 +188,13 @@ const Marking = () => {
           }
         }
       `}</style>
-      <div class="nav">
-      <NavBar />
-        </div>
-      <div class="mob-nav">
-      <MobileNav />
-        </div>
+      <Header />
+      <div className="nav">
+        <NavBar />
+      </div>
+      <div className="mob-nav">
+        <MobileNav />
+      </div>
       <div className="attendanceMain">
         <h2 className="attendanceHeading">Mark Attendance for {date}</h2>
         <div>
