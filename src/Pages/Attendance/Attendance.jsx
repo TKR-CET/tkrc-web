@@ -121,7 +121,7 @@ const Attendance = () => {
                     <td>{record.date}</td>
                     <td>{record.periods.join(", ")}</td>
                     <td>{record.topic}</td>
-                    <td>{record.remarks}</td>
+                    
                     <td>
                       {record.absentees.length > 0
                         ? record.absentees.join(", ")
