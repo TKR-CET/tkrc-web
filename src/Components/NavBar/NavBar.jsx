@@ -123,7 +123,7 @@ function NavBar() {
             <div className="account-menu-content">
               <ul>
                 <li>Settings</li>
-               <link to="/"> <li>Logout</li></link>
+               <li>Logout</li>
               </ul>
             </div>
           )}
