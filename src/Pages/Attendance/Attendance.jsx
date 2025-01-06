@@ -33,7 +33,15 @@ const Attendance = () => {
       console.log("API Response Data:", data); // Debugging: Check API response
 
       if (Array.isArray(data)) {
-        setAttendanceData(data);
+        // Process absentees for each record
+        const processedData = data.map((record) => ({
+          ...record,
+          absentees: record.attendance
+            .filter((student) => student.status === "absent")
+            .map((student) => student.rollNumber), // Extract roll numbers of absentees
+        }));
+        console.log("Processed Data with Absentees:", processedData); // Debugging
+        setAttendanceData(processedData);
       } else {
         throw new Error("Invalid data format: Expected an array.");
       }
@@ -107,26 +115,23 @@ const Attendance = () => {
                 </tr>
               </thead>
               <tbody>
-                {attendanceData.map((record, index) => {
-                  console.log("Record Absentees:", record.absentees); // Debugging: Check record.absentees
-                  return (
-                    <tr key={index}>
-                      <td>{record.subject}</td>
-                      <td>{record.date}</td>
-                      <td>{record.periods.join(", ")}</td>
-                      <td>{record.topic}</td>
-                      <td>{record.remarks}</td>
-                      <td>
-                        {record.absentees && record.absentees.length > 0
-                          ? record.absentees.join(", ")
-                          : "None"}
-                      </td>
-                      <td>
-                        <button onClick={() => handleEdit(record)}>Edit</button>
-                      </td>
-                    </tr>
-                  );
-                })}
+                {attendanceData.map((record, index) => (
+                  <tr key={index}>
+                    <td>{record.subject}</td>
+                    <td>{record.date}</td>
+                    <td>{record.periods.join(", ")}</td>
+                    <td>{record.topic}</td>
+                    <td>{record.remarks}</td>
+                    <td>
+                      {record.absentees.length > 0
+                        ? record.absentees.join(", ")
+                        : "None"}
+                    </td>
+                    <td>
+                      <button onClick={() => handleEdit(record)}>Edit</button>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
