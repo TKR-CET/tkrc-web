@@ -116,8 +116,8 @@ h1, h2, h3, h4, h5, h6 {
     margin: 0;
 }
 .about-campus p {
-    font-size: 15px !important;
-    line-height: 2.9 !important;
+    font-size: 15px;
+    line-height: 1.7 ;
     text-align: justify;
     color: #333;
     margin-top: 10px;
