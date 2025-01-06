@@ -22,7 +22,7 @@ const Attendance = () => {
 
     try {
       const response = await fetch(
-      `https://tkrcet-backend.onrender.com/attendance/fetch-attendance?batch=${selectedBatch}&date=${selectedDate}`
+        `https://tkrcet-backend.onrender.com/attendance/fetch-attendance?batch=${selectedBatch}&date=${selectedDate}`
       );
 
       if (!response.ok) {
@@ -43,15 +43,11 @@ const Attendance = () => {
   };
 
   const handleEdit = (row) => {
-  const queryParams = new URLSearchParams({
-    date: row.date,
-    periods: row.periods.join(","),
-  }).toString();
-  window.location.href = `/mark?${queryParams}`;
-};
-
-  const isPeriodTaken = (period) => {
-    return attendanceData.some((record) => record.periods.includes(period));
+    const queryParams = new URLSearchParams({
+      date: row.date,
+      periods: row.periods.join(","),
+    }).toString();
+    window.location.href = `/mark?${queryParams}`;
   };
 
   return (
@@ -104,6 +100,7 @@ const Attendance = () => {
                   <th>Periods</th>
                   <th>Topic</th>
                   <th>Remarks</th>
+                  <th>Absentees</th>
                   <th>Edit</th>
                 </tr>
               </thead>
@@ -115,6 +112,11 @@ const Attendance = () => {
                     <td>{record.periods.join(", ")}</td>
                     <td>{record.topic}</td>
                     <td>{record.remarks}</td>
+                    <td>
+                      {record.absentees && record.absentees.length > 0
+                        ? record.absentees.join(", ")
+                        : "None"}
+                    </td>
                     <td>
                       <button onClick={() => handleEdit(record)}>Edit</button>
                     </td>
