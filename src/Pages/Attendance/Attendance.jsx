@@ -109,7 +109,7 @@ const Attendance = () => {
                   <th>Date</th>
                   <th>Periods</th>
                   <th>Topic</th>
-                  <th>Remarks</th>
+                  
                   <th>Absentees</th>
                   <th>Edit</th>
                 </tr>
