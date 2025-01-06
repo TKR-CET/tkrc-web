@@ -76,7 +76,7 @@ body {
 .typing {
   display: inline-block;
   font-family: monospace; /* Typewriter-like font */
-  font-size: 16px; /* Smaller size */
+  font-size: 14px; /* Smaller size */
   white-space: nowrap; /* Prevents text wrapping */
   overflow: hidden; /* Hides text outside container */
   width: 12ch; /* Adjust width to fit text length */
