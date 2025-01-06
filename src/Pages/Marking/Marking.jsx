@@ -48,7 +48,10 @@ const Marking = () => {
     fetchExistingData();
   }, [date]);
 
-  const isPeriodDisabled = (period) => existingData.includes(period);
+  const isPeriodDisabled = (period) => {
+  // Disable periods only if they are in existingData and not in selectedPeriods
+  return existingData.includes(period) && !selectedPeriods.includes(period);
+};
 
   const handleAttendanceChange = (rollNumber, status) => {
     setAttendance((prev) => ({
