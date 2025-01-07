@@ -35,10 +35,25 @@ const Marking = () => {
     const fetchExistingData = async () => {
       try {
         const response = await fetch(
-          `https://tkrcet-backend.onrender.com/attendance/check?date=${date}`
+          `https://tkrcet-backend.onrender.com/attendance/check?date=${date}&periods=${selectedPeriods.join(",")}`
         );
         if (!response.ok) throw new Error("Failed to fetch existing attendance data.");
         const data = await response.json();
+
+        // Prepopulate data if available
+        if (data) {
+          setPeriods(data.periods || selectedPeriods);
+          setSubject(data.subject || "");
+          setTopic(data.topic || "");
+          setRemarks(data.remarks || "");
+          if (data.attendance) {
+            const attendanceMap = data.attendance.reduce((acc, record) => {
+              acc[record.rollNumber] = record.status;
+              return acc;
+            }, {});
+            setAttendance(attendanceMap);
+          }
+        }
         setExistingData(data.periods || []);
       } catch (error) {
         console.error("Error fetching existing data:", error.message);
@@ -46,7 +61,7 @@ const Marking = () => {
     };
 
     fetchExistingData();
-  }, [date]);
+  }, [date, selectedPeriods]);
 
   const isPeriodDisabled = (period) => {
     return existingData.includes(period) && !selectedPeriods.includes(period);
@@ -108,86 +123,204 @@ const Marking = () => {
 
   return (
     <>
-          <style>{`
-        .attendanceMain {
-          padding: 20px;
-          background-color: #fff;
-          margin: 20px;
-          border-radius: 8px;
-          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-        .attendanceHeading {
-          font-size: 20px;
-          font-weight: bold;
-          margin-bottom: 20px;
-          text-align: center;
-        }
-        .subjectTopicEntry label {
-          display: block;
-          margin: 8px 0 5px;
-          font-weight: 600;
-        }
-        .subjectTopicEntry input,
-        .subjectTopicEntry textarea {
-          width: 100%;
-          padding: 10px;
-          margin-bottom: 10px;
-          border-radius: 5px;
-          border: 1px solid #ccc;
-        }
-        .attendanceList {
-          width: 100%;
-          margin-top: 20px;
-          border-collapse: collapse;
-        }
-        .attendanceList th,
-        .attendanceList td {
-          padding: 10px;
-          text-align: center;
-          border: 1px solid #ddd;
-        }
-        .attendanceList th {
-          background-color: #f4f4f4;
-        }
+<style>{`
+    .attendanceMain {
+    padding: 20px;
+    background-color: #fff;
+    margin: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+
+  .compulsoryText {
+    color: red;
+    font-weight: bold;
+  }
+
+  .attendanceHeading {
+    font-size: 19px;
+    font-weight: bold;
+    padding-top:5px;
+    margin-top:4px;
+    margin-bottom: 15px;
+    text-align: center;
+  }
+
+  .attendanceDetails {
+    margin-bottom: 20px;
+  }
+
+  .periodSelection {
+    margin-bottom: 15px;
+  }
+
+  .periodSelection label {
+    font-size: 14px;
+    margin-right: 10px;
+  }
+
+  .periodSelection input[type="checkbox"] {
+    margin-right: 6px;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    display: inline-block;
+  }
+
+  .subjectTopicEntry label {
+    font-size: 14px;
+    margin-top: 8px;
+    display: block;
+  }
+
+  .subjectTopicEntry input,
+  .subjectTopicEntry textarea {
+    font-size: 14px;
+    padding: 8px;
+    margin-top: 6px;
+    margin-bottom: 12px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    width: 100%;
+  }
+
+  .subjectTopicEntry textarea {
+    height: 80px;
+    resize: vertical;
+  }
+
+  #btn-submit {
+    background-color: #FF5733;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    position: relative;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+  }
+
+  #btn-submit:hover {
+    background-color: #ff704d;
+  }
+
+  button:disabled {
+    background-color: #dcdcdc;
+    cursor: not-allowed;
+  }
+
+  .attendanceList {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+
+  .attendanceList th,
+  .attendanceList td {
+    text-align: center;
+    padding: 10px;
+    border: 1.5px solid #ddd;
+  }
+
+  .attendanceList th {
+    background-color: #f7f7f7;
+    font-weight: bold;
+  }
+
+  .attendanceList td {
+    background-color: #fff;
+  }
+
+.attendanceList input[type="radio"] {
+  appearance: none;
+  -webkit-appearance: none; /* Safari */
+  width: 20px;
+  height: 20px;
+  border: 2px solid #aaa;
+  border-radius: 50%;
+  cursor: pointer;
+  background-color: white;
+}
+
+.attendanceList input[type="radio"]:checked {
+  background-color: #2ecc71; /* Green for Present */
+  border-color: #2ecc71;
+}
+
+.attendanceList input[type="radio"].absentStatus:checked {
+  background-color: #e74c3c; /* Red for Absent */
+  border-color: #e74c3c;
+}
+
+  @media (max-width: 768px) {
+    .attendanceMain {
+      margin: 15px;
+      padding: 20px;
+    }
+        .periodSelection label{
+        margin-right:4px;
+
+    .periodSelection input[type="checkbox"] {
+      margin-right: 0px !important;
+    }
+
+    .attendanceList th,
+    .attendanceList td {
+      font-size: 12px;
+      padding: 8px;
+    }
+
+    .subjectTopicEntry textarea {
+      height: 70px;
+    }
+
+    .subjectTopicEntry input,
+    .subjectTopicEntry textarea {
+      font-size: 12px;
+    }
+
+    #btn-submit {
+      font-size: 14px;
+      position:relative;
+      padding-top:5px !important;
+    }
         .attendanceList input[type="radio"] {
-          appearance: none;
-          width: 18px;
-          height: 18px;
-          border: 2px solid #aaa;
-          border-radius: 50%;
-        }
-        .attendanceList input[type="radio"]:checked {
-          background-color: #2ecc71;
-          border-color: #2ecc71;
-        }
-        .attendanceList input[type="radio"].absentStatus:checked {
-          background-color: #e74c3c;
-          border-color: #e74c3c;
-        }
-        #btn-submit {
-          background-color: #007bff;
-          color: #fff;
-          padding: 10px 20px;
-          border: none;
-          border-radius: 5px;
-          cursor: pointer;
-          margin-top: 20px;
-        }
-        #btn-submit:disabled {
-          background-color: #ccc;
-          cursor: not-allowed;
-        }
-        @media (max-width: 768px) {
-          .attendanceMain {
-            margin: 10px;
-          }
-          .attendanceList th,
-          .attendanceList td {
-            padding: 8px;
-            font-size: 12px;
-          }
-        }
+      width: 25px !important;
+      height: 25px !important;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .attendanceList th,
+    .attendanceList td {
+      font-size: 11px;
+      padding: 6px;
+    }
+
+    .attendanceList input[type="radio"] {
+      width: 20px;
+      height: 20px;
+    }
+
+    .subjectTopicEntry textarea {
+      height: 60px;
+    }
+
+    #btn-submit {
+      font-size: 14px;
+      padding: 8px;
+      width: 100%;
+      left: 0;
+      transform: none;
+      top: 0;
+    }
+  }
       `}</style>
+
       <Header />
       <div className="nav">
         <NavBar />
