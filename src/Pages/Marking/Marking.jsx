@@ -18,16 +18,26 @@ const Marking = () => {
     { rollNumber: "23891A6XYZ4", name: "Name 4" },
   ];
 
-  const initialAttendance = studentsData.reduce((acc, student) => {
-    acc[student.rollNumber] = "present";
-    return acc;
-  }, {});
-
-  const [attendance, setAttendance] = useState(initialAttendance);
+  // Parse query params for subject, topic, remarks, and attendance
+  const [subject, setSubject] = useState(query.get("subject") || "");
+  const [topic, setTopic] = useState(query.get("topic") || "");
+  const [remarks, setRemarks] = useState(query.get("remarks") || "");
+  const [attendance, setAttendance] = useState(() => {
+    const attendanceQuery = query.get("attendance");
+    if (attendanceQuery) {
+      return attendanceQuery.split(",").reduce((acc, item) => {
+        const [rollNumber, status] = item.split(":");
+        acc[rollNumber] = status;
+        return acc;
+      }, {});
+    }
+    // Default all students to "present"
+    return studentsData.reduce((acc, student) => {
+      acc[student.rollNumber] = "present";
+      return acc;
+    }, {});
+  });
   const [periods, setPeriods] = useState(selectedPeriods);
-  const [subject, setSubject] = useState("");
-  const [topic, setTopic] = useState("");
-  const [remarks, setRemarks] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [existingData, setExistingData] = useState([]);
 
@@ -35,25 +45,12 @@ const Marking = () => {
     const fetchExistingData = async () => {
       try {
         const response = await fetch(
-          `https://tkrcet-backend.onrender.com/attendance/check?date=${date}&periods=${selectedPeriods.join(",")}`
+          `https://tkrcet-backend.onrender.com/attendance/check?date=${date}`
         );
         if (!response.ok) throw new Error("Failed to fetch existing attendance data.");
         const data = await response.json();
 
-        // Prepopulate data if available
-        if (data) {
-          setPeriods(data.periods || selectedPeriods);
-          setSubject(data.subject || "");
-          setTopic(data.topic || "");
-          setRemarks(data.remarks || "");
-          if (data.attendance) {
-            const attendanceMap = data.attendance.reduce((acc, record) => {
-              acc[record.rollNumber] = record.status;
-              return acc;
-            }, {});
-            setAttendance(attendanceMap);
-          }
-        }
+        // Update state with existing data if available
         setExistingData(data.periods || []);
       } catch (error) {
         console.error("Error fetching existing data:", error.message);
@@ -61,7 +58,7 @@ const Marking = () => {
     };
 
     fetchExistingData();
-  }, [date, selectedPeriods]);
+  }, [date]);
 
   const isPeriodDisabled = (period) => {
     return existingData.includes(period) && !selectedPeriods.includes(period);
@@ -123,7 +120,7 @@ const Marking = () => {
 
   return (
     <>
-<style>{`
+      <style>{`
     .attendanceMain {
     padding: 20px;
     background-color: #fff;
@@ -320,7 +317,6 @@ const Marking = () => {
     }
   }
       `}</style>
-
       <Header />
       <div className="nav">
         <NavBar />
@@ -397,7 +393,6 @@ const Marking = () => {
                 <td>
                   <input
                     type="radio"
-                    className="absentStatus"
                     checked={attendance[student.rollNumber] === "absent"}
                     onChange={() => handleAttendanceChange(student.rollNumber, "absent")}
                   />
