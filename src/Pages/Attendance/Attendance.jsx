@@ -53,13 +53,19 @@ const Attendance = () => {
   };
 
   const handleEdit = (row) => {
-    const queryParams = new URLSearchParams({
-      date: row.date,
-      periods: row.periods.join(","),
-    }).toString();
-    window.location.href = `/mark?${queryParams}`;
-  };
-
+  const queryParams = new URLSearchParams({
+    date: row.date,
+    periods: row.periods.join(","),
+    subject: row.subject,
+    topic: row.topic,
+    remarks: row.remarks || "",
+  }).toString();
+  const attendanceData = row.attendance.map(
+    (student) => `${student.rollNumber}:${student.status}`
+  ).join(",");
+  
+  window.location.href = `/mark?${queryParams}&attendance=${encodeURIComponent(attendanceData)}`;
+};
   return (
     <div>
       <Header />
