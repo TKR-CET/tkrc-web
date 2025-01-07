@@ -53,19 +53,27 @@ const Attendance = () => {
   };
 
   const handleEdit = (row) => {
-  const queryParams = new URLSearchParams({
-    date: row.date,
-    periods: row.periods.join(","),
-    subject: row.subject,
-    topic: row.topic,
-    remarks: row.remarks || "",
-  }).toString();
-  const attendanceData = row.attendance.map(
-    (student) => `${student.rollNumber}:${student.status}`
-  ).join(",");
+    const queryParams = new URLSearchParams({
+      date: row.date,
+      periods: row.periods.join(","),
+      subject: row.subject,
+      topic: row.topic,
+      remarks: row.remarks || "",
+    }).toString();
+    const attendanceData = row.attendance.map(
+      (student) => `${student.rollNumber}:${student.status}`
+    ).join(",");
   
-  window.location.href = `/mark?${queryParams}&attendance=${encodeURIComponent(attendanceData)}`;
-};
+    window.location.href = `/mark?${queryParams}&attendance=${encodeURIComponent(attendanceData)}`;
+  };
+
+  // Function to check if the date is in the past
+  const isDateInPast = (attendanceDate) => {
+    const currentDate = new Date();
+    const recordDate = new Date(attendanceDate);
+    return recordDate < currentDate;
+  };
+
   return (
     <div>
       <Header />
@@ -115,7 +123,6 @@ const Attendance = () => {
                   <th>Date</th>
                   <th>Periods</th>
                   <th>Topic</th>
-                  
                   <th>Absentees</th>
                   <th>Edit</th>
                 </tr>
@@ -127,14 +134,18 @@ const Attendance = () => {
                     <td>{record.date}</td>
                     <td>{record.periods.join(", ")}</td>
                     <td>{record.topic}</td>
-                    
                     <td>
                       {record.absentees.length > 0
                         ? record.absentees.join(", ")
                         : "None"}
                     </td>
                     <td>
-                      <button onClick={() => handleEdit(record)}>Edit</button>
+                      {/* Display "Not Editable" if the date is in the past */}
+                      {isDateInPast(record.date) ? (
+                        <span>Not Editable</span>
+                      ) : (
+                        <button onClick={() => handleEdit(record)}>Edit</button>
+                      )}
                     </td>
                   </tr>
                 ))}
