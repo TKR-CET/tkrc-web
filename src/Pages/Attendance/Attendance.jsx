@@ -11,6 +11,7 @@ const Attendance = () => {
   const [attendanceData, setAttendanceData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const currentDate = new Date().toISOString().split("T")[0]; // Current date in 'YYYY-MM-DD' format
 
   useEffect(() => {
     fetchAttendanceData(batch, date);
@@ -63,14 +64,19 @@ const Attendance = () => {
     const attendanceData = row.attendance.map(
       (student) => `${student.rollNumber}:${student.status}`
     ).join(",");
-  
+
     window.location.href = `/mark?${queryParams}&attendance=${encodeURIComponent(attendanceData)}`;
   };
 
-  // Function to check if the date is in the past
+  // Function to check if the date is in the past (ignoring time)
   const isDateInPast = (attendanceDate) => {
     const currentDate = new Date();
     const recordDate = new Date(attendanceDate);
+
+    // Set both dates to the start of the day (00:00:00) to ignore time
+    currentDate.setHours(0, 0, 0, 0);
+    recordDate.setHours(0, 0, 0, 0);
+
     return recordDate < currentDate;
   };
 
@@ -140,9 +146,8 @@ const Attendance = () => {
                         : "None"}
                     </td>
                     <td>
-                      {/* Display "Not Editable" if the date is in the past */}
                       {isDateInPast(record.date) ? (
-                        <span>Not Editable</span>
+                        "Not Editable"
                       ) : (
                         <button onClick={() => handleEdit(record)}>Edit</button>
                       )}
