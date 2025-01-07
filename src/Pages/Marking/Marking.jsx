@@ -390,13 +390,14 @@ const Marking = () => {
                     onChange={() => handleAttendanceChange(student.rollNumber, "present")}
                   />
                 </td>
-                <td>
-                  <input
-                    type="radio"
-                    checked={attendance[student.rollNumber] === "absent"}
-                    onChange={() => handleAttendanceChange(student.rollNumber, "absent")}
-                  />
-                </td>
+         <td>
+  <input
+    type="radio"
+    className="absentStatus"
+    checked={attendance[student.rollNumber] === "absent"}
+    onChange={() => handleAttendanceChange(student.rollNumber, "absent")}
+  />
+</td>
               </tr>
             ))}
           </tbody>
