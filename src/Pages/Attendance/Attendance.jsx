@@ -28,7 +28,7 @@ const Attendance = () => {
       );
 
       if (!response.ok) {
-        throw new Error(`Failed to fetch attendance data: ${response.status}`);
+        throw new Error(`No attendance record found : ${response.status}`);
       }
 
       const { data } = await response.json();
