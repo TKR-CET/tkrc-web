@@ -7,7 +7,7 @@
   padding: 10px 15px;
   border-bottom: 2px solid #ccc;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-  height:200px;
+  height:190px;
 }
 
 /* Left and Right Sections */
@@ -43,7 +43,7 @@
 }
 
 .college-name {
-  font-size: 26px;
+  font-size: 24px;
   color: purple;
   margin: 0;
   font-family: "Times New Roman", Times, serif;
