@@ -11,7 +11,7 @@ function VideoSection() {
         loop
         muted
         className="video"
-{/*         style={{ boxShadow: '0px 0px 20px rgb(255, 255, 255)' }} */}
+
       ></video>
     </div>
   );
