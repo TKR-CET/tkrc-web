@@ -1,13 +1,12 @@
 /* General Styles (For Both Desktop and Mobile) */
 .header-container {
   display: flex;
-  align-items: center; 
+  align-items: center;
   justify-content: space-between;
   background-color: #ffffff;
   padding: 10px 15px;
   border-bottom: 2px solid #ccc;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-  height:190px;
 }
 
 /* Left and Right Sections */
@@ -20,7 +19,7 @@
 
 .info-left p,
 .info-right p {
-  font-size: 14px;
+  font-size: 12px;
   margin: 5px 0;
   line-height: 1.4;
 }
@@ -58,12 +57,12 @@
 /* Right Section Specific Styles */
 .autonomous-text {
   color: red;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: bold;
 }
 
 .accreditation-info {
-  font-size: 14px;
+  font-size: 12px;
   line-height: 1.4;
 }
 
