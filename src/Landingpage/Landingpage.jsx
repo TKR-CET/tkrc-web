@@ -19,10 +19,11 @@ const Landingpage=()=>{
         <div class="mob-nav">
         <MobileNav/>
         </div>
-      <div class="fot">
+
+        <VideoSection/>
+            <div class="fot">
         <MainFooter/>
         </div>
-        <VideoSection/>
               <div class="del">
           <DelegatesInfo/>
                 </div>
