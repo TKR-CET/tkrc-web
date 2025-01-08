@@ -11,6 +11,7 @@ const Attendance = () => {
   const [attendanceData, setAttendanceData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
   const currentDate = new Date().toISOString().split("T")[0]; // Current date in 'YYYY-MM-DD' format
 
   useEffect(() => {
@@ -31,17 +32,14 @@ const Attendance = () => {
       }
 
       const { data } = await response.json();
-      console.log("API Response Data:", data); // Debugging: Check API response
 
       if (Array.isArray(data)) {
-        // Process absentees for each record
         const processedData = data.map((record) => ({
           ...record,
           absentees: record.attendance
             .filter((student) => student.status === "absent")
-            .map((student) => student.rollNumber), // Extract roll numbers of absentees
+            .map((student) => student.rollNumber),
         }));
-        console.log("Processed Data with Absentees:", processedData); // Debugging
         setAttendanceData(processedData);
       } else {
         throw new Error("Invalid data format: Expected an array.");
@@ -61,23 +59,21 @@ const Attendance = () => {
       topic: row.topic,
       remarks: row.remarks || "",
     }).toString();
-    const attendanceData = row.attendance.map(
-      (student) => `${student.rollNumber}:${student.status}`
-    ).join(",");
+
+    const attendanceData = row.attendance
+      .map((student) => `${student.rollNumber}:${student.status}`)
+      .join(",");
 
     window.location.href = `/mark?${queryParams}&attendance=${encodeURIComponent(attendanceData)}`;
   };
 
-  // Function to check if the date is in the past (ignoring time)
-  const isDateInPast = (attendanceDate) => {
+  const isDateInPastOrFuture = (attendanceDate) => {
     const currentDate = new Date();
     const recordDate = new Date(attendanceDate);
-
-    // Set both dates to the start of the day (00:00:00) to ignore time
     currentDate.setHours(0, 0, 0, 0);
     recordDate.setHours(0, 0, 0, 0);
 
-    return recordDate < currentDate;
+    return recordDate !== currentDate;
   };
 
   return (
@@ -146,7 +142,7 @@ const Attendance = () => {
                         : "None"}
                     </td>
                     <td>
-                      {isDateInPast(record.date) ? (
+                      {isDateInPastOrFuture(record.date) ? (
                         "Not Editable"
                       ) : (
                         <button onClick={() => handleEdit(record)}>Edit</button>
