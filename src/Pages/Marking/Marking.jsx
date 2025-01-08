@@ -18,7 +18,9 @@ const Marking = () => {
     { rollNumber: "23891A6XYZ4", name: "Name 4" },
   ];
 
-  // Parse query params for subject, topic, remarks, and attendance
+  const today = new Date().toISOString().split("T")[0];
+  const isFutureDate = new Date(date) > new Date(today);
+
   const [subject, setSubject] = useState(query.get("subject") || "");
   const [topic, setTopic] = useState(query.get("topic") || "");
   const [remarks, setRemarks] = useState(query.get("remarks") || "");
@@ -31,12 +33,12 @@ const Marking = () => {
         return acc;
       }, {});
     }
-    // Default all students to "present"
     return studentsData.reduce((acc, student) => {
       acc[student.rollNumber] = "present";
       return acc;
     }, {});
   });
+
   const [periods, setPeriods] = useState(selectedPeriods);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [existingData, setExistingData] = useState([]);
@@ -49,8 +51,6 @@ const Marking = () => {
         );
         if (!response.ok) throw new Error("Failed to fetch existing attendance data.");
         const data = await response.json();
-
-        // Update state with existing data if available
         setExistingData(data.periods || []);
       } catch (error) {
         console.error("Error fetching existing data:", error.message);
@@ -120,7 +120,7 @@ const Marking = () => {
 
   return (
     <>
-      <style>{`
+<style>{`
     .attendanceMain {
     padding: 20px;
     background-color: #fff;
@@ -326,6 +326,11 @@ const Marking = () => {
       </div>
       <div className="attendanceMain">
         <h2 className="attendanceHeading">Mark Attendance for {date}</h2>
+        {isFutureDate && (
+          <p className="compulsoryText">
+            Attendance cannot be marked for a future date.
+          </p>
+        )}
         <div>
           <label>Periods:</label>
           {[1, 2, 3, 4, 5, 6].map((period) => (
@@ -333,7 +338,7 @@ const Marking = () => {
               <input
                 type="checkbox"
                 value={period}
-                disabled={isPeriodDisabled(period)}
+                disabled={isFutureDate || isPeriodDisabled(period)}
                 checked={periods.includes(period)}
                 onChange={() =>
                   setPeriods((prev) =>
@@ -353,6 +358,7 @@ const Marking = () => {
             value={subject}
             onChange={(e) => setSubject(e.target.value)}
             placeholder="Enter Subject"
+            disabled={isFutureDate}
           />
           <label htmlFor="input-topic">Topic:</label>
           <textarea
@@ -360,6 +366,7 @@ const Marking = () => {
             value={topic}
             onChange={(e) => setTopic(e.target.value)}
             placeholder="Enter Topic"
+            disabled={isFutureDate}
           />
           <label htmlFor="input-remarks">Remarks:</label>
           <textarea
@@ -367,6 +374,7 @@ const Marking = () => {
             value={remarks}
             onChange={(e) => setRemarks(e.target.value)}
             placeholder="Enter Remarks"
+            disabled={isFutureDate}
           />
         </div>
         <table className="attendanceList">
@@ -388,16 +396,18 @@ const Marking = () => {
                     type="radio"
                     checked={attendance[student.rollNumber] === "present"}
                     onChange={() => handleAttendanceChange(student.rollNumber, "present")}
+                    disabled={isFutureDate}
                   />
                 </td>
-         <td>
-  <input
-    type="radio"
-    className="absentStatus"
-    checked={attendance[student.rollNumber] === "absent"}
-    onChange={() => handleAttendanceChange(student.rollNumber, "absent")}
-  />
-</td>
+                <td>
+                  <input
+                    type="radio"
+                    className="absentStatus"
+                    checked={attendance[student.rollNumber] === "absent"}
+                    onChange={() => handleAttendanceChange(student.rollNumber, "absent")}
+                    disabled={isFutureDate}
+                  />
+                </td>
               </tr>
             ))}
           </tbody>
@@ -405,7 +415,7 @@ const Marking = () => {
         <button
           id="btn-submit"
           onClick={handleSubmit}
-          disabled={isSubmitting || periods.length === 0}
+          disabled={isSubmitting || periods.length === 0 || isFutureDate}
         >
           {isSubmitting ? "Submitting..." : "Submit"}
         </button>
