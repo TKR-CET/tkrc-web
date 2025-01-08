@@ -35,7 +35,7 @@ nav {
 }
 
 .nav-menu-links a:hover {
-  color: #ffb005;
+  color: green;
 }
 
 /* Dropdown Styling */
@@ -173,7 +173,7 @@ nav {
 }
 
 .account-menu-button:hover {
-  background-color: #005bb5;
+  background-color: #ffb005;
   color: #fff;
 }
 
