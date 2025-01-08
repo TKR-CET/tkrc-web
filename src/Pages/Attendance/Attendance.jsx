@@ -67,15 +67,23 @@ const Attendance = () => {
     window.location.href = `/mark?${queryParams}&attendance=${encodeURIComponent(attendanceData)}`;
   };
 
-  const isDateInPastOrFuture = (attendanceDate) => {
-    const currentDate = new Date();
-    const recordDate = new Date(attendanceDate);
-    currentDate.setHours(0, 0, 0, 0);
-    recordDate.setHours(0, 0, 0, 0);
+  const isDateInPast = (attendanceDate) => {
+  const currentDate = new Date();
+  const recordDate = new Date(attendanceDate);
+  currentDate.setHours(0, 0, 0, 0);
+  recordDate.setHours(0, 0, 0, 0);
 
-    return recordDate !== currentDate;
-  };
+  return recordDate < currentDate; // Return true if the record date is in the past
+};
 
+const isDateInFuture = (attendanceDate) => {
+  const currentDate = new Date();
+  const recordDate = new Date(attendanceDate);
+  currentDate.setHours(0, 0, 0, 0);
+  recordDate.setHours(0, 0, 0, 0);
+
+  return recordDate > currentDate; // Return true if the record date is in the future
+};
   return (
     <div>
       <Header />
@@ -142,12 +150,12 @@ const Attendance = () => {
                         : "None"}
                     </td>
                     <td>
-                      {isDateInPastOrFuture(record.date) ? (
-                        "Not Editable"
-                      ) : (
-                        <button onClick={() => handleEdit(record)}>Edit</button>
-                      )}
-                    </td>
+  {isDateInPast(record.date) || isDateInFuture(record.date) ? (
+    "Not Editable"
+  ) : (
+    <button onClick={() => handleEdit(record)}>Edit</button>
+  )}
+</td>
                   </tr>
                 ))}
               </tbody>
