@@ -6,12 +6,7 @@
 .mob-nav {
   display: none; /* Hide mobile nav by default */
 }
-.del{
-  display:none;
-}
-.fot{
-  display:block;
-}
+
 /* Show/hide based on screen size */
 @media screen and (max-width: 768px) {
   .nav {
@@ -21,10 +16,4 @@
   .mob-nav {
     display: block; /* Show mobile nav on smaller screens */
   }
-  .del{
-  display:block;
-}
-.fot{
-  display:none;
-}
 }
