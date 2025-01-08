@@ -5,7 +5,7 @@ import VideoSection from '../Components/VideoSection/VideoSection.jsx';
 import Footer from '../Components/Footer/Footer.jsx';
 import MobileNav from "../Components/MobileNav/MobileNav.jsx"
 import "./Landingpage.css"
-import MainFooter from "Components/MainFooter/MainFooter.jsx"
+import MainFooter from "../Components/MainFooter/MainFooter.jsx"
 import DelegatesInfo from "../Components/DelegatesInfo/DelegatesInfo.jsx"
 const Landingpage=()=>{
   return(
