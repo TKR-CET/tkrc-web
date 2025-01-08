@@ -19,7 +19,8 @@ const Marking = () => {
   ];
 
   const today = new Date().toISOString().split("T")[0];
-  const isFutureDate = new Date(date) > new Date(today);
+  const isFutureDate = new Date(date) > new Date(today); // Check if it's a future date
+  const isPastDate = new Date(date) < new Date(today); // Check if it's a past date
 
   const [subject, setSubject] = useState(query.get("subject") || "");
   const [topic, setTopic] = useState(query.get("topic") || "");
@@ -326,9 +327,9 @@ const Marking = () => {
       </div>
       <div className="attendanceMain">
         <h2 className="attendanceHeading">Mark Attendance for {date}</h2>
-        {isFutureDate && (
+        {(isFutureDate || isPastDate) && (
           <p className="compulsoryText">
-            Attendance cannot be marked for a future date.
+            Attendance cannot be marked for a future or past date.
           </p>
         )}
         <div>
@@ -338,7 +339,7 @@ const Marking = () => {
               <input
                 type="checkbox"
                 value={period}
-                disabled={isFutureDate || isPeriodDisabled(period)}
+                disabled={isFutureDate || isPastDate || isPeriodDisabled(period)}
                 checked={periods.includes(period)}
                 onChange={() =>
                   setPeriods((prev) =>
@@ -358,7 +359,7 @@ const Marking = () => {
             value={subject}
             onChange={(e) => setSubject(e.target.value)}
             placeholder="Enter Subject"
-            disabled={isFutureDate}
+            disabled={isFutureDate || isPastDate}
           />
           <label htmlFor="input-topic">Topic:</label>
           <textarea
@@ -366,7 +367,7 @@ const Marking = () => {
             value={topic}
             onChange={(e) => setTopic(e.target.value)}
             placeholder="Enter Topic"
-            disabled={isFutureDate}
+            disabled={isFutureDate || isPastDate}
           />
           <label htmlFor="input-remarks">Remarks:</label>
           <textarea
@@ -374,7 +375,7 @@ const Marking = () => {
             value={remarks}
             onChange={(e) => setRemarks(e.target.value)}
             placeholder="Enter Remarks"
-            disabled={isFutureDate}
+            disabled={isFutureDate || isPastDate}
           />
         </div>
         <table className="attendanceList">
@@ -396,7 +397,7 @@ const Marking = () => {
                     type="radio"
                     checked={attendance[student.rollNumber] === "present"}
                     onChange={() => handleAttendanceChange(student.rollNumber, "present")}
-                    disabled={isFutureDate}
+                    disabled={isFutureDate || isPastDate}
                   />
                 </td>
                 <td>
@@ -405,7 +406,7 @@ const Marking = () => {
                     className="absentStatus"
                     checked={attendance[student.rollNumber] === "absent"}
                     onChange={() => handleAttendanceChange(student.rollNumber, "absent")}
-                    disabled={isFutureDate}
+                    disabled={isFutureDate || isPastDate}
                   />
                 </td>
               </tr>
@@ -415,7 +416,7 @@ const Marking = () => {
         <button
           id="btn-submit"
           onClick={handleSubmit}
-          disabled={isSubmitting || periods.length === 0 || isFutureDate}
+          disabled={isSubmitting || periods.length === 0 || isFutureDate || isPastDate}
         >
           {isSubmitting ? "Submitting..." : "Submit"}
         </button>
