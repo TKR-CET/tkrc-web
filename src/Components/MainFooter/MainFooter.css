@@ -6,7 +6,8 @@
     padding: 30px 10px; /* Add padding for spacing */
     font-family: 'Arial', sans-serif; /* Use a clean font */
     font-size: 14px; /* Set a readable font size */
-    border-top: 2px solid #34495e; /* Optional: Add a top border */
+    border-top: 2px solid #34495e; 
+    padding-bottom:10px;/* Optional: Add a top border */
 }
 
 .footer p {
