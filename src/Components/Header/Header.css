@@ -7,7 +7,7 @@
   padding: 10px 15px;
   border-bottom: 2px solid #ccc;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-  height:180px;
+  height:200px;
 }
 
 /* Left and Right Sections */
@@ -20,7 +20,7 @@
 
 .info-left p,
 .info-right p {
-  font-size: 12px;
+  font-size: 14px;
   margin: 5px 0;
   line-height: 1.4;
 }
@@ -43,7 +43,7 @@
 }
 
 .college-name {
-  font-size: 24px;
+  font-size: 26px;
   color: purple;
   margin: 0;
   font-family: "Times New Roman", Times, serif;
@@ -58,12 +58,12 @@
 /* Right Section Specific Styles */
 .autonomous-text {
   color: red;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: bold;
 }
 
 .accreditation-info {
-  font-size: 12px;
+  font-size: 14px;
   line-height: 1.4;
 }
 
