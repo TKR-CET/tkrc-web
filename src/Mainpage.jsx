@@ -7,6 +7,7 @@ import Attendance from './Pages/Attendance/Attendance'
 import Activitydiary from './Pages/Activitydiary/Activitydiary';
 import Homepage from "./Homepage/Homepage";
 import Marking from "./Pages/Marking/Marking.jsx";
+import AddFacultyForm from "./AddFacultyForm";
 
 
 
@@ -33,8 +34,8 @@ function Mainpage() {
         <Route path="/index" element={<Landingpage/>}/>
                 <Route path="/attendance" element={<Attendance/>}/>
                   <Route path="/activity" element={<Activitydiary/>}/>
-
-                  
+  
+                  <Route path="/form" element={<AddFacultyForm/>}/>
                   <Route path="/mark" element={<Marking/>}/>
       </Routes>
     </div>
