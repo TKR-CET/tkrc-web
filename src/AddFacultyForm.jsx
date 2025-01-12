@@ -7,7 +7,20 @@ const AddFacultyForm = () => {
     role: "",
     department: "",
     password: "",
-    timetable: '[{"day":"Monday","periods":[{"periodNumber":1,"subject":"Database Systems","year":"First Year","department":"Computer Science","section":"A"}]}]',
+    timetable: [
+      {
+        day: "Monday",
+        periods: [
+          {
+            periodNumber: 1,
+            subject: "Database Systems",
+            year: "First Year",
+            department: "Computer Science",
+            section: "A",
+          },
+        ],
+      },
+    ],
   });
   const [image, setImage] = useState(null);
   const [message, setMessage] = useState("");
@@ -21,6 +34,17 @@ const AddFacultyForm = () => {
     });
   };
 
+  // Handle timetable input change
+  const handleTimetableChange = (e, index, periodIndex) => {
+    const { name, value } = e.target;
+    const updatedTimetable = [...formData.timetable];
+    updatedTimetable[index].periods[periodIndex][name] = value;
+    setFormData({
+      ...formData,
+      timetable: updatedTimetable,
+    });
+  };
+
   // Handle file input changes
   const handleFileChange = (e) => {
     setImage(e.target.files[0]);
@@ -30,15 +54,6 @@ const AddFacultyForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Ensure timetable is parsed as an array before sending it
-    let parsedTimetable;
-    try {
-      parsedTimetable = JSON.parse(formData.timetable); // Parse timetable string to an array
-    } catch (error) {
-      setMessage("Invalid timetable format");
-      return;
-    }
-
     // Create a FormData object to send form data and file
     const form = new FormData();
     form.append("name", formData.name);
@@ -46,12 +61,14 @@ const AddFacultyForm = () => {
     form.append("role", formData.role);
     form.append("department", formData.department);
     form.append("password", formData.password);
-    form.append("timetable", JSON.stringify(parsedTimetable));  // Send timetable as an array
+
+    // Convert timetable to JSON before sending
+    form.append("timetable", JSON.stringify(formData.timetable));
     if (image) form.append("image", image);  // Attach image if provided
 
     try {
       // Send the form data to the backend using fetch
-      const response = await fetch("http://localhost:5000/faculty/addfaculty", {
+      const response = await fetch("http://localhost:5000/api/faculty/add", {
         method: "POST",
         body: form,
       });
@@ -122,15 +139,58 @@ const AddFacultyForm = () => {
             required
           />
         </div>
-        <div>
-          <label>Timetable (JSON format):</label>
-          <textarea
-            name="timetable"
-            value={formData.timetable}
-            onChange={handleChange}
-            required
-          />
-        </div>
+        
+        {/* Timetable Form Inputs */}
+        {formData.timetable.map((timetableItem, index) => (
+          <div key={index}>
+            <h4>{timetableItem.day}</h4>
+            {timetableItem.periods.map((period, periodIndex) => (
+              <div key={periodIndex}>
+                <label>Period Number:</label>
+                <input
+                  type="number"
+                  name="periodNumber"
+                  value={period.periodNumber}
+                  onChange={(e) => handleTimetableChange(e, index, periodIndex)}
+                  required
+                />
+                <label>Subject:</label>
+                <input
+                  type="text"
+                  name="subject"
+                  value={period.subject}
+                  onChange={(e) => handleTimetableChange(e, index, periodIndex)}
+                  required
+                />
+                <label>Year:</label>
+                <input
+                  type="text"
+                  name="year"
+                  value={period.year}
+                  onChange={(e) => handleTimetableChange(e, index, periodIndex)}
+                  required
+                />
+                <label>Department:</label>
+                <input
+                  type="text"
+                  name="department"
+                  value={period.department}
+                  onChange={(e) => handleTimetableChange(e, index, periodIndex)}
+                  required
+                />
+                <label>Section:</label>
+                <input
+                  type="text"
+                  name="section"
+                  value={period.section}
+                  onChange={(e) => handleTimetableChange(e, index, periodIndex)}
+                  required
+                />
+              </div>
+            ))}
+          </div>
+        ))}
+
         <div>
           <label>Profile Image:</label>
           <input
@@ -146,4 +206,3 @@ const AddFacultyForm = () => {
 };
 
 export default AddFacultyForm;
-                
