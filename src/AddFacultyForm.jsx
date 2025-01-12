@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
- 
+
 const AddFacultyForm = () => {
   const [formData, setFormData] = useState({
     name: "",
@@ -8,11 +8,12 @@ const AddFacultyForm = () => {
     role: "",
     department: "",
     password: "",
-    timetable: [],
+    timetable: "", // Store timetable as a raw JSON string
   });
 
   const [image, setImage] = useState(null);
   const [responseMessage, setResponseMessage] = useState("");
+  const [timetableError, setTimetableError] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -26,22 +27,36 @@ const AddFacultyForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const data = new FormData();
-    data.append("name", formData.name);
-    data.append("facultyId", formData.facultyId);
-    data.append("role", formData.role);
-    data.append("department", formData.department);
-    data.append("password", formData.password);
-    data.append("timetable", JSON.stringify(formData.timetable));
-    if (image) data.append("image", image);
-
     try {
+      // Validate and parse the timetable
+      const parsedTimetable = JSON.parse(formData.timetable);
+      if (!Array.isArray(parsedTimetable)) {
+        setTimetableError("Timetable must be an array");
+        return;
+      }
+      setTimetableError(""); // Reset error if valid
+
+      // Prepare form data for submission
+      const data = new FormData();
+      data.append("name", formData.name);
+      data.append("facultyId", formData.facultyId);
+      data.append("role", formData.role);
+      data.append("department", formData.department);
+      data.append("password", formData.password);
+      data.append("timetable", formData.timetable); // Send raw JSON string
+      if (image) data.append("image", image);
+
+      // Send data to the backend
       const response = await axios.post("http://localhost:5000/faculty/addfaculty", data, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setResponseMessage(response.data.message);
     } catch (error) {
-      setResponseMessage(error.response?.data?.message || "Error adding faculty");
+      if (error instanceof SyntaxError) {
+        setTimetableError("Invalid JSON format for timetable");
+      } else {
+        setResponseMessage(error.response?.data?.message || "Error adding faculty");
+      }
     }
   };
 
@@ -74,15 +89,17 @@ const AddFacultyForm = () => {
           <textarea
             name="timetable"
             value={formData.timetable}
-            onChange={(e) => setFormData({ ...formData, timetable: JSON.parse(e.target.value) })}
+            onChange={handleChange}
             placeholder='[{ "day": "Monday", "periods": [...] }, ...]'
+            required
           />
+          {timetableError && <p style={{ color: "red" }}>{timetableError}</p>}
         </div>
         <div>
           <label>Profile Image:</label>
           <input type="file" accept="image/*" onChange={handleImageChange} />
         </div>
-        <button type="submit">Add Faculty</button>
+        <button type="submit" disabled={timetableError}>Add Faculty</button>
       </form>
       {responseMessage && <p>{responseMessage}</p>}
     </div>
