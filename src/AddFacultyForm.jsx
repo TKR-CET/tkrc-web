@@ -30,8 +30,14 @@ const AddFacultyForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Parse timetable string into an array of objects
-    const parsedTimetable = JSON.parse(formData.timetable);
+    // Ensure timetable is parsed as an array before sending it
+    let parsedTimetable;
+    try {
+      parsedTimetable = JSON.parse(formData.timetable); // Parse timetable string to an array
+    } catch (error) {
+      setMessage("Invalid timetable format");
+      return;
+    }
 
     // Create a FormData object to send form data and file
     const form = new FormData();
@@ -136,7 +142,8 @@ const AddFacultyForm = () => {
         <button type="submit">Add Faculty</button>
       </form>
     </div>
-  ); 
+  );
 };
 
 export default AddFacultyForm;
+                
