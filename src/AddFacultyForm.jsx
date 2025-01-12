@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-
+ 
 const AddFacultyForm = () => {
   const [formData, setFormData] = useState({
     name: "",
