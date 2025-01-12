@@ -68,7 +68,7 @@ const AddFacultyForm = () => {
 
     try {
       // Send the form data to the backend using fetch
-      const response = await fetch("http://localhost:5000/api/faculty/add", {
+      const response = await fetch("http://localhost:5000/faculty/addfaculty", {
         method: "POST",
         body: form,
       });
