@@ -65,39 +65,38 @@ const Timetable = () => {
             </div>
 
             {/* Staff Details */}
-            <section className="staff-details">
-                <table>
-                    <tbody>
-                        <tr>
-                            <td>Name</td>
-                            <td>{facultyDetails.name || "N/A"}</td>
-                            <td rowSpan={3}>
-                                {facultyDetails.image && (
-                                    <img
-                                        src={`http://localhost:5000/uploads/${facultyDetails.image?.split('/').pop()}`}
-                                        alt={`${facultyDetails.name || "Faculty"} Profile`}
-                                        className="faculty-image"
-                                        style={{ width: '100px', height: '100px', borderRadius: '50%' }}
-                                        onLoad={() => alert("Image loaded successfully!")}
-                                        onError={(e) => {
-                                            alert(`Failed to load image: ${facultyDetails.image}`);
-                                            e.target.src = "/path/to/default-image.jpg"; // Fallback to default image
-                                        }}
-                                    />
-                                )}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Department</td>
-                            <td>{facultyDetails.department || "N/A"}</td>
-                        </tr>
-                        <tr>
-                            <td>Designation</td>
-                            <td>{facultyDetails.role || "N/A"}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </section>
+    <section className="staff-details">
+    <table>
+        <tbody>
+            <tr>
+                <td>Name</td>
+                <td>{facultyDetails.name || "N/A"}</td>
+                <td rowSpan={3}>
+
+                      {facultyDetails.image && (
+    <img
+        src={`http://localhost:5000/uploads/${facultyDetails.image.split('/').pop()}`}
+        alt={`${facultyDetails.name || "Faculty"} Profile`}
+        className="faculty-image"
+        style={{ width: '100px', height: '100px', borderRadius: '50%' }}
+        onError={(e) => {
+            e.target.src = "/path/to/default-image.jpg"; // Fallback to default image
+        }}
+    />
+)}                   
+                </td>
+            </tr>
+            <tr>
+                <td>Department</td>
+                <td>{facultyDetails.department || "N/A"}</td>
+            </tr>
+            <tr>
+                <td>Designation</td>
+                <td>{facultyDetails.role || "N/A"}</td>
+            </tr>
+        </tbody>
+    </table>
+</section>
 
             {/* Timetable */}
             <h2>Time Table - ODD Semester (2024-25)</h2>
@@ -171,3 +170,4 @@ const Timetable = () => {
 };
 
 export default Timetable;
+                
