@@ -10,36 +10,52 @@ const Timetable = () => {
     const [facultyDetails, setFacultyDetails] = useState({});
     const facultyId = localStorage.getItem("facultyId"); // Using MongoDB _id from localStorage
 
+    // Fetch timetable
     useEffect(() => {
-    const fetchTimetable = async () => {
-        try {
-            const response = await axios.get(
-                `http://localhost:5000/faculty/${facultyId}/timetable`
-            );
-            setTimetable(response.data.timetable);
-            setFacultyDetails(response.data.facultyDetails);
-
-            // Check if the image URL is missing or invalid
-            if (!response.data.facultyDetails.image || response.data.facultyDetails.image === "./images/logo.png") {
-                alert("Faculty image is missing or invalid. Using default image.");
-                setFacultyDetails((prevDetails) => ({
-                    ...prevDetails,
-                    image: "./images/logo.png"  // Ensure default image is set
-                }));
+        const fetchTimetable = async () => {
+            try {
+                const response = await axios.get(
+                    `http://localhost:5000/faculty/${facultyId}/timetable`
+                );
+                setTimetable(response.data.timetable);
+            } catch (error) {
+                alert("Error fetching timetable: " + error.message);
+                console.error("Error fetching timetable:", error);
             }
-        } catch (error) {
-            alert("Error fetching timetable: " + error.message);
-            console.error("Error fetching timetable:", error);
+        };
+
+        if (facultyId) {
+            fetchTimetable();
+        } else {
+            alert("Faculty ID is missing!");
+            console.error("Faculty ID is missing!");
         }
+    }, [facultyId]);
+
+    // Fetch faculty details
+    useEffect(() => {
+        const fetchFacultyDetails = async () => {
+            try {
+                const response = await axios.get(
+                    `http://localhost:5000/faculty/${facultyId}`
+                );
+                setFacultyDetails(response.data);
+            } catch (error) {
+                alert("Error fetching faculty details: " + error.message);
+                console.error("Error fetching faculty details:", error);
+            }
+        };
+
+        if (facultyId) {
+            fetchFacultyDetails();
+        }
+    }, [facultyId]);
+
+    const handleImageError = (e) => {
+        console.warn("Error loading faculty image. Using fallback image.");
+        e.target.src = "./images/logo.png"; // Fallback to default image
     };
 
-    if (facultyId) {
-        fetchTimetable();
-    } else {
-        alert("Faculty ID is missing!");
-        console.error("Faculty ID is missing!");
-    }
-}, [facultyId]);
     const processPeriods = (periods) => {
         const mergedPeriods = [];
         let i = 0;
@@ -64,11 +80,6 @@ const Timetable = () => {
         return mergedPeriods;
     };
 
-    const handleImageError = (e) => {
-        console.warn("Error loading faculty image. Using fallback image.");
-        e.target.src = "./images/logo.png"; // Fallback to default image
-    };
-
     return (
         <div>
             <Header />
@@ -88,7 +99,7 @@ const Timetable = () => {
                             <td>{facultyDetails.name || "N/A"}</td>
                             <td rowSpan={3}>
                                 <img
-                                    src={facultyDetails.image || "./images/logo.png"} // Use image directly from the database
+                                    src={facultyDetails.image || "./images/logo.png"} // Use image from separate fetch
                                     alt={`${facultyDetails.name || "Faculty"} Profile`}
                                     className="faculty-image"
                                     style={{
@@ -136,11 +147,9 @@ const Timetable = () => {
                                 ) || null;
                             });
 
-                            // Split periods into two groups: before and after LUNCH
                             const periodsBeforeLunch = periods.slice(0, 3);
                             const periodsAfterLunch = periods.slice(4);
 
-                            // Process merging for each group
                             const mergedBeforeLunch = processPeriods(periodsBeforeLunch);
                             const mergedAfterLunch = processPeriods(periodsAfterLunch);
 
@@ -148,7 +157,6 @@ const Timetable = () => {
                                 <tr key={index}>
                                     <td>{dayData.day || "N/A"}</td>
 
-                                    {/* Render periods before LUNCH */}
                                     {mergedBeforeLunch.map((merged, i) => (
                                         <td key={i} colSpan={merged.span}>
                                             {merged.period
@@ -157,7 +165,6 @@ const Timetable = () => {
                                         </td>
                                     ))}
 
-                                    {/* Render LUNCH */}
                                     <td
                                         key="lunch"
                                         style={{ textAlign: "center", fontWeight: "bold" }}
@@ -165,7 +172,6 @@ const Timetable = () => {
                                         LUNCH
                                     </td>
 
-                                    {/* Render periods after LUNCH */}
                                     {mergedAfterLunch.map((merged, i) => (
                                         <td key={i + 4} colSpan={merged.span}>
                                             {merged.period
