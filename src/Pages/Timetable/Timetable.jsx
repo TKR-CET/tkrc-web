@@ -61,10 +61,6 @@ const Timetable = () => {
         e.target.src = "./images/logo.png"; // Fallback to default image
     };
 
-    const imagePath = facultyDetails.image
-        ? `http://localhost:5000/uploads/${facultyDetails.image}`
-        : "./images/logo.png"; // Fallback image if no image is provided
-
     return (
         <div>
             <Header />
@@ -84,7 +80,7 @@ const Timetable = () => {
                             <td>{facultyDetails.name || "N/A"}</td>
                             <td rowSpan={3}>
                                 <img
-                                    src={imagePath}
+                                    src={facultyDetails.image || "./images/logo.png"} // Use image directly from the database
                                     alt={`${facultyDetails.name || "Faculty"} Profile`}
                                     className="faculty-image"
                                     style={{
