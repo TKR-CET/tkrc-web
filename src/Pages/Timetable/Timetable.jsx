@@ -11,27 +11,31 @@ const Timetable = () => {
     const facultyId = localStorage.getItem("facultyId"); // Using MongoDB _id from localStorage
 
     useEffect(() => {
-        const fetchTimetable = async () => {
-            try {
-                const response = await axios.get(
-                    `http://localhost:5000/faculty/${facultyId}/timetable`
-                );
-                setTimetable(response.data.timetable);
-                setFacultyDetails(response.data.facultyDetails);
-            } catch (error) {
-                alert("Error fetching timetable: " + error.message);
-                console.error("Error fetching timetable:", error);
+    const fetchTimetable = async () => {
+        try {
+            const response = await axios.get(
+                `http://localhost:5000/faculty/${facultyId}/timetable`
+            );
+            setTimetable(response.data.timetable);
+            setFacultyDetails(response.data.facultyDetails);
+
+            // Check if the image URL is present and valid
+            if (!response.data.facultyDetails.image || response.data.facultyDetails.image === "./images/logo.png") {
+                alert("Faculty image is missing or invalid. Using default image.");
             }
-        };
-
-        if (facultyId) {
-            fetchTimetable();
-        } else {
-            alert("Faculty ID is missing!");
-            console.error("Faculty ID is missing!");
+        } catch (error) {
+            alert("Error fetching timetable: " + error.message);
+            console.error("Error fetching timetable:", error);
         }
-    }, [facultyId]);
+    };
 
+    if (facultyId) {
+        fetchTimetable();
+    } else {
+        alert("Faculty ID is missing!");
+        console.error("Faculty ID is missing!");
+    }
+}, [facultyId]);
     const processPeriods = (periods) => {
         const mergedPeriods = [];
         let i = 0;
