@@ -19,9 +19,13 @@ const Timetable = () => {
             setTimetable(response.data.timetable);
             setFacultyDetails(response.data.facultyDetails);
 
-            // Check if the image URL is present and valid
+            // Check if the image URL is missing or invalid
             if (!response.data.facultyDetails.image || response.data.facultyDetails.image === "./images/logo.png") {
                 alert("Faculty image is missing or invalid. Using default image.");
+                setFacultyDetails((prevDetails) => ({
+                    ...prevDetails,
+                    image: "./images/logo.png"  // Ensure default image is set
+                }));
             }
         } catch (error) {
             alert("Error fetching timetable: " + error.message);
