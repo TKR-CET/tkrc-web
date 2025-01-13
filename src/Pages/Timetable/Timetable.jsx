@@ -84,8 +84,8 @@ const Timetable = () => {
         <div>
             <Header />
             <div className="nav">
-                <NavBar />
-            </div>
+  <NavBar facultyName={facultyDetails.name} />
+</div>
             <div className="mob-nav">
                 <MobileNav />
             </div>
