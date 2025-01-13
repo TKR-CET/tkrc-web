@@ -2,10 +2,10 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./NavBar.css";
 
-function NavBar() {
+function NavBar({ facultyName }) {
   const [attendanceMenuVisible, setAttendanceMenuVisible] = useState(false);
-  const [accountMenuVisible, setAccountMenuVisible] = useState(false); // Track Account menu visibility
-  const [subMenu, setSubMenu] = useState(null); // Tracks the current submenu (class, department, etc.)
+  const [accountMenuVisible, setAccountMenuVisible] = useState(false);
+  const [subMenu, setSubMenu] = useState(null);
   const [branchesVisible, setBranchesVisible] = useState(false);
 
   const navRef = useRef(null);
@@ -22,18 +22,23 @@ function NavBar() {
   };
 
   const handleClassClick = (e) => {
-    e.stopPropagation(); // Prevent closing the menu
+    e.stopPropagation();
     setSubMenu("class");
   };
 
   const handleYearClick = (e) => {
-    e.stopPropagation(); // Prevent closing the menu
+    e.stopPropagation();
     setSubMenu("department");
   };
 
   const handleDepartmentClick = (e) => {
-    e.stopPropagation(); // Prevent closing the menu
+    e.stopPropagation();
     setBranchesVisible(true);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("facultyId");
+    navigate("/"); // Redirect to login page
   };
 
   useEffect(() => {
@@ -42,7 +47,7 @@ function NavBar() {
         setAttendanceMenuVisible(false);
         setSubMenu(null);
         setBranchesVisible(false);
-        setAccountMenuVisible(false); // Close account menu when clicking outside
+        setAccountMenuVisible(false);
       }
     };
 
@@ -59,7 +64,7 @@ function NavBar() {
           <Link to="/index">
             <li>Home</li>
           </Link>
-          <Link  to="/timetable">
+          <Link to="/timetable">
             <li>Timetable</li>
           </Link>
           <li>
@@ -68,14 +73,19 @@ function NavBar() {
                 Attendance
               </a>
               {attendanceMenuVisible && (
-                <div className="menu-drop-container" onClick={(e) => e.stopPropagation()}>
+                <div
+                  className="menu-drop-container"
+                  onClick={(e) => e.stopPropagation()}
+                >
                   <div className="menu-dropdown-content">
                     {subMenu === null && (
                       <>
                         <ul>
                           <li onClick={handleClassClick}>Class</li>
                           <li>Register</li>
-                        <Link id="j" to="/activity" > <li>Activity Diary</li></Link>
+                          <Link id="j" to="/activity">
+                            <li>Activity Diary</li>
+                          </Link>
                         </ul>
                       </>
                     )}
@@ -97,9 +107,15 @@ function NavBar() {
                     {branchesVisible && (
                       <>
                         <ul>
-                         <Link id="j" to="/attendance"><li onClick={() => navigate("/ece-a")}>ECE-A</li></Link>
-                         <Link id="j" to="/attendance"><li onClick={() => navigate("/cse-b")}>CSE-B</li></Link>
-                         <Link id="j" to="/attendance">   <li onClick={() => navigate("/csd-a")}>CSD-A</li></Link>
+                          <Link id="j" to="/attendance">
+                            <li onClick={() => navigate("/ece-a")}>ECE-A</li>
+                          </Link>
+                          <Link id="j" to="/attendance">
+                            <li onClick={() => navigate("/cse-b")}>CSE-B</li>
+                          </Link>
+                          <Link id="j" to="/attendance">
+                            <li onClick={() => navigate("/csd-a")}>CSD-A</li>
+                          </Link>
                         </ul>
                       </>
                     )}
@@ -114,7 +130,7 @@ function NavBar() {
         </ul>
       </div>
       <div className="nav-user-profile">
-        <span>Welcome, User</span>
+        <span>Welcome, {facultyName || "User"}</span>
         <div className="account-menu">
           <button className="account-menu-button" onClick={toggleAccountMenu}>
             Account
@@ -123,7 +139,7 @@ function NavBar() {
             <div className="account-menu-content">
               <ul>
                 <li>Settings</li>
-               <li>Logout</li>
+                <li onClick={handleLogout}>Logout</li>
               </ul>
             </div>
           )}
