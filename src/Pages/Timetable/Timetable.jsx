@@ -80,7 +80,7 @@ const Timetable = () => {
         className="faculty-image"
         style={{ width: '100px', height: '100px', borderRadius: '50%' }}
         onError={(e) => {
-            e.target.src = "./images/tkrcet-chairman.webp"; // Fallback to default image
+            e.target.src = "./images/logo.png"; // Fallback to default image
         }}
     />
 )}                   
