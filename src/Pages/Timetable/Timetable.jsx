@@ -11,30 +11,27 @@ const Timetable = () => {
     const facultyId = localStorage.getItem("facultyId"); // Using MongoDB _id from localStorage
 
     useEffect(() => {
-    const fetchTimetable = async () => {
-        try {
-            const response = await axios.get(
-                `http://localhost:5000/faculty/${facultyId}/timetable`
-            );
+        const fetchTimetable = async () => {
+            try {
+                const response = await axios.get(
+                    `http://localhost:5000/faculty/${facultyId}/timetable`
+                );
+                setTimetable(response.data.timetable);
+                setFacultyDetails(response.data.facultyDetails);
+            } catch (error) {
+                alert("Error fetching timetable: " + error.message);
+                console.error("Error fetching timetable:", error);
+            }
+        };
 
-            // Debugging alert to check faculty details
-            alert("Faculty Details: " + JSON.stringify(response.data.facultyDetails));
-
-            setTimetable(response.data.timetable);
-            setFacultyDetails(response.data.facultyDetails);
-        } catch (error) {
-            alert("Error fetching timetable: " + error.message); // Alert for API errors
-            console.error("Error fetching timetable:", error);
+        if (facultyId) {
+            fetchTimetable();
+        } else {
+            alert("Faculty ID is missing!");
+            console.error("Faculty ID is missing!");
         }
-    };
+    }, [facultyId]);
 
-    if (facultyId) {
-        fetchTimetable();
-    } else {
-        alert("Faculty ID is missing!");
-        console.error("Faculty ID is missing!");
-    }
-}, [facultyId]);
     const processPeriods = (periods) => {
         const mergedPeriods = [];
         let i = 0;
@@ -60,16 +57,13 @@ const Timetable = () => {
     };
 
     const handleImageError = (e) => {
-        alert("Error loading faculty image. Using fallback image.");
+        console.warn("Error loading faculty image. Using fallback image.");
         e.target.src = "./images/logo.png"; // Fallback to default image
     };
 
-    useEffect(() => {
-        // Alert if facultyDetails is not loaded properly
-        if (!facultyDetails.name) {
-            alert("Faculty details not found!");
-        }
-    }, [facultyDetails]);
+    const imagePath = facultyDetails.image
+        ? `http://localhost:5000/uploads/${facultyDetails.image}`
+        : "./images/logo.png"; // Fallback image if no image is provided
 
     return (
         <div>
@@ -89,30 +83,18 @@ const Timetable = () => {
                             <td>Name</td>
                             <td>{facultyDetails.name || "N/A"}</td>
                             <td rowSpan={3}>
-    {facultyDetails.image ? (
-        <img
-            src={`http://localhost:5000/uploads/${facultyDetails.image}`}
-            alt={`${facultyDetails.name || "Faculty"} Profile`}
-            className="faculty-image"
-            style={{ width: "100px", height: "100px", borderRadius: "50%" }}
-            onError={(e) => {
-                alert("Image failed to load from: " + e.target.src);
-                e.target.src = "./images/logo.png"; // Fallback image
-            }}
-            onLoad={() => {
-                alert("Image loaded successfully from: " + `http://localhost:5000/uploads/${facultyDetails.image}`);
-            }}
-        />
-    ) : (
-        <img
-            src="./images/logo.png" // Fallback image
-            alt="Default Profile"
-            className="faculty-image"
-            style={{ width: "100px", height: "100px", borderRadius: "50%" }}
-            onLoad={() => alert("Default image loaded.")}
-        />
-    )}
-</td>
+                                <img
+                                    src={imagePath}
+                                    alt={`${facultyDetails.name || "Faculty"} Profile`}
+                                    className="faculty-image"
+                                    style={{
+                                        width: "100px",
+                                        height: "100px",
+                                        borderRadius: "50%",
+                                    }}
+                                    onError={handleImageError}
+                                />
+                            </td>
                         </tr>
                         <tr>
                             <td>Department</td>
