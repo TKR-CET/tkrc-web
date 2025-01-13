@@ -89,11 +89,13 @@ const Homepage = () => {
         });
 
         if (response.data.success) {
-            // Store the faculty ID in localStorage or state
-            localStorage.setItem("facultyId", response.data.facultyId);
+            const { faculty } = response.data;
+
+            // Store the faculty ID in localStorage
+            localStorage.setItem("facultyId", faculty.id);
 
             // Show success alert with faculty data
-            alert(`Login successful!\nName: ${response.data.name}\nRole: ${response.data.role}\nDepartment: ${response.data.department}`);
+            alert(`Login successful!\nName: ${faculty.name}\nRole: ${faculty.role}\nDepartment: ${faculty.department}`);
 
             // Redirect to timetable page
             navigate('/index');
@@ -103,7 +105,7 @@ const Homepage = () => {
     } catch (err) {
         setError("Login failed. Please try again.");
     }
-}
+};
     
 
     return (
