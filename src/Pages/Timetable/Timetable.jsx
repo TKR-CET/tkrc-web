@@ -11,25 +11,30 @@ const Timetable = () => {
     const facultyId = localStorage.getItem("facultyId"); // Using MongoDB _id from localStorage
 
     useEffect(() => {
-        const fetchTimetable = async () => {
-            try {
-                const response = await axios.get(
-                    `http://localhost:5000/faculty/${facultyId}/timetable`
-                );
-                setTimetable(response.data.timetable);
-                setFacultyDetails(response.data.facultyDetails);
-            } catch (error) {
-                console.error("Error fetching timetable:", error);
-            }
-        };
+    const fetchTimetable = async () => {
+        try {
+            const response = await axios.get(
+                `http://localhost:5000/faculty/${facultyId}/timetable`
+            );
 
-        if (facultyId) {
-            fetchTimetable();
-        } else {
-            console.error("Faculty ID is missing!");
+            // Debugging alert to check faculty details
+            alert("Faculty Details: " + JSON.stringify(response.data.facultyDetails));
+
+            setTimetable(response.data.timetable);
+            setFacultyDetails(response.data.facultyDetails);
+        } catch (error) {
+            alert("Error fetching timetable: " + error.message); // Alert for API errors
+            console.error("Error fetching timetable:", error);
         }
-    }, [facultyId]);
+    };
 
+    if (facultyId) {
+        fetchTimetable();
+    } else {
+        alert("Faculty ID is missing!");
+        console.error("Faculty ID is missing!");
+    }
+}, [facultyId]);
     const processPeriods = (periods) => {
         const mergedPeriods = [];
         let i = 0;
