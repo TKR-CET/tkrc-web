@@ -14,7 +14,7 @@ const Timetable = () => {
         const fetchTimetable = async () => {
             try {
                 const response = await axios.get(
-                    `https://tkrcet-backend.onrender.com/faculty/${facultyId}/timetable`
+                    `http://localhost:5000/faculty/${facultyId}/timetable`
                 );
                 setTimetable(response.data.timetable);
                 setFacultyDetails(response.data.facultyDetails);
