@@ -84,23 +84,30 @@ const Timetable = () => {
                             <td>Name</td>
                             <td>{facultyDetails.name || "N/A"}</td>
                             <td rowSpan={3}>
-                                {facultyDetails.image ? (
-                                    <img
-                                        src={`http://localhost:5000/uploads/${facultyDetails.image}`}
-                                        alt={`${facultyDetails.name || "Faculty"} Profile`}
-                                        className="faculty-image"
-                                        style={{ width: '100px', height: '100px', borderRadius: '50%' }}
-                                        onError={handleImageError} // Handle error
-                                    />
-                                ) : (
-                                    <img
-                                        src="./images/logo.png" // Fallback image
-                                        alt="Default Profile"
-                                        className="faculty-image"
-                                        style={{ width: '100px', height: '100px', borderRadius: '50%' }}
-                                    />
-                                )}
-                            </td>
+    {facultyDetails.image ? (
+        <img
+            src={`http://localhost:5000/uploads/${facultyDetails.image}`}
+            alt={`${facultyDetails.name || "Faculty"} Profile`}
+            className="faculty-image"
+            style={{ width: "100px", height: "100px", borderRadius: "50%" }}
+            onError={(e) => {
+                alert("Image failed to load from: " + e.target.src);
+                e.target.src = "./images/logo.png"; // Fallback image
+            }}
+            onLoad={() => {
+                alert("Image loaded successfully from: " + `http://localhost:5000/uploads/${facultyDetails.image}`);
+            }}
+        />
+    ) : (
+        <img
+            src="./images/logo.png" // Fallback image
+            alt="Default Profile"
+            className="faculty-image"
+            style={{ width: "100px", height: "100px", borderRadius: "50%" }}
+            onLoad={() => alert("Default image loaded.")}
+        />
+    )}
+</td>
                         </tr>
                         <tr>
                             <td>Department</td>
