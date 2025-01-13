@@ -46,7 +46,7 @@
 
 .timetable th, .timetable td {
   padding: 8px;
-  border: 1px solid #ddd;
+  border: 1px solid black;
   font-size: 14px;
 }
 
@@ -100,4 +100,4 @@
   .timetable h2 {
     font-size: 14px; /* Reduce heading font size */
   }
-}
+  }
