@@ -1,7 +1,7 @@
 import React, { useState , useEffect } from 'react';
 import './Homepage.css';
-import { Link } from "react-router-dom";
-
+import { Link, useNavigate } from "react-router-dom";
+import axios from 'axios';
 
 
 const Homepage = () => {
@@ -68,6 +68,43 @@ const Homepage = () => {
 
     const currentDelegate = delegateInfo[delegateKeys[currentDelegateIndex]];
     const currentImage = imagesLoader[currentImageIndex];
+    
+    //backend logics fetching
+    
+    
+    
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
+    const navigate = useNavigate();
+
+    
+    
+
+    const handleLogin = async () => {
+    try {
+        const response = await axios.post('http://localhost:5000/faculty/login', {
+            username,
+            password,
+        });
+
+        if (response.data.success) {
+            // Store the faculty ID in localStorage or state
+            localStorage.setItem("facultyId", response.data.facultyId);
+
+            // Show success alert with faculty data
+            alert(`Login successful!\nName: ${response.data.name}\nRole: ${response.data.role}\nDepartment: ${response.data.department}`);
+
+            // Redirect to timetable page
+            navigate('/index');
+        } else {
+            setError(response.data.message);
+        }
+    } catch (err) {
+        setError("Login failed. Please try again.");
+    }
+}
+    
 
     return (
         <div>
@@ -144,12 +181,23 @@ const Homepage = () => {
                         </div>
                     </div>
 
-                    <div className="login">
-                        <h3>Login</h3>
-                        <input type="text" placeholder="Username" />
-                        <input type="password" placeholder="Password" />
-                      <Link  to="/index">  <button id="menu">Login</button></Link>
-                    </div>
+                 <div className="login">
+                <h3>Login</h3>
+                <input
+                    type="text"
+                    placeholder="Username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                />
+                <input
+                    type="password"
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                />
+                {error && <p style={{ color: "red" }}>{error}</p>}
+                <button id="menu" onClick={handleLogin}>Login</button>
+            </div>
                 </div>
                   </div>
             
@@ -165,3 +213,4 @@ const Homepage = () => {
 };
 
 export default Homepage;
+              
