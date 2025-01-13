@@ -75,12 +75,12 @@ const Timetable = () => {
 
                       {facultyDetails.image && (
     <img
-        src={`http://localhost:5000/uploads/${facultyDetails.image.split('/').pop()}`}
+        src={`http://localhost:5000/uploads/${facultyDetails.image}`}
         alt={`${facultyDetails.name || "Faculty"} Profile`}
         className="faculty-image"
         style={{ width: '100px', height: '100px', borderRadius: '50%' }}
         onError={(e) => {
-            e.target.src = "/path/to/default-image.jpg"; // Fallback to default image
+            e.target.src = "/"; // Fallback to default image
         }}
     />
 )}                   
