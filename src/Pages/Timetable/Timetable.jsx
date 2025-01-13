@@ -73,12 +73,17 @@ const Timetable = () => {
                 <td>{facultyDetails.name || "N/A"}</td>
                 <td rowSpan={3}>
 
-                                         {facultyDetails.image && (   <img 
-                            src={facultyDetails.image} 
-                            alt={`${facultyDetails.name} Profile`} 
-                            className="faculty-image" 
-                            style={{ width: '100px', height: '100px', borderRadius: '50%' }} 
-                        />
+                                         {facultyDetails.image && (   <img
+  src={facultyDetails.image || "/path/to/default-image.jpg"}
+  alt={`${facultyDetails.name || "Faculty"} Profile`}
+  className="faculty-image"
+  style={{ width: '100px', height: '100px', borderRadius: '50%' }}
+  onLoad={() => alert("Image loaded successfully!")}
+  onError={(e) => {
+    alert(`Failed to load image: ${facultyDetails.image}`);
+    e.target.src = "/path/to/default-image.jpg"; // Fallback to default image
+  }}
+/>
                     )}
                 </td>
             </tr>
