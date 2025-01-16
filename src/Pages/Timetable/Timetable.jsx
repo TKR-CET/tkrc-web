@@ -84,8 +84,8 @@ const Timetable = () => {
         <div>
             <Header />
             <div className="nav">
-  <NavBar facultyName={facultyDetails.name} />
-</div>
+                <NavBar facultyName={facultyDetails.name} />
+            </div>
             <div className="mob-nav">
                 <MobileNav />
             </div>
@@ -107,7 +107,7 @@ const Timetable = () => {
                                         height: "100px",
                                         borderRadius: "50%",
                                     }}
-                                    onError={handleImageError}
+                                    onError={handleImageError} // Handle image error fallback
                                 />
                             </td>
                         </tr>
