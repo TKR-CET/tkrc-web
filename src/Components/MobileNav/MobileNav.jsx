@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './MobileNav.css';
-import {Link} from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import axios from 'axios';
 
 const MenuItem = ({ label, onClick, active }) => (
   <div
@@ -24,43 +25,89 @@ const MobileNav = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeMenu, setActiveMenu] = useState(null);
   const [activeSubmenu, setActiveSubmenu] = useState(null);
-  const [activeYear, setActiveYear] = useState(null);
-  const [showDepartments, setShowDepartments] = useState(false);
+  const [classOptions, setClassOptions] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [facultyId, setFacultyId] = useState(null);
+  const [accountMenuOpen, setAccountMenuOpen] = useState(false);
 
+  const mongoDbId = localStorage.getItem("facultyId");
+  const navigate = useNavigate();
+
+  // Fetch facultyId based on mongoDbId
+  const fetchFacultyId = async () => {
+    if (!mongoDbId) return;
+
+    try {
+      const response = await axios.get(`https://tkrcet-backend.onrender.com/faculty/${mongoDbId}`);
+      setFacultyId(response.data.facultyId);
+    } catch (error) {
+      console.error("Error fetching facultyId:", error);
+    }
+  };
+
+  // Fetch today's timetable dynamically
+  const fetchClassOptions = async () => {
+    if (!facultyId) return;
+
+    setLoading(true);
+    try {
+      const response = await axios.get(
+        `https://tkrcet-backend.onrender.com/faculty/${facultyId}/timetable-today`
+      );
+      const classes = response.data.classes || [];
+
+      // Filter out duplicates and exclude 4th period (Lunch)
+      const uniqueClasses = classes.filter((period, index, self) => {
+        if (index === 3) return false; // Exclude 4th period (lunch)
+        return (
+          self.findIndex(
+            (item) =>
+              item.subject === period.subject &&
+              item.programYear === period.programYear &&
+              item.department === period.department &&
+              item.section === period.section
+          ) === index
+        );
+      });
+
+      setClassOptions(uniqueClasses);
+    } catch (error) {
+      console.error("Error fetching class options:", error);
+      setClassOptions([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Logout function
+  const handleLogout = () => {
+    localStorage.removeItem("facultyId"); // Remove facultyId from localStorage
+    navigate("/"); // Redirect to login page
+  };
+
+  // Toggle Menu
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
     setActiveMenu(null);
     setActiveSubmenu(null);
-    setActiveYear(null);
-    setShowDepartments(false);
+    setAccountMenuOpen(false); // Close account menu when toggling main menu
   };
 
-  const resetState = () => {
-    setActiveSubmenu(null);
-    setActiveYear(null);
-    setShowDepartments(false);
+  // Toggle Account Dropdown Menu
+  const toggleAccountMenu = () => {
+    setAccountMenuOpen(!accountMenuOpen);
   };
 
-  const handleSubmenuSelect = (submenu) => {
-    if (activeSubmenu === submenu) {
-      setActiveSubmenu(null); // Reset if the same submenu is clicked again
-    } else {
-      setActiveSubmenu(submenu);
-      if (submenu === 'class') {
-        setActiveYear(null); // Reset year when switching to "Class"
-        setShowDepartments(false);
-      }
+  // Fetch facultyId and timetable data on component load
+  useEffect(() => {
+    fetchFacultyId();
+  }, [mongoDbId]);
+
+  useEffect(() => {
+    if (facultyId) {
+      fetchClassOptions(); // Fetch timetable once facultyId is available
     }
-  };
-
-  const handleYearSelect = (year) => {
-    if (activeYear === year) {
-      setActiveYear(null); // Reset if the same year is clicked again
-    } else {
-      setActiveYear(year);
-      setShowDepartments(false); // Reset department visibility when switching years
-    }
-  };
+  }, [facultyId]);
 
   return (
     <div className="mobile-nav-container">
@@ -77,65 +124,63 @@ const MobileNav = () => {
 
       {menuOpen && (
         <div className="menu">
-         <Link id="link" to="/index" ><MenuItem label="Home" onClick={() => setActiveMenu('home')} active={activeMenu === 'home'} /></Link>
-       <Link id="link" to="/timetable" > <MenuItem label="Timetable" onClick={() => setActiveMenu('timetable')} active={activeMenu === 'timetable'} /></Link> 
+          <Link id="link" to="/index">
+            <MenuItem label="Home" onClick={() => setActiveMenu('home')} active={activeMenu === 'home'} />
+          </Link>
+          <Link id="link" to="/timetable">
+            <MenuItem label="Timetable" onClick={() => setActiveMenu('timetable')} active={activeMenu === 'timetable'} />
+          </Link>
           <MenuItem label="Notifications" onClick={() => setActiveMenu('notifications')} active={activeMenu === 'notifications'} />
-          
+
           {/* Attendance Dropdown in the Main Menu */}
-        <MenuItem label="Attendance" onClick={() => setActiveMenu('attendance')} active={activeMenu === 'attendance'} />
+          <MenuItem label="Attendance" onClick={() => setActiveMenu('attendance')} active={activeMenu === 'attendance'} />
           
-          {/* Attendance Submenu */}
           {activeMenu === 'attendance' && (
             <Dropdown isOpen={activeMenu === 'attendance'}>
-         <MenuItem label="Class" onClick={() => handleSubmenuSelect('class')} active={activeSubmenu === 'class'} />
-              
-              {/* Only show Register and Activity Diary if Class is not selected */}
-              {activeSubmenu !== 'class' && (
-                <>
-                  <MenuItem label="Register" onClick={() => handleSubmenuSelect('register')} active={activeSubmenu === 'register'} />
-              <Link id="link" to="/activity"  ><MenuItem label="Activity Diary" onClick={() => handleSubmenuSelect('activityDiary')} active={activeSubmenu === 'activityDiary'} /></Link> 
-                </>
-              )}
-              
-              {/* Class Submenu */}
+              {/* Class Dropdown */}
+              <MenuItem label="Class" onClick={() => setActiveSubmenu('class')} active={activeSubmenu === 'class'} />
               {activeSubmenu === 'class' && (
                 <Dropdown isOpen={activeSubmenu === 'class'}>
-                  {/* Show Year 1 only if Year 2 or Year 3 is not selected */}
-                  {activeYear !== 'year2' && activeYear !== 'year3' && (
-                    <MenuItem label="Year 1" onClick={() => handleYearSelect('year1')} active={activeYear === 'year1'} />
-                  )}
-
-                  {/* Show Year 2 only if Year 1 or Year 3 is not selected */}
-                  {activeYear !== 'year1' && activeYear !== 'year3' && (
-                    <MenuItem label="Year 2" onClick={() => handleYearSelect('year2')} active={activeYear === 'year2'} />
-                  )}
-
-                  {/* Show Year 3 only if Year 1 or Year 2 is not selected */}
-                  {activeYear !== 'year1' && activeYear !== 'year2' && (
-                    <MenuItem label="Year 3" onClick={() => handleYearSelect('year3')} active={activeYear === 'year3'} />
-                  )}
-
-                  {/* Year-based Department Selection */}
-                  {(activeYear === 'year1' || activeYear === 'year2' || activeYear === 'year3') && (
-                    <Dropdown isOpen={true}>
-                      <MenuItem label="Department" onClick={() => setShowDepartments(true)} active={showDepartments} />
-                      {showDepartments && (
-                        <Dropdown isOpen={showDepartments}>
-                       <Link id="link" to="/attendance" > <MenuItem label="CSE" /></Link> 
-                        <Link id="link" to="/attendance" >    <MenuItem label="ECE" /></Link>
-                      <Link id="link" to="/attendance" >     <MenuItem label="EEE" /></Link>
-                       <Link id="link" to="/attendance" >    <MenuItem label="Mechanical" /></Link>
-                        </Dropdown>
-                      )}
-                    </Dropdown>
+                  {loading ? (
+                    <MenuItem label="Loading..." />
+                  ) : classOptions.length === 0 ? (
+                    <MenuItem label="No Classes Today" />
+                  ) : (
+                    classOptions.map((option, index) => (
+                      <MenuItem
+                        key={index}
+                        label={`${option.programYear} ${option.department}-${option.section} - ${option.subject}`}
+                        onClick={() =>
+                          navigate(
+                            `/attendance?programYear=${option.programYear}&department=${option.department}&section=${option.section}&subject=${option.subject}`
+                          )
+                        }
+                      />
+                    ))
                   )}
                 </Dropdown>
+              )}
+
+              {/* Register and Activity Diary */}
+              {activeSubmenu !== 'class' && (
+                <>
+                  <MenuItem label="Register" onClick={() => setActiveSubmenu('register')} active={activeSubmenu === 'register'} />
+                  <Link id="link" to="/activity">
+                    <MenuItem label="Activity Diary" onClick={() => setActiveSubmenu('activityDiary')} active={activeSubmenu === 'activityDiary'} />
+                  </Link>
+                </>
               )}
             </Dropdown>
           )}
 
-          {/* Account Menu Item */}
-          <MenuItem label="Account" onClick={() => setActiveMenu('account')} active={activeMenu === 'account'} />
+          {/* Account Menu */}
+          <MenuItem label="Account" onClick={toggleAccountMenu} active={accountMenuOpen} />
+          {accountMenuOpen && (
+            <Dropdown isOpen={accountMenuOpen}>
+              <MenuItem label="Settings"  />
+              <MenuItem label="Logout" onClick={handleLogout} />
+            </Dropdown>
+          )}
         </div>
       )}
     </div>
