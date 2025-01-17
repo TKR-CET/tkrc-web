@@ -3,12 +3,21 @@
   width: 80%;
   margin: 20px auto;
 }
+#h3{
+  color:purple;
+  font-family: Sans-Serif;
+  font-size: bold;
+}
 
 .staff-details table {
   width: 100%;
   border-collapse: collapse;
+  border:solid black 1px !important;
 }
-
+#image{
+  width:150px;
+  
+}
 .staff-details th {
   background-color: #e6adad;
   color: #000;
@@ -36,7 +45,10 @@
   font-weight: bold;
   margin-bottom: 10px;
 }
-
+.m4 th{
+  color:black !important;
+  font-weight: bold !important;
+}
 .timetable table {
   width: 100%;
   border-collapse: collapse;
@@ -101,3 +113,4 @@
     font-size: 14px; /* Reduce heading font size */
   }
   }
+  
