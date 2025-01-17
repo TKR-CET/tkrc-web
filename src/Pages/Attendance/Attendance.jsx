@@ -1,89 +1,71 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 import "./Attendance.css";
 import Header from "../../Components/Header/Header";
 import NavBar from "../../Components/NavBar/NavBar";
 import MobileNav from "../../Components/MobileNav/MobileNav.jsx";
 
 const Attendance = () => {
+  const location = useLocation();
+
+  // Extract query parameters
+  const queryParams = new URLSearchParams(location.search);
+  const programYear = queryParams.get("programYear");
+  const department = queryParams.get("department");
+  const section = queryParams.get("section");
+  const subject = queryParams.get("subject");
+
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
   const [batch, setBatch] = useState("ALL");
   const [attendanceData, setAttendanceData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const currentDate = new Date().toISOString().split("T")[0]; // Current date in 'YYYY-MM-DD' format
-
   useEffect(() => {
-    fetchAttendanceData(batch, date);
-  }, [batch, date]);
-
-  const fetchAttendanceData = async (selectedBatch, selectedDate) => {
-    setLoading(true);
-    setError("");
-
-    try {
-      const response = await fetch(
-        `https://tkrcet-backend.onrender.com/attendance/fetch-attendance?batch=${selectedBatch}&date=${selectedDate}`
-      );
-
-      if (!response.ok) {
-        throw new Error(`No attendance record found : ${response.status}`);
-      }
-
-      const { data } = await response.json();
-
-      if (Array.isArray(data)) {
-        const processedData = data.map((record) => ({
-          ...record,
-          absentees: record.attendance
-            .filter((student) => student.status === "absent")
-            .map((student) => student.rollNumber),
-        }));
-        setAttendanceData(processedData);
-      } else {
-        throw new Error("Invalid data format: Expected an array.");
-      }
-    } catch (err) {
-      setError(err.message || "An unknown error occurred.");
-    } finally {
-      setLoading(false);
+    if (programYear && department && section && subject) {
+      fetchAttendanceData(batch, date, programYear, department, section, subject);
     }
-  };
+  }, [batch, date, programYear, department, section, subject]);
 
-  const handleEdit = (row) => {
-    const queryParams = new URLSearchParams({
-      date: row.date,
-      periods: row.periods.join(","),
-      subject: row.subject,
-      topic: row.topic,
-      remarks: row.remarks || "",
-    }).toString();
+  const fetchAttendanceData = async (
+  selectedBatch,
+  selectedDate,
+  year,
+  department,
+  section
+) => {
+  setLoading(true);
+  setError("");
 
-    const attendanceData = row.attendance
-      .map((student) => `${student.rollNumber}:${student.status}`)
-      .join(",");
+  try {
+    const response = await fetch(
+      `https://tkrcet-backend.onrender.com/Attendance/fetch-attendance?date=${selectedDate}&year=${year}&department=${department}&section=${section}`
+    );
 
-    window.location.href = `/mark?${queryParams}&attendance=${encodeURIComponent(attendanceData)}`;
-  };
+    if (!response.ok) {
+      throw new Error(`No attendance record found: ${response.status}`);
+    }
 
-  const isDateInPast = (attendanceDate) => {
-  const currentDate = new Date();
-  const recordDate = new Date(attendanceDate);
-  currentDate.setHours(0, 0, 0, 0);
-  recordDate.setHours(0, 0, 0, 0);
+    const { data } = await response.json();
 
-  return recordDate < currentDate; // Return true if the record date is in the past
+    if (Array.isArray(data)) {
+      const processedData = data.map((record) => ({
+        ...record,
+        absentees: record.attendance
+          .filter((student) => student.status === "absent")
+          .map((student) => student.rollNumber),
+      }));
+      setAttendanceData(processedData);
+    } else {
+      throw new Error("Invalid data format: Expected an array.");
+    }
+  } catch (err) {
+    setError(err.message || "An unknown error occurred.");
+  } finally {
+    setLoading(false);
+  }
 };
 
-const isDateInFuture = (attendanceDate) => {
-  const currentDate = new Date();
-  const recordDate = new Date(attendanceDate);
-  currentDate.setHours(0, 0, 0, 0);
-  recordDate.setHours(0, 0, 0, 0);
-
-  return recordDate > currentDate; // Return true if the record date is in the future
-};
   return (
     <div>
       <Header />
@@ -115,10 +97,20 @@ const isDateInFuture = (attendanceDate) => {
               value={date}
               onChange={(e) => setDate(e.target.value)}
             />
-            <Link to={`/mark?date=${date}`} className="go">
-              GO
-            </Link>
+<Link
+  to={`/mark?date=${date}&programYear=${programYear}&department=${department}&section=${section}&subject=${subject}`}
+  className="go"
+>
+  GO
+</Link>
           </div>
+        </div>
+        <div className="class-info">
+          <h3>Selected Class Details</h3>
+          <p>Program Year: {programYear}</p>
+          <p>Department: {department}</p>
+          <p>Section: {section}</p>
+          <p>Subject: {subject}</p>
         </div>
         {loading ? (
           <p>Loading...</p>
@@ -150,12 +142,8 @@ const isDateInFuture = (attendanceDate) => {
                         : "None"}
                     </td>
                     <td>
-  {isDateInPast(record.date) || isDateInFuture(record.date) ? (
-    "Not Editable"
-  ) : (
-    <button onClick={() => handleEdit(record)}>Edit</button>
-  )}
-</td>
+                      <button onClick={() => handleEdit(record)}>Edit</button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
