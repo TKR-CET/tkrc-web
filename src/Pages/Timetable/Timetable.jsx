@@ -15,7 +15,7 @@ const Timetable = () => {
         const fetchTimetable = async () => {
             try {
                 const response = await axios.get(
-                    `http://localhost:5000/faculty/${facultyId}/timetable`
+                    `https://tkrcet-backend.onrender.com/faculty/${facultyId}/timetable`
                 );
                 setTimetable(response.data.timetable);
             } catch (error) {
@@ -37,7 +37,7 @@ const Timetable = () => {
         const fetchFacultyDetails = async () => {
             try {
                 const response = await axios.get(
-                    `http://localhost:5000/faculty/${facultyId}`
+                    `https://tkrcet-backend.onrender.com/faculty/${facultyId}`
                 );
                 setFacultyDetails(response.data);
             } catch (error) {
@@ -84,8 +84,8 @@ const Timetable = () => {
         <div>
             <Header />
             <div className="nav">
-                <NavBar facultyName={facultyDetails.name} />
-            </div>
+  <NavBar facultyName={facultyDetails.name} />
+</div>
             <div className="mob-nav">
                 <MobileNav />
             </div>
@@ -95,28 +95,30 @@ const Timetable = () => {
                 <table>
                     <tbody>
                         <tr>
-                            <td>Name</td>
+                            <td id="h3">Name</td>
                             <td>{facultyDetails.name || "N/A"}</td>
-                            <td rowSpan={3}>
+                            <td id="image" rowSpan={3}>
                                 <img
                                     src={facultyDetails.image || "./images/logo.png"} // Use image from separate fetch
                                     alt={`${facultyDetails.name || "Faculty"} Profile`}
                                     className="faculty-image"
                                     style={{
+                          position:"relative",
+                          left:"14px",
                                         width: "100px",
                                         height: "100px",
                                         borderRadius: "50%",
                                     }}
-                                    onError={handleImageError} // Handle image error fallback
+                                    onError={handleImageError}
                                 />
                             </td>
                         </tr>
                         <tr>
-                            <td>Department</td>
+                            <td id="h3" >Department</td>
                             <td>{facultyDetails.department || "N/A"}</td>
                         </tr>
                         <tr>
-                            <td>Designation</td>
+                            <td id="h3">Designation</td>
                             <td>{facultyDetails.role || "N/A"}</td>
                         </tr>
                     </tbody>
@@ -128,7 +130,7 @@ const Timetable = () => {
             <section className="timetable">
                 <table>
                     <thead>
-                        <tr>
+                        <tr class="m4">
                             <th>DAY</th>
                             <th>9:40-10:40</th>
                             <th>10:40-11:40</th>
