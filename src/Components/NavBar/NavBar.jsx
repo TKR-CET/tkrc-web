@@ -1,53 +1,103 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 import "./NavBar.css";
 
 function NavBar({ facultyName }) {
   const [attendanceMenuVisible, setAttendanceMenuVisible] = useState(false);
+  const [classOptions, setClassOptions] = useState([]);
+  const [loading, setLoading] = useState(false); // Loading state for fetching timetable
   const [accountMenuVisible, setAccountMenuVisible] = useState(false);
-  const [subMenu, setSubMenu] = useState(null);
-  const [branchesVisible, setBranchesVisible] = useState(false);
+  const [showDynamicClasses, setShowDynamicClasses] = useState(false); // Track if "Class" is clicked
+  const [providedFacultyId, setProvidedFacultyId] = useState(null); // Faculty-provided ID (e.g., M100)
 
   const navRef = useRef(null);
   const navigate = useNavigate();
+  const mongoDbFacultyId = localStorage.getItem("facultyId");
 
+  // Toggle Attendance Dropdown Menu
   const toggleAttendanceMenu = () => {
     setAttendanceMenuVisible(!attendanceMenuVisible);
-    setSubMenu(null);
-    setBranchesVisible(false);
   };
 
+  // Toggle Account Dropdown Menu
   const toggleAccountMenu = () => {
     setAccountMenuVisible(!accountMenuVisible);
   };
 
-  const handleClassClick = (e) => {
-    e.stopPropagation();
-    setSubMenu("class");
+  // Fetch faculty-provided ID (e.g., M100) using MongoDB _id
+  const fetchProvidedFacultyId = async () => {
+    try {
+      const response = await axios.get(
+        `https://tkrcet-backend.onrender.com/faculty/${mongoDbFacultyId}`
+      );
+      setProvidedFacultyId(response.data.facultyId);
+    } catch (error) {
+      console.error("Error fetching faculty-provided ID:", error);
+    }
   };
 
-  const handleYearClick = (e) => {
-    e.stopPropagation();
-    setSubMenu("department");
+  // Fetch today's timetable dynamically
+  const fetchClassOptions = async () => {
+    if (!providedFacultyId) return;
+
+    setLoading(true);
+    try {
+      const response = await axios.get(
+        `https://tkrcet-backend.onrender.com/faculty/${providedFacultyId}/timetable-today`
+      );
+      const classes = response.data.classes || [];
+
+      // Filter out duplicates and exclude 4th period
+      const uniqueClasses = classes.filter((period, index, self) => {
+        if (index === 3) return false; // Exclude 4th period (lunch)
+        return (
+          self.findIndex(
+            (item) =>
+              item.subject === period.subject &&
+              item.programYear === period.programYear &&
+              item.department === period.department &&
+              item.section === period.section
+          ) === index
+        );
+      });
+
+      setClassOptions(uniqueClasses);
+    } catch (error) {
+      console.error("Error fetching class options:", error);
+      setClassOptions([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleDepartmentClick = (e) => {
-    e.stopPropagation();
-    setBranchesVisible(true);
-  };
-
+  // Logout function
   const handleLogout = () => {
     localStorage.removeItem("facultyId");
     navigate("/"); // Redirect to login page
   };
 
+  // Handle Class click: Show dynamic class dropdown, hide other items
+  const handleClassClick = () => {
+    setShowDynamicClasses(true); // Show class options dynamically
+  };
+
+  // Handle redirection to the attendance page with selected class details
+  const handleClassSelect = (option) => {
+    const { programYear, department, section, subject } = option;
+
+    // Navigate to Attendance component with query parameters
+    const route = `/attendance?programYear=${programYear}&department=${department}&section=${section}&subject=${subject}`;
+    navigate(route);
+  };
+
+  // Close menus on outside click
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (navRef.current && !navRef.current.contains(event.target)) {
         setAttendanceMenuVisible(false);
-        setSubMenu(null);
-        setBranchesVisible(false);
         setAccountMenuVisible(false);
+        setShowDynamicClasses(false); // Reset state when clicking outside
       }
     };
 
@@ -56,6 +106,20 @@ function NavBar({ facultyName }) {
       document.removeEventListener("click", handleClickOutside);
     };
   }, []);
+
+  // Fetch faculty-provided ID on component load
+  useEffect(() => {
+    if (mongoDbFacultyId) {
+      fetchProvidedFacultyId();
+    }
+  }, [mongoDbFacultyId]);
+
+  // Fetch timetable data once the provided facultyId is available
+  useEffect(() => {
+    if (providedFacultyId) {
+      fetchClassOptions();
+    }
+  }, [providedFacultyId]);
 
   return (
     <nav ref={navRef}>
@@ -78,47 +142,34 @@ function NavBar({ facultyName }) {
                   onClick={(e) => e.stopPropagation()}
                 >
                   <div className="menu-dropdown-content">
-                    {subMenu === null && (
-                      <>
-                        <ul>
-                          <li onClick={handleClassClick}>Class</li>
-                          <li>Register</li>
-                          <Link id="j" to="/activity">
+                    <ul>
+                      {showDynamicClasses ? (
+                        loading ? (
+                          <li>Loading classes...</li>
+                        ) : classOptions.length === 0 ? (
+                          <li>No classes today</li>
+                        ) : (
+                          classOptions.map((option, index) => (
+                            <li
+                              key={index}
+                              onClick={() => handleClassSelect(option)}
+                            >
+                              {`${option.programYear} ${option.department}-${option.section} - ${option.subject}`}
+                            </li>
+                          ))
+                        )
+                      ) : (
+                        <>
+                    <Link id="f" to="" >    <li onClick={handleClassClick}>Class</li></Link>
+                          <Link id="f" to="/register">
+                            <li>Register</li>
+                          </Link>
+                          <Link  id="f" to="/activity">
                             <li>Activity Diary</li>
                           </Link>
-                        </ul>
-                      </>
-                    )}
-                    {subMenu === "class" && (
-                      <>
-                        <ul>
-                          <li onClick={handleYearClick}>Year-1</li>
-                          <li onClick={handleYearClick}>Year-2</li>
-                        </ul>
-                      </>
-                    )}
-                    {subMenu === "department" && (
-                      <>
-                        <ul>
-                          <li onClick={handleDepartmentClick}>Department</li>
-                        </ul>
-                      </>
-                    )}
-                    {branchesVisible && (
-                      <>
-                        <ul>
-                          <Link id="j" to="/attendance">
-                            <li onClick={() => navigate("/ece-a")}>ECE-A</li>
-                          </Link>
-                          <Link id="j" to="/attendance">
-                            <li onClick={() => navigate("/cse-b")}>CSE-B</li>
-                          </Link>
-                          <Link id="j" to="/attendance">
-                            <li onClick={() => navigate("/csd-a")}>CSD-A</li>
-                          </Link>
-                        </ul>
-                      </>
-                    )}
+                        </>
+                      )}
+                    </ul>
                   </div>
                 </div>
               )}
