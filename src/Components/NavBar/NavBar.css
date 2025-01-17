@@ -12,6 +12,11 @@ nav {
   list-style: none;
   color:#4b4b4bcd;
 }
+#f{
+  color:black;
+  font-size:bold;
+  
+}
 
 .nav-left-section {
   display: flex;
@@ -51,7 +56,7 @@ nav {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border-radius: 4px;
   z-index: 100;
-  width: 150px;
+  width: 240px;
 }
 
 .menu-dropdown-content {
@@ -204,4 +209,5 @@ nav {
 
 .account-menu-content ul li:hover {
   background-color: #e0e0e0;
-}
+  }
+    
