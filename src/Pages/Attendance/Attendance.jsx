@@ -41,7 +41,7 @@ const Attendance = () => {
       if (Array.isArray(data)) {
         const processedData = data.map((record) => ({
           ...record,
-          classDetails: `${record.programYear} ${record.department}-${record.section}`, // Combine programYear, department, and section
+          classDetails: `${record.year} ${record.department}-${record.section}`, // Combine programYear, department, and section
           absentees: record.attendance
             .filter((student) => student.status === "absent")
             .map((student) => student.rollNumber),
