@@ -331,7 +331,7 @@ const Marking = () => {
       <div className="attendanceMain">
         <h2 className="attendanceHeading">Mark Attendance</h2>
         <p>
-          Program Year: {programYear} | Department: {department} | Section: {section} | Subject: {subject}
+           Year: {programYear}   |  Department: {department}   | Section: {section}   Subject: {subject}
         </p>
         <div className="periodSelection">
           <label>Periods:</label>
