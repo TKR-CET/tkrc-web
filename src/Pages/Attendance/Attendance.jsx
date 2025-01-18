@@ -21,17 +21,6 @@ const Attendance = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Function to convert numeric years to Roman numerals
-  const mapYearToRoman = (year) => {
-    const yearMap = {
-      "1": "I",
-      "2": "II",
-      "3": "III",
-      "4": "IV",
-    };
-    return yearMap[year] || "N/A"; // Default to "N/A" if year is undefined
-  };
-
   // Function to fetch attendance records by date
   const fetchAttendanceByDate = async () => {
     setLoading(true);
@@ -48,11 +37,11 @@ const Attendance = () => {
 
       const { data } = await response.json();
 
-      // Process the data
+      // Process the data to match the format seen in `MobileNav`
       if (Array.isArray(data)) {
         const processedData = data.map((record) => ({
           ...record,
-          classDetails: `B.Tech ${mapYearToRoman(record.year)} ${record.department}-${record.section}`, // Combine year, department, and section
+          classDetails: `${record.programYear} ${record.department}-${record.section}`, // Combine programYear, department, and section
           absentees: record.attendance
             .filter((student) => student.status === "absent")
             .map((student) => student.rollNumber),
@@ -104,7 +93,7 @@ const Attendance = () => {
               value={date}
               onChange={(e) => setDate(e.target.value)}
             />
-            <button onClick={handleGoClick} className="go-button">
+            <button onClick={handleGoClick} className="go">
               Go
             </button>
           </div>
