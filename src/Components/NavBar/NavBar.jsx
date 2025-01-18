@@ -9,7 +9,7 @@ function NavBar() {
   const [loading, setLoading] = useState(false); // Loading state for fetching timetable
   const [accountMenuVisible, setAccountMenuVisible] = useState(false);
   const [showDynamicClasses, setShowDynamicClasses] = useState(false); // Track if "Class" is clicked
-  const [providedFacultyId, setProvidedFacultyId] = useState(null); // Faculty-provided ID (e.g., M100)
+  const [providedFacultyId, setProvidedFacultyId] = useState(null); // Faculty object
 
   const navRef = useRef(null);
   const navigate = useNavigate();
@@ -25,14 +25,14 @@ function NavBar() {
     setAccountMenuVisible(!accountMenuVisible);
   };
 
-  // Fetch faculty-provided ID (e.g., M100) using MongoDB _id
+  // Fetch faculty-provided ID (e.g., M100) and name using MongoDB _id
   const fetchProvidedFacultyId = async () => {
     try {
       const response = await axios.get(
         `https://tkrcet-backend.onrender.com/faculty/${mongoDbFacultyId}`
       );
-      setProvidedFacultyId(response.data.facultyId);
-       setProvidedFacultyId(response.data.name);
+      // Assuming response.data contains { facultyId: 'M100', name: 'John Doe' }
+      setProvidedFacultyId(response.data); // Store the whole object
     } catch (error) {
       console.error("Error fetching faculty-provided ID:", error);
     }
@@ -45,7 +45,7 @@ function NavBar() {
     setLoading(true);
     try {
       const response = await axios.get(
-        `https://tkrcet-backend.onrender.com/faculty/${providedFacultyId}/timetable-today`
+        `https://tkrcet-backend.onrender.com/faculty/${providedFacultyId.facultyId}/timetable-today`
       );
       const classes = response.data.classes || [];
 
@@ -161,11 +161,13 @@ function NavBar() {
                         )
                       ) : (
                         <>
-                    <Link id="f" to="" >    <li onClick={handleClassClick}>Class</li></Link>
+                          <Link id="f" to="">
+                            <li onClick={handleClassClick}>Class</li>
+                          </Link>
                           <Link id="f" to="/register">
                             <li>Register</li>
                           </Link>
-                          <Link  id="f" to="/activity">
+                          <Link id="f" to="/activity">
                             <li>Activity Diary</li>
                           </Link>
                         </>
@@ -182,7 +184,9 @@ function NavBar() {
         </ul>
       </div>
       <div className="nav-user-profile">
-        <span>Welcome, {providedFacultyId.name || "User"}</span>
+        <span>
+          Welcome, {providedFacultyId?.name || "User"}
+        </span>
         <div className="account-menu">
           <button className="account-menu-button" onClick={toggleAccountMenu}>
             Account
