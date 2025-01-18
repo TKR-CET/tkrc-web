@@ -1,22 +1,32 @@
 import React, { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import "./Attendance.css";
 import Header from "../../Components/Header/Header";
 import NavBar from "../../Components/NavBar/NavBar";
 import MobileNav from "../../Components/MobileNav/MobileNav";
 
 const Attendance = () => {
-  const [date, setDate] = useState(new Date().toISOString().split("T")[0]); // Default to today's date
-  const [attendanceData, setAttendanceData] = useState([]); // Holds the fetched attendance records
-  const [loading, setLoading] = useState(false); // Loading state for the fetch operation
-  const [error, setError] = useState(""); // Holds error messages
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Extract query parameters
+  const queryParams = new URLSearchParams(location.search);
+  const programYear = queryParams.get("programYear");
+  const department = queryParams.get("department");
+  const section = queryParams.get("section");
+  const subject = queryParams.get("subject");
+
+  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
+  const [attendanceData, setAttendanceData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   // Function to fetch attendance records by date
   const fetchAttendanceByDate = async () => {
-    setLoading(true); // Set loading state to true
-    setError(""); // Reset error state
+    setLoading(true);
+    setError("");
 
     try {
-      // Make API call to fetch attendance data for the given date
       const response = await fetch(
         `https://tkrcet-backend.onrender.com/Attendance/date?date=${date}`
       );
@@ -27,7 +37,7 @@ const Attendance = () => {
 
       const { data } = await response.json();
 
-      // Process the data if it is an array
+      // Process the data
       if (Array.isArray(data)) {
         const processedData = data.map((record) => ({
           ...record,
@@ -35,14 +45,14 @@ const Attendance = () => {
             .filter((student) => student.status === "absent")
             .map((student) => student.rollNumber),
         }));
-        setAttendanceData(processedData); // Update the state with processed data
+        setAttendanceData(processedData);
       } else {
         throw new Error("Invalid data format: Expected an array.");
       }
     } catch (err) {
-      setError(err.message || "An unknown error occurred."); // Handle errors
+      setError(err.message || "An unknown error occurred.");
     } finally {
-      setLoading(false); // Set loading state to false
+      setLoading(false);
     }
   };
 
@@ -50,6 +60,13 @@ const Attendance = () => {
   useEffect(() => {
     fetchAttendanceByDate();
   }, [date]);
+
+  // Redirect to the marking page with query parameters
+  const handleGoClick = () => {
+    navigate(
+      `/mark?programYear=${programYear}&department=${department}&section=${section}&subject=${subject}&date=${date}`
+    );
+  };
 
   const handleEdit = (record) => {
     alert(`Edit functionality for ${record.subject} is not implemented yet.`);
@@ -66,7 +83,7 @@ const Attendance = () => {
       </div>
       <div className="content">
         <div className="title-bar">
-          <div className="date-selector-wrapper">
+          <div className="batch-date-selectors">
             <label htmlFor="date">Select Date: </label>
             <input
               type="date"
@@ -75,9 +92,18 @@ const Attendance = () => {
               value={date}
               onChange={(e) => setDate(e.target.value)}
             />
+            <button onClick={handleGoClick} className="go-button">
+              Go
+            </button>
           </div>
         </div>
-
+        <div className="class-info">
+          <h3>Selected Class Details</h3>
+          <p>Program Year: {programYear || "N/A"}</p>
+          <p>Department: {department || "N/A"}</p>
+          <p>Section: {section || "N/A"}</p>
+          <p>Subject: {subject || "N/A"}</p>
+        </div>
         {loading ? (
           <p>Loading attendance records...</p>
         ) : error ? (
