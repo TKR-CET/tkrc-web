@@ -28,7 +28,7 @@ const Attendance = () => {
 
     try {
       const response = await fetch(
-        `https://tkrcet-backend.onrender.com/Attendance/fetch-attendance?date=${date}&programYear=${programYear}&department=${department}&section=${section}&subject=${subject}`
+        `https://tkrcet-backend.onrender.com/Attendance/fetch?date=${date}&programYear=${programYear}&department=${department}&section=${section}&subject=${subject}`
       );
 
       if (!response.ok) {
@@ -89,16 +89,14 @@ const Attendance = () => {
     }
   };
 
-  // Fetch attendance when component loads
+  // Automatically fetch attendance when date changes
   useEffect(() => {
     if (programYear && department && section && subject) {
       fetchAttendanceWithDetails();
+    } else {
+      fetchAttendanceByDate();
     }
-  }, [programYear, department, section, subject, date]);
-
-  const handleFetchByDate = () => {
-    fetchAttendanceByDate();
-  };
+  }, [date]); // Trigger whenever `date` changes
 
   const handleEdit = (record) => {
     alert(`Edit functionality for ${record.subject} is not implemented yet.`);
@@ -135,9 +133,6 @@ const Attendance = () => {
               value={date}
               onChange={(e) => setDate(e.target.value)}
             />
-            <button onClick={handleFetchByDate} className="fetch-button">
-              Fetch by Date
-            </button>
           </div>
         </div>
         <div className="class-info">
