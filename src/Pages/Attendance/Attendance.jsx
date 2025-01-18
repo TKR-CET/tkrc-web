@@ -21,7 +21,7 @@ const Attendance = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Function to fetch attendance records by date
+  // Fetch attendance records for the selected date
   const fetchAttendanceByDate = async () => {
     setLoading(true);
     setError("");
@@ -37,11 +37,11 @@ const Attendance = () => {
 
       const { data } = await response.json();
 
-      // Process the data to match the format seen in `MobileNav`
+      // Process data to include each period as a separate record
       if (Array.isArray(data)) {
         const processedData = data.map((record) => ({
           ...record,
-          classDetails: `${record.year} ${record.department}-${record.section}`, // Combine programYear, department, and section
+          classDetails: `${record.year} ${record.department}-${record.section}`,
           absentees: record.attendance
             .filter((student) => student.status === "absent")
             .map((student) => student.rollNumber),
@@ -70,7 +70,9 @@ const Attendance = () => {
   };
 
   const handleEdit = (record) => {
-    alert(`Edit functionality for ${record.subject} is not implemented yet.`);
+    navigate(
+      `/edit?programYear=${record.year}&department=${record.department}&section=${record.section}&subject=${record.subject}&date=${record.date}&period=${record.period}`
+    );
   };
 
   return (
@@ -112,8 +114,9 @@ const Attendance = () => {
                     <th>Class</th>
                     <th>Subject</th>
                     <th>Date</th>
-                    <th>Periods</th>
+                    <th>Period</th>
                     <th>Topic</th>
+                    <th>Remarks</th>
                     <th>Absentees</th>
                     <th>Edit</th>
                   </tr>
@@ -124,8 +127,9 @@ const Attendance = () => {
                       <td>{record.classDetails}</td>
                       <td>{record.subject}</td>
                       <td>{record.date}</td>
-                      <td>{record.periods.join(", ")}</td>
+                      <td>{record.period}</td>
                       <td>{record.topic}</td>
+                      <td>{record.remarks}</td>
                       <td>
                         {record.absentees.length > 0
                           ? record.absentees.join(", ")
