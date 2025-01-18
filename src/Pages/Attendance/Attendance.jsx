@@ -1,66 +1,22 @@
 import React, { useState, useEffect } from "react";
-import { useLocation, Link } from "react-router-dom";
 import "./Attendance.css";
 import Header from "../../Components/Header/Header";
 import NavBar from "../../Components/NavBar/NavBar";
 import MobileNav from "../../Components/MobileNav/MobileNav";
 
 const Attendance = () => {
-  const location = useLocation();
+  const [date, setDate] = useState(new Date().toISOString().split("T")[0]); // Default to today's date
+  const [attendanceData, setAttendanceData] = useState([]); // Holds the fetched attendance records
+  const [loading, setLoading] = useState(false); // Loading state for the fetch operation
+  const [error, setError] = useState(""); // Holds error messages
 
-  // Extract query parameters
-  const queryParams = new URLSearchParams(location.search);
-  const programYear = queryParams.get("programYear");
-  const department = queryParams.get("department");
-  const section = queryParams.get("section");
-  const subject = queryParams.get("subject");
-
-  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
-  const [batch, setBatch] = useState("ALL");
-  const [attendanceData, setAttendanceData] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-
-  // Fetch attendance with all details
-  const fetchAttendanceWithDetails = async () => {
-    setLoading(true);
-    setError("");
-
-    try {
-      const response = await fetch(
-        `https://tkrcet-backend.onrender.com/Attendance/fetch-attendance?date=${date}&programYear=${programYear}&department=${department}&section=${section}&subject=${subject}`
-      );
-
-      if (!response.ok) {
-        throw new Error(`No attendance record found: ${response.status}`);
-      }
-
-      const { data } = await response.json();
-
-      if (Array.isArray(data)) {
-        const processedData = data.map((record) => ({
-          ...record,
-          absentees: record.attendance
-            .filter((student) => student.status === "absent")
-            .map((student) => student.rollNumber),
-        }));
-        setAttendanceData(processedData);
-      } else {
-        throw new Error("Invalid data format: Expected an array.");
-      }
-    } catch (err) {
-      setError(err.message || "An unknown error occurred.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Fetch attendance by date only
+  // Function to fetch attendance records by date
   const fetchAttendanceByDate = async () => {
-    setLoading(true);
-    setError("");
+    setLoading(true); // Set loading state to true
+    setError(""); // Reset error state
 
     try {
+      // Make API call to fetch attendance data for the given date
       const response = await fetch(
         `https://tkrcet-backend.onrender.com/Attendance/date?date=${date}`
       );
@@ -71,6 +27,7 @@ const Attendance = () => {
 
       const { data } = await response.json();
 
+      // Process the data if it is an array
       if (Array.isArray(data)) {
         const processedData = data.map((record) => ({
           ...record,
@@ -78,25 +35,21 @@ const Attendance = () => {
             .filter((student) => student.status === "absent")
             .map((student) => student.rollNumber),
         }));
-        setAttendanceData(processedData);
+        setAttendanceData(processedData); // Update the state with processed data
       } else {
         throw new Error("Invalid data format: Expected an array.");
       }
     } catch (err) {
-      setError(err.message || "An unknown error occurred.");
+      setError(err.message || "An unknown error occurred."); // Handle errors
     } finally {
-      setLoading(false);
+      setLoading(false); // Set loading state to false
     }
   };
 
-  // Automatically fetch attendance when date changes
+  // Automatically fetch attendance when the date changes
   useEffect(() => {
-    if (programYear && department && section && subject) {
-      fetchAttendanceWithDetails();
-    } else {
-      fetchAttendanceByDate();
-    }
-  }, [date]); // Trigger whenever `date` changes
+    fetchAttendanceByDate();
+  }, [date]);
 
   const handleEdit = (record) => {
     alert(`Edit functionality for ${record.subject} is not implemented yet.`);
@@ -113,19 +66,8 @@ const Attendance = () => {
       </div>
       <div className="content">
         <div className="title-bar">
-          <div className="batch-date-selectors">
-            <label htmlFor="batch">Batch: </label>
-            <select
-              id="batch"
-              className="batch-selector"
-              value={batch}
-              onChange={(e) => setBatch(e.target.value)}
-            >
-              <option value="ALL">ALL</option>
-              <option value="Batch1">Batch 1</option>
-              <option value="Batch2">Batch 2</option>
-            </select>
-            <label htmlFor="date">Date: </label>
+          <div className="date-selector-wrapper">
+            <label htmlFor="date">Select Date: </label>
             <input
               type="date"
               id="date"
@@ -135,49 +77,47 @@ const Attendance = () => {
             />
           </div>
         </div>
-        <div className="class-info">
-          <h3>Selected Class Details</h3>
-          <p>Program Year: {programYear}</p>
-          <p>Department: {department}</p>
-          <p>Section: {section}</p>
-          <p>Subject: {subject}</p>
-        </div>
+
         {loading ? (
-          <p>Loading...</p>
+          <p>Loading attendance records...</p>
         ) : error ? (
           <p className="error">{error}</p>
         ) : (
           <div className="attendance-table-wrapper">
-            <table className="attendance-table">
-              <thead>
-                <tr>
-                  <th>Subject</th>
-                  <th>Date</th>
-                  <th>Periods</th>
-                  <th>Topic</th>
-                  <th>Absentees</th>
-                  <th>Edit</th>
-                </tr>
-              </thead>
-              <tbody>
-                {attendanceData.map((record, index) => (
-                  <tr key={index}>
-                    <td>{record.subject}</td>
-                    <td>{record.date}</td>
-                    <td>{record.periods.join(", ")}</td>
-                    <td>{record.topic}</td>
-                    <td>
-                      {record.absentees.length > 0
-                        ? record.absentees.join(", ")
-                        : "None"}
-                    </td>
-                    <td>
-                      <button onClick={() => handleEdit(record)}>Edit</button>
-                    </td>
+            {attendanceData.length > 0 ? (
+              <table className="attendance-table">
+                <thead>
+                  <tr>
+                    <th>Subject</th>
+                    <th>Date</th>
+                    <th>Periods</th>
+                    <th>Topic</th>
+                    <th>Absentees</th>
+                    <th>Edit</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {attendanceData.map((record, index) => (
+                    <tr key={index}>
+                      <td>{record.subject}</td>
+                      <td>{record.date}</td>
+                      <td>{record.periods.join(", ")}</td>
+                      <td>{record.topic}</td>
+                      <td>
+                        {record.absentees.length > 0
+                          ? record.absentees.join(", ")
+                          : "None"}
+                      </td>
+                      <td>
+                        <button onClick={() => handleEdit(record)}>Edit</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <p>No attendance records available for the selected date.</p>
+            )}
           </div>
         )}
       </div>
