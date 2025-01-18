@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, Link } from "react-router-dom";
 import "./Attendance.css";
-import Header from "../../Components/Header/Header"; 
+import Header from "../../Components/Header/Header";
 import NavBar from "../../Components/NavBar/NavBar";
-import MobileNav from "../../Components/MobileNav/MobileNav.jsx";
+import MobileNav from "../../Components/MobileNav/MobileNav";
 
 const Attendance = () => {
   const location = useLocation();
@@ -21,49 +21,88 @@ const Attendance = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  // Fetch attendance with all details
+  const fetchAttendanceWithDetails = async () => {
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await fetch(
+        `https://tkrcet-backend.onrender.com/Attendance/fetch-attendance?date=${date}&programYear=${programYear}&department=${department}&section=${section}&subject=${subject}`
+      );
+
+      if (!response.ok) {
+        throw new Error(`No attendance record found: ${response.status}`);
+      }
+
+      const { data } = await response.json();
+
+      if (Array.isArray(data)) {
+        const processedData = data.map((record) => ({
+          ...record,
+          absentees: record.attendance
+            .filter((student) => student.status === "absent")
+            .map((student) => student.rollNumber),
+        }));
+        setAttendanceData(processedData);
+      } else {
+        throw new Error("Invalid data format: Expected an array.");
+      }
+    } catch (err) {
+      setError(err.message || "An unknown error occurred.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch attendance by date only
+  const fetchAttendanceByDate = async () => {
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await fetch(
+        `https://tkrcet-backend.onrender.com/Attendance/date?date=${date}`
+      );
+
+      if (!response.ok) {
+        throw new Error(`No attendance record found for the date: ${response.status}`);
+      }
+
+      const { data } = await response.json();
+
+      if (Array.isArray(data)) {
+        const processedData = data.map((record) => ({
+          ...record,
+          absentees: record.attendance
+            .filter((student) => student.status === "absent")
+            .map((student) => student.rollNumber),
+        }));
+        setAttendanceData(processedData);
+      } else {
+        throw new Error("Invalid data format: Expected an array.");
+      }
+    } catch (err) {
+      setError(err.message || "An unknown error occurred.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch attendance when component loads
   useEffect(() => {
     if (programYear && department && section && subject) {
-      fetchAttendanceData(batch, date, programYear, department, section, subject);
+      fetchAttendanceWithDetails();
     }
-  }, [batch, date, programYear, department, section, subject]);
+  }, [programYear, department, section, subject, date]);
 
-  const fetchAttendanceData = async (
-  selectedBatch,
-  selectedDate,
-  year,
-  department,
-  section
-) => {
-  setLoading(true);
-  setError("");
+  const handleFetchByDate = () => {
+    fetchAttendanceByDate();
+  };
 
-  try {
-    const response = await fetch(
-      `https://tkrcet-backend.onrender.com/Attendance/date?date=${selectedDate}`);
-
-    if (!response.ok) {
-      throw new Error(`No attendance record found: ${response.status}`);
-    }
-
-    const { data } = await response.json();
-
-    if (Array.isArray(data)) {
-      const processedData = data.map((record) => ({
-        ...record,
-        absentees: record.attendance
-          .filter((student) => student.status === "absent")
-          .map((student) => student.rollNumber),
-      }));
-      setAttendanceData(processedData);
-    } else {
-      throw new Error("Invalid data format: Expected an array.");
-    }
-  } catch (err) {
-    setError(err.message || "An unknown error occurred.");
-  } finally {
-    setLoading(false);
-  }
-};
+  const handleEdit = (record) => {
+    alert(`Edit functionality for ${record.subject} is not implemented yet.`);
+  };
 
   return (
     <div>
@@ -96,12 +135,9 @@ const Attendance = () => {
               value={date}
               onChange={(e) => setDate(e.target.value)}
             />
-<Link
-  to={`/mark?date=${date}&programYear=${programYear}&department=${department}&section=${section}&subject=${subject}`}
-  className="go"
->
-  GO
-</Link>
+            <button onClick={handleFetchByDate} className="fetch-button">
+              Fetch by Date
+            </button>
           </div>
         </div>
         <div className="class-info">
