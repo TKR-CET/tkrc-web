@@ -22,14 +22,13 @@ const Marking = () => {
   const [periods, setPeriods] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isMarked, setIsMarked] = useState(false);
+  const [isMarked, setIsMarked] = useState(false); // Check if attendance is already marked
 
   useEffect(() => {
     fetchStudents();
     checkExistingAttendance();
   }, []);
 
-  // Check if attendance is already marked for the given date and class details
   const checkExistingAttendance = async () => {
     try {
       const response = await fetch(
@@ -41,11 +40,9 @@ const Marking = () => {
       }
 
       const result = await response.json();
-
-      // Check if attendance is marked for this subject
       const periodsWithSubject = result.periods || [];
       if (periodsWithSubject.includes(subject)) {
-        setIsMarked(true); // Attendance already marked
+        setIsMarked(true); // Mark the attendance as already existing
       }
     } catch (error) {
       alert(`Failed to check attendance: ${error.message}`);
@@ -170,7 +167,7 @@ const Marking = () => {
               <input
                 type="checkbox"
                 value={period}
-                disabled={isMarked} // Disable if already marked
+                disabled={isMarked} // Only disable checkboxes if attendance is already marked
                 checked={periods.includes(period)}
                 onChange={() =>
                   setPeriods((prev) =>
@@ -187,7 +184,6 @@ const Marking = () => {
           <textarea
             id="input-topic"
             value={topic}
-            disabled={isMarked} // Disable if already marked
             onChange={(e) => setTopic(e.target.value)}
             placeholder="Enter Topic"
           />
@@ -195,7 +191,6 @@ const Marking = () => {
           <textarea
             id="input-remarks"
             value={remarks}
-            disabled={isMarked} // Disable if already marked
             onChange={(e) => setRemarks(e.target.value)}
             placeholder="Enter Remarks"
           />
@@ -220,7 +215,6 @@ const Marking = () => {
                   <td>
                     <input
                       type="radio"
-                      disabled={isMarked} // Disable if already marked
                       checked={attendance[student.rollNumber] === "present"}
                       onChange={() => handleAttendanceChange(student.rollNumber, "present")}
                     />
@@ -229,7 +223,6 @@ const Marking = () => {
                     <input
                       type="radio"
                       className="absentStatus"
-                      disabled={isMarked} // Disable if already marked
                       checked={attendance[student.rollNumber] === "absent"}
                       onChange={() => handleAttendanceChange(student.rollNumber, "absent")}
                     />
