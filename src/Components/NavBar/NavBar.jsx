@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./NavBar.css";
 
-function NavBar({ facultyName }) {
+function NavBar() {
   const [attendanceMenuVisible, setAttendanceMenuVisible] = useState(false);
   const [classOptions, setClassOptions] = useState([]);
   const [loading, setLoading] = useState(false); // Loading state for fetching timetable
@@ -32,6 +32,7 @@ function NavBar({ facultyName }) {
         `https://tkrcet-backend.onrender.com/faculty/${mongoDbFacultyId}`
       );
       setProvidedFacultyId(response.data.facultyId);
+       setProvidedFacultyId(response.data.name);
     } catch (error) {
       console.error("Error fetching faculty-provided ID:", error);
     }
@@ -181,7 +182,7 @@ function NavBar({ facultyName }) {
         </ul>
       </div>
       <div className="nav-user-profile">
-        <span>Welcome, {facultyName || "User"}</span>
+        <span>Welcome, {providedFacultyId.name || "User"}</span>
         <div className="account-menu">
           <button className="account-menu-button" onClick={toggleAccountMenu}>
             Account
