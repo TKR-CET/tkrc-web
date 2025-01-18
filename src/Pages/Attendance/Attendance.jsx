@@ -28,7 +28,7 @@ const Attendance = () => {
 
     try {
       const response = await fetch(
-        `https://tkrcet-backend.onrender.com/Attendance/fetch?date=${date}&programYear=${programYear}&department=${department}&section=${section}&subject=${subject}`
+        `https://tkrcet-backend.onrender.com/Attendance/fetch-attendance?date=${date}&programYear=${programYear}&department=${department}&section=${section}&subject=${subject}`
       );
 
       if (!response.ok) {
