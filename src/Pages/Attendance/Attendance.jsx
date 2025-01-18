@@ -108,6 +108,9 @@ const Attendance = () => {
               <table className="attendance-table">
                 <thead>
                   <tr>
+                    <th>Program Year</th>
+                    <th>Department</th>
+                    <th>Section</th>
                     <th>Subject</th>
                     <th>Date</th>
                     <th>Periods</th>
@@ -119,6 +122,9 @@ const Attendance = () => {
                 <tbody>
                   {attendanceData.map((record, index) => (
                     <tr key={index}>
+                      <td>{record.programYear}</td>
+                      <td>{record.department}</td>
+                      <td>{record.section}</td>
                       <td>{record.subject}</td>
                       <td>{record.date}</td>
                       <td>{record.periods.join(", ")}</td>
