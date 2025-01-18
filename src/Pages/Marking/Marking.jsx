@@ -22,7 +22,7 @@ const Marking = () => {
   const [periods, setPeriods] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isMarked, setIsMarked] = useState(false); // Check if attendance is already marked
+  const [markedPeriods, setMarkedPeriods] = useState([]); // Tracks already marked periods
 
   useEffect(() => {
     fetchStudents();
@@ -42,11 +42,9 @@ const Marking = () => {
 
       const result = await response.json();
 
-      // If attendance is marked for this subject, disable the fields
-      const periodsWithSubject = result.periods || [];
-      if (periodsWithSubject.includes(subject)) {
-        setIsMarked(true);
-      }
+      // Set marked periods
+      const markedPeriods = result.periods || [];
+      setMarkedPeriods(markedPeriods);
     } catch (error) {
       alert(`Failed to check attendance: ${error.message}`);
     }
@@ -90,8 +88,8 @@ const Marking = () => {
   };
 
   const handleSubmit = async () => {
-    if (isMarked) {
-      alert("Attendance for this subject is already marked.");
+    if (markedPeriods.length > 0) {
+      alert("Attendance for selected periods is already marked.");
       return;
     }
 
@@ -151,7 +149,8 @@ const Marking = () => {
 
   return (
     <>
-      <style>{`.attendanceMain {
+      <style>
+      {`.attendanceMain {
     padding: 20px;
     background-color: #fff;
     margin: 20px;
@@ -346,7 +345,7 @@ const Marking = () => {
       top: 0;
     }
   }
-      `}</style>
+     ` }</style>
       <Header />
       <div className="nav">
         <NavBar />
@@ -366,7 +365,7 @@ const Marking = () => {
               <input
                 type="checkbox"
                 value={period}
-                disabled={isMarked} // Disable if already marked
+                disabled={markedPeriods.includes(period)} // Disable if period is already marked
                 checked={periods.includes(period)}
                 onChange={() =>
                   setPeriods((prev) =>
@@ -383,7 +382,6 @@ const Marking = () => {
           <textarea
             id="input-topic"
             value={topic}
-            disabled={isMarked} // Disable if already marked
             onChange={(e) => setTopic(e.target.value)}
             placeholder="Enter Topic"
           />
@@ -391,7 +389,6 @@ const Marking = () => {
           <textarea
             id="input-remarks"
             value={remarks}
-            disabled={isMarked} // Disable if already marked
             onChange={(e) => setRemarks(e.target.value)}
             placeholder="Enter Remarks"
           />
@@ -416,7 +413,6 @@ const Marking = () => {
                   <td>
                     <input
                       type="radio"
-                      disabled={isMarked} // Disable if already marked
                       checked={attendance[student.rollNumber] === "present"}
                       onChange={() => handleAttendanceChange(student.rollNumber, "present")}
                     />
@@ -425,7 +421,6 @@ const Marking = () => {
                     <input
                       type="radio"
                       className="absentStatus"
-                      disabled={isMarked} // Disable if already marked
                       checked={attendance[student.rollNumber] === "absent"}
                       onChange={() => handleAttendanceChange(student.rollNumber, "absent")}
                     />
@@ -435,8 +430,8 @@ const Marking = () => {
             </tbody>
           </table>
         )}
-        <button id="btn-submit" onClick={handleSubmit} disabled={isMarked || isSubmitting}>
-          {isSubmitting ? "Submitting..." : isMarked ? "Attendance Already Marked" : "Submit"}
+        <button id="btn-submit" onClick={handleSubmit} disabled={isSubmitting}>
+          {isSubmitting ? "Submitting..." : "Submit"}
         </button>
       </div>
     </>
