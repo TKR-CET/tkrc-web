@@ -30,34 +30,35 @@ const Marking = () => {
     checkExistingAttendance();
   }, []);
 
-  // Fetch existing attendance for the given date and class details
   const checkExistingAttendance = async () => {
-  try {
-    const response = await fetch(
-      `https://tkrcet-backend.onrender.com/Attendance/check?date=${date}&year=${programYear}&department=${department}&section=${section}`
-    );
+    try {
+      const response = await fetch(
+        `https://tkrcet-backend.onrender.com/Attendance/check?date=${date}&year=${programYear}&department=${department}&section=${section}`
+      );
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+
+      // Extract periods for the specific subject
+      const markedPeriods = result.periods || [];
+      const subjectPeriods = markedPeriods.filter(
+        (record) => record.subject === subject
+      );
+
+      // Collect the periods to disable
+      const periodsToDisable = subjectPeriods.flat();
+      setDisabledPeriods(periodsToDisable);
+
+      if (periodsToDisable.length > 0) {
+        setIsMarked(true);
+      }
+    } catch (error) {
+      alert(`Failed to check attendance: ${error.message}`);
     }
-
-    const result = await response.json();
-
-    // Extract periods for the specific subject
-    const markedPeriods = result.periods || [];
-    const filteredPeriods = markedPeriods.filter((record) => record.subject === subject);
-
-    // If periods exist for this subject, disable those periods
-    const periodsToDisable = filteredPeriods.flatMap((record) => record.periods || []);
-    setDisabledPeriods(periodsToDisable);
-
-    if (periodsToDisable.length > 0) {
-      setIsMarked(true);
-    }
-  } catch (error) {
-    alert(`Failed to check attendance: ${error.message}`);
-  }
-};
+  };
 
   const fetchStudents = async () => {
     try {
@@ -170,26 +171,25 @@ const Marking = () => {
         <p>
           Year: {programYear} | Department: {department} | Section: {section} | Subject: {subject}
         </p>
-       <div className="periodSelection">
-  <label>Periods:</label>
-  {[1, 2, 3, 4, 5, 6].map((period) => (
-    <label key={period}>
-      <input
-        type="checkbox"
-        value={period}
-        disabled={disabledPeriods.includes(period)} // Disable only specific periods
-        checked={periods.includes(period)}
-        onChange={() =>
-          setPeriods((prev) =>
-            prev.includes(period) ? prev.filter((p) => p !== period) : [...prev, period]
-          )
-        }
-      />
-      {period}
-    </label>
-  ))}
-</div>
-
+        <div className="periodSelection">
+          <label>Periods:</label>
+          {[1, 2, 3, 4, 5, 6].map((period) => (
+            <label key={period}>
+              <input
+                type="checkbox"
+                value={period}
+                disabled={disabledPeriods.includes(period)} // Disable only specific periods
+                checked={periods.includes(period)}
+                onChange={() =>
+                  setPeriods((prev) =>
+                    prev.includes(period) ? prev.filter((p) => p !== period) : [...prev, period]
+                  )
+                }
+              />
+              {period}
+            </label>
+          ))}
+        </div>
         <div className="subjectTopicEntry">
           <label htmlFor="input-topic">Topic:</label>
           <textarea
