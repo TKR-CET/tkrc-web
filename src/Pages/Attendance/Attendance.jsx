@@ -23,8 +23,8 @@ const Attendance = () => {
 
   // Function to fetch attendance records by date
   const fetchAttendanceByDate = async () => {
-    setLoading(true); // Set loading state to true
-    setError(""); // Reset error state
+    setLoading(true);
+    setError("");
 
     try {
       const response = await fetch(
@@ -41,6 +41,7 @@ const Attendance = () => {
       if (Array.isArray(data)) {
         const processedData = data.map((record) => ({
           ...record,
+          classDetails: `B.Tech ${record.programYear} ${record.department}-${record.section}`, // Combine details
           absentees: record.attendance
             .filter((student) => student.status === "absent")
             .map((student) => student.rollNumber),
@@ -52,7 +53,7 @@ const Attendance = () => {
     } catch (err) {
       setError(err.message || "An unknown error occurred.");
     } finally {
-      setLoading(false); // Set loading state to false
+      setLoading(false);
     }
   };
 
@@ -108,9 +109,7 @@ const Attendance = () => {
               <table className="attendance-table">
                 <thead>
                   <tr>
-                    <th>Program Year</th>
-                    <th>Department</th>
-                    <th>Section</th>
+                    <th>Class</th>
                     <th>Subject</th>
                     <th>Date</th>
                     <th>Periods</th>
@@ -122,9 +121,7 @@ const Attendance = () => {
                 <tbody>
                   {attendanceData.map((record, index) => (
                     <tr key={index}>
-                      <td>{record.programYear}</td>
-                      <td>{record.department}</td>
-                      <td>{record.section}</td>
+                      <td>{record.classDetails}</td>
                       <td>{record.subject}</td>
                       <td>{record.date}</td>
                       <td>{record.periods.join(", ")}</td>
