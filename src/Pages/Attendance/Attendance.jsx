@@ -39,8 +39,7 @@ const Attendance = () => {
 
   try {
     const response = await fetch(
-      `https://tkrcet-backend.onrender.com/Attendance/fetch-attendance?date=${selectedDate}&year=${year}&department=${department}&section=${section}`
-    );
+      `https://tkrcet-backend.onrender.com/Attendance/fetch-attendance?date=${selectedDate});
 
     if (!response.ok) {
       throw new Error(`No attendance record found: ${response.status}`);
