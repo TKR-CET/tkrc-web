@@ -21,6 +21,17 @@ const Attendance = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  // Function to convert numeric years to Roman numerals
+  const mapYearToRoman = (year) => {
+    const yearMap = {
+      "1": "I",
+      "2": "II",
+      "3": "III",
+      "4": "IV",
+    };
+    return yearMap[year] || year; // Fallback to original value if not found
+  };
+
   // Function to fetch attendance records by date
   const fetchAttendanceByDate = async () => {
     setLoading(true);
@@ -41,7 +52,7 @@ const Attendance = () => {
       if (Array.isArray(data)) {
         const processedData = data.map((record) => ({
           ...record,
-          classDetails: `B.Tech ${record.programYear} ${record.department}-${record.section}`, // Combine details
+          classDetails: `B.Tech ${mapYearToRoman(record.programYear)} ${record.department}-${record.section}`, // Combine details
           absentees: record.attendance
             .filter((student) => student.status === "absent")
             .map((student) => student.rollNumber),
@@ -93,7 +104,7 @@ const Attendance = () => {
               value={date}
               onChange={(e) => setDate(e.target.value)}
             />
-            <button onClick={handleGoClick} className="go">
+            <button onClick={handleGoClick} className="go-button">
               Go
             </button>
           </div>
