@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, Link } from "react-router-dom";
 import "./Attendance.css";
-import Header from "../../Components/Header/Header";
+import Header from "../../Components/Header/Header"; 
 import NavBar from "../../Components/NavBar/NavBar";
 import MobileNav from "../../Components/MobileNav/MobileNav.jsx";
 
