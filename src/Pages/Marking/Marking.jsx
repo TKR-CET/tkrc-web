@@ -1,3 +1,5 @@
+
+
 import React, { useState, useEffect } from "react";
 import Header from "../../Components/Header/Header";
 import NavBar from "../../Components/NavBar/NavBar";
@@ -22,14 +24,14 @@ const Marking = () => {
   const [periods, setPeriods] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [markedPeriods, setMarkedPeriods] = useState([]); // Tracks already marked periods
+  const [isMarked, setIsMarked] = useState(false); // Check if attendance is already marked
 
   useEffect(() => {
     fetchStudents();
     checkExistingAttendance();
   }, []);
 
-  // Fetch existing attendance for the given date and class details
+  // Check if attendance is already marked for the given date and class details
   const checkExistingAttendance = async () => {
     try {
       const response = await fetch(
@@ -42,9 +44,10 @@ const Marking = () => {
 
       const result = await response.json();
 
-      // Set marked periods
-      const markedPeriods = result.periods || [];
-      setMarkedPeriods(markedPeriods);
+      const periodsWithSubject = result.periods || [];
+      if (periodsWithSubject.includes(subject)) {
+        setIsMarked(true); // Mark the attendance as already existing
+      }
     } catch (error) {
       alert(`Failed to check attendance: ${error.message}`);
     }
@@ -88,8 +91,8 @@ const Marking = () => {
   };
 
   const handleSubmit = async () => {
-    if (markedPeriods.length > 0) {
-      alert("Attendance for selected periods is already marked.");
+    if (isMarked) {
+      alert("Attendance for this subject is already marked.");
       return;
     }
 
@@ -149,7 +152,7 @@ const Marking = () => {
 
   return (
     <>
-      <style>
+       <style>
       {`.attendanceMain {
     padding: 20px;
     background-color: #fff;
@@ -365,7 +368,7 @@ const Marking = () => {
               <input
                 type="checkbox"
                 value={period}
-                disabled={markedPeriods.includes(period)} // Disable if period is already marked
+                disabled={isMarked} // Disable if already marked
                 checked={periods.includes(period)}
                 onChange={() =>
                   setPeriods((prev) =>
@@ -382,6 +385,7 @@ const Marking = () => {
           <textarea
             id="input-topic"
             value={topic}
+            disabled={isMarked} // Disable if already marked
             onChange={(e) => setTopic(e.target.value)}
             placeholder="Enter Topic"
           />
@@ -389,6 +393,7 @@ const Marking = () => {
           <textarea
             id="input-remarks"
             value={remarks}
+            disabled={isMarked} // Disable if already marked
             onChange={(e) => setRemarks(e.target.value)}
             placeholder="Enter Remarks"
           />
@@ -413,6 +418,7 @@ const Marking = () => {
                   <td>
                     <input
                       type="radio"
+                      disabled={isMarked} // Disable if already marked
                       checked={attendance[student.rollNumber] === "present"}
                       onChange={() => handleAttendanceChange(student.rollNumber, "present")}
                     />
@@ -421,6 +427,7 @@ const Marking = () => {
                     <input
                       type="radio"
                       className="absentStatus"
+                      disabled={isMarked} // Disable if already marked
                       checked={attendance[student.rollNumber] === "absent"}
                       onChange={() => handleAttendanceChange(student.rollNumber, "absent")}
                     />
@@ -430,8 +437,8 @@ const Marking = () => {
             </tbody>
           </table>
         )}
-        <button id="btn-submit" onClick={handleSubmit} disabled={isSubmitting}>
-          {isSubmitting ? "Submitting..." : "Submit"}
+        <button id="btn-submit" onClick={handleSubmit} disabled={isMarked || isSubmitting}>
+          {isSubmitting ? "Submitting..." : isMarked ? "Attendance Already Marked" : "Submit"}
         </button>
       </div>
     </>
@@ -439,3 +446,4 @@ const Marking = () => {
 };
 
 export default Marking;
+
