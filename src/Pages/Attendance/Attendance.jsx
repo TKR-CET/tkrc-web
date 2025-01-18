@@ -23,8 +23,8 @@ const Attendance = () => {
 
   // Function to fetch attendance records by date
   const fetchAttendanceByDate = async () => {
-    setLoading(true);
-    setError("");
+    setLoading(true); // Set loading state to true
+    setError(""); // Reset error state
 
     try {
       const response = await fetch(
@@ -52,7 +52,7 @@ const Attendance = () => {
     } catch (err) {
       setError(err.message || "An unknown error occurred.");
     } finally {
-      setLoading(false);
+      setLoading(false); // Set loading state to false
     }
   };
 
@@ -97,13 +97,7 @@ const Attendance = () => {
             </button>
           </div>
         </div>
-        <div className="class-info">
-          <h3>Selected Class Details</h3>
-          <p>Program Year: {programYear || "N/A"}</p>
-          <p>Department: {department || "N/A"}</p>
-          <p>Section: {section || "N/A"}</p>
-          <p>Subject: {subject || "N/A"}</p>
-        </div>
+
         {loading ? (
           <p>Loading attendance records...</p>
         ) : error ? (
