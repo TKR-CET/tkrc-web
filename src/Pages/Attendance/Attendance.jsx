@@ -16,12 +16,13 @@ const Attendance = () => {
   const section = queryParams.get("section");
   const subject = queryParams.get("subject");
 
-  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
+  const currentDate = new Date().toISOString().split("T")[0]; // Get current date in 'YYYY-MM-DD' format
+  const [date, setDate] = useState(currentDate); // Default to current date
   const [attendanceData, setAttendanceData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Fetch attendance records for the selected date
+  // Fetch attendance records for the current date
   const fetchAttendanceByDate = async () => {
     setLoading(true);
     setError("");
@@ -57,22 +58,25 @@ const Attendance = () => {
     }
   };
 
-  // Automatically fetch attendance when the date changes
+  // Automatically fetch attendance for the current date
   useEffect(() => {
     fetchAttendanceByDate();
-  }, [date]);
+  }, []);
 
-  // Redirect to the marking page with query parameters
+  // Redirect to the marking page (for current date only)
   const handleGoClick = () => {
     navigate(
-      `/mark?programYear=${programYear}&department=${department}&section=${section}&subject=${subject}&date=${date}`
+      `/mark?programYear=${programYear}&department=${department}&section=${section}&subject=${subject}&date=${currentDate}`
     );
   };
 
+  // Redirect to the editing page for the current date
   const handleEdit = (record) => {
-    navigate(
-      `/edit?programYear=${record.year}&department=${record.department}&section=${record.section}&subject=${record.subject}&date=${record.date}&period=${record.period}`
-    );
+    if (record.date === currentDate) {
+      navigate(
+        `/edit?programYear=${record.year}&department=${record.department}&section=${record.section}&subject=${record.subject}&date=${record.date}&period=${record.period}`
+      );
+    }
   };
 
   return (
@@ -92,8 +96,8 @@ const Attendance = () => {
               type="date"
               id="date"
               className="date-selector"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
+              value={currentDate} // Restrict date to current date
+              disabled // Prevent user from changing the date
             />
             <button onClick={handleGoClick} className="go">
               Go
@@ -136,14 +140,18 @@ const Attendance = () => {
                           : "None"}
                       </td>
                       <td>
-                        <button onClick={() => handleEdit(record)}>Edit</button>
+                        {record.date === currentDate ? (
+                          <button onClick={() => handleEdit(record)}>Edit</button>
+                        ) : (
+                          <span>Not Editable</span>
+                        )}
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             ) : (
-              <p>No attendance records available for the selected date.</p>
+              <p>No attendance records available for today.</p>
             )}
           </div>
         )}
