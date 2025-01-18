@@ -20,41 +20,16 @@ const Marking = () => {
   const [remarks, setRemarks] = useState("");
   const [attendance, setAttendance] = useState({});
   const [periods, setPeriods] = useState([]);
-  const [disabledPeriods, setDisabledPeriods] = useState([]); // Track disabled periods
+  const [markedPeriods, setMarkedPeriods] = useState([]); // Tracks already marked periods
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     fetchStudents();
-    checkExistingAttendance();
+    fetchMarkedPeriods();
   }, []);
 
-  // Fetch existing attendance for the given date and class details
-  const checkExistingAttendance = async () => {
-    try {
-      const response = await fetch(
-        `https://tkrcet-backend.onrender.com/Attendance/check?date=${date}&year=${programYear}&department=${department}&section=${section}`
-      );
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const result = await response.json();
-
-      // Extract periods specific to the current subject
-      const markedRecords = result.periods || [];
-      const periodsForSubject = markedRecords
-        .filter((record) => record.subject === subject) // Match only the current subject
-        .flatMap((record) => record.periods); // Get all marked periods
-
-      setDisabledPeriods(periodsForSubject);
-
-    } catch (error) {
-      console.error("Error checking existing attendance:", error.message);
-    }
-  };
-
+  // Fetch students
   const fetchStudents = async () => {
     try {
       const response = await fetch(
@@ -79,12 +54,36 @@ const Marking = () => {
         throw new Error("Unexpected data format. 'students' property is missing or invalid.");
       }
     } catch (error) {
-      console.error("Error fetching students:", error.message);
+      alert(`Failed to fetch data: ${error.message}`);
     } finally {
       setIsLoading(false);
     }
   };
 
+  // Fetch already marked periods
+  const fetchMarkedPeriods = async () => {
+    try {
+      const response = await fetch(
+        `https://tkrcet-backend.onrender.com/Attendance/check?date=${date}&year=${programYear}&department=${department}&section=${section}`
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+
+      if (result.periods && Array.isArray(result.periods)) {
+        setMarkedPeriods(result.periods); // Save marked periods
+      } else {
+        throw new Error("Unexpected data format. 'periods' property is missing or invalid.");
+      }
+    } catch (error) {
+      alert(`Failed to fetch marked periods: ${error.message}`);
+    }
+  };
+
+  // Handle attendance change
   const handleAttendanceChange = (rollNumber, status) => {
     setAttendance((prev) => ({
       ...prev,
@@ -92,6 +91,7 @@ const Marking = () => {
     }));
   };
 
+  // Handle submit
   const handleSubmit = async () => {
     const trimmedSubject = subject.trim();
     const trimmedTopic = topic.trim();
@@ -141,7 +141,7 @@ const Marking = () => {
         throw new Error(result.message || "Failed to submit attendance.");
       }
     } catch (error) {
-      console.error("Error submitting attendance:", error.message);
+      alert(error.message);
     } finally {
       setIsSubmitting(false);
     }
@@ -168,15 +168,15 @@ const Marking = () => {
               <input
                 type="checkbox"
                 value={period}
-                disabled={disabledPeriods.includes(period)} // Disable already marked periods
                 checked={periods.includes(period)}
+                disabled={markedPeriods.includes(period)} // Disable already marked periods
                 onChange={() =>
                   setPeriods((prev) =>
                     prev.includes(period) ? prev.filter((p) => p !== period) : [...prev, period]
                   )
                 }
               />
-              {period}
+              {period} {markedPeriods.includes(period) && "(Marked)"}
             </label>
           ))}
         </div>
