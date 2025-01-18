@@ -29,7 +29,7 @@ const Attendance = () => {
       "3": "III",
       "4": "IV",
     };
-    return yearMap[year] || year; // Fallback to original value if not found
+    return yearMap[year] || "N/A"; // Default to "N/A" if year is undefined
   };
 
   // Function to fetch attendance records by date
@@ -52,7 +52,7 @@ const Attendance = () => {
       if (Array.isArray(data)) {
         const processedData = data.map((record) => ({
           ...record,
-          classDetails: `B.Tech ${mapYearToRoman(record.programYear)} ${record.department}-${record.section}`, // Combine details
+          classDetails: `B.Tech ${mapYearToRoman(record.year)} ${record.department}-${record.section}`, // Combine year, department, and section
           absentees: record.attendance
             .filter((student) => student.status === "absent")
             .map((student) => student.rollNumber),
