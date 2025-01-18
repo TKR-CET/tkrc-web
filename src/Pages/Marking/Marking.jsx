@@ -23,13 +23,13 @@ const Marking = () => {
   const [disabledPeriods, setDisabledPeriods] = useState([]); // Track disabled periods
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isMarked, setIsMarked] = useState(false); // Check if attendance is already marked
 
   useEffect(() => {
     fetchStudents();
     checkExistingAttendance();
   }, []);
 
+  // Fetch existing attendance for the given date and class details
   const checkExistingAttendance = async () => {
     try {
       const response = await fetch(
@@ -42,21 +42,16 @@ const Marking = () => {
 
       const result = await response.json();
 
-      // Extract periods for the specific subject
-      const markedPeriods = result.periods || [];
-      const subjectPeriods = markedPeriods.filter(
-        (record) => record.subject === subject
-      );
+      // Extract periods specific to the current subject
+      const markedRecords = result.periods || [];
+      const periodsForSubject = markedRecords
+        .filter((record) => record.subject === subject) // Match only the current subject
+        .flatMap((record) => record.periods); // Get all marked periods
 
-      // Collect the periods to disable
-      const periodsToDisable = subjectPeriods.flat();
-      setDisabledPeriods(periodsToDisable);
+      setDisabledPeriods(periodsForSubject);
 
-      if (periodsToDisable.length > 0) {
-        setIsMarked(true);
-      }
     } catch (error) {
-      alert(`Failed to check attendance: ${error.message}`);
+      console.error("Error checking existing attendance:", error.message);
     }
   };
 
@@ -84,7 +79,7 @@ const Marking = () => {
         throw new Error("Unexpected data format. 'students' property is missing or invalid.");
       }
     } catch (error) {
-      alert(`Failed to fetch data: ${error.message}`);
+      console.error("Error fetching students:", error.message);
     } finally {
       setIsLoading(false);
     }
@@ -98,11 +93,6 @@ const Marking = () => {
   };
 
   const handleSubmit = async () => {
-    if (isMarked) {
-      alert("Attendance for this subject is already marked.");
-      return;
-    }
-
     const trimmedSubject = subject.trim();
     const trimmedTopic = topic.trim();
     const trimmedRemarks = remarks.trim();
@@ -151,7 +141,7 @@ const Marking = () => {
         throw new Error(result.message || "Failed to submit attendance.");
       }
     } catch (error) {
-      alert(error.message);
+      console.error("Error submitting attendance:", error.message);
     } finally {
       setIsSubmitting(false);
     }
@@ -178,7 +168,7 @@ const Marking = () => {
               <input
                 type="checkbox"
                 value={period}
-                disabled={disabledPeriods.includes(period)} // Disable only specific periods
+                disabled={disabledPeriods.includes(period)} // Disable already marked periods
                 checked={periods.includes(period)}
                 onChange={() =>
                   setPeriods((prev) =>
@@ -195,7 +185,6 @@ const Marking = () => {
           <textarea
             id="input-topic"
             value={topic}
-            disabled={isMarked} // Disable if already marked
             onChange={(e) => setTopic(e.target.value)}
             placeholder="Enter Topic"
           />
@@ -203,7 +192,6 @@ const Marking = () => {
           <textarea
             id="input-remarks"
             value={remarks}
-            disabled={isMarked} // Disable if already marked
             onChange={(e) => setRemarks(e.target.value)}
             placeholder="Enter Remarks"
           />
@@ -228,7 +216,6 @@ const Marking = () => {
                   <td>
                     <input
                       type="radio"
-                      disabled={isMarked} // Disable if already marked
                       checked={attendance[student.rollNumber] === "present"}
                       onChange={() => handleAttendanceChange(student.rollNumber, "present")}
                     />
@@ -237,7 +224,6 @@ const Marking = () => {
                     <input
                       type="radio"
                       className="absentStatus"
-                      disabled={isMarked} // Disable if already marked
                       checked={attendance[student.rollNumber] === "absent"}
                       onChange={() => handleAttendanceChange(student.rollNumber, "absent")}
                     />
@@ -247,8 +233,8 @@ const Marking = () => {
             </tbody>
           </table>
         )}
-        <button id="btn-submit" onClick={handleSubmit} disabled={isMarked || isSubmitting}>
-          {isSubmitting ? "Submitting..." : isMarked ? "Attendance Already Marked" : "Submit"}
+        <button id="btn-submit" onClick={handleSubmit} disabled={isSubmitting}>
+          {isSubmitting ? "Submitting..." : "Submit"}
         </button>
       </div>
     </>
