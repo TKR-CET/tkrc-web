@@ -92,7 +92,7 @@ const Attendance = () => {
               value={date}
               onChange={(e) => setDate(e.target.value)}
             />
-            <button onClick={handleGoClick} className="go-button">
+            <button onClick={handleGoClick} className="go">
               Go
             </button>
           </div>
