@@ -16,10 +16,12 @@ const Attendance = () => {
   const section = queryParams.get("section");
   const subject = queryParams.get("subject");
 
-  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
+  const [date, setDate] = useState(new Date().toISOString().split("T")[0]); // Current date
   const [attendanceData, setAttendanceData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const todayDate = new Date().toISOString().split("T")[0]; // Today's date
 
   // Fetch attendance records for the selected date
   const fetchAttendanceByDate = async () => {
@@ -69,10 +71,13 @@ const Attendance = () => {
     );
   };
 
+  // Handle editing a record
   const handleEdit = (record) => {
-    navigate(
-      `/edit?programYear=${record.year}&department=${record.department}&section=${record.section}&subject=${record.subject}&date=${record.date}&period=${record.period}`
-    );
+    if (record.date === todayDate) {
+      navigate(
+        `/mark?programYear=${record.year}&department=${record.department}&section=${record.section}&subject=${record.subject}&date=${record.date}&period=${record.period}`
+      );
+    }
   };
 
   return (
@@ -136,7 +141,13 @@ const Attendance = () => {
                           : "None"}
                       </td>
                       <td>
-                        <button onClick={() => handleEdit(record)}>Edit</button>
+                        <button
+                          onClick={() => handleEdit(record)}
+                          disabled={record.date !== todayDate}
+                          title={record.date !== todayDate ? "Editing is only allowed for today's records" : ""}
+                        >
+                          Edit
+                        </button>
                       </td>
                     </tr>
                   ))}
