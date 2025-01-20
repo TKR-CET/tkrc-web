@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "./Attendance.css";
 import Header from "../../Components/Header/Header";
-import NavBar from "../../Components/NavBar/NavBar";
+import NavBar from "../../Components/NavBar/NavBar"; 
 import MobileNav from "../../Components/MobileNav/MobileNav";
 
 const Attendance = () => {
