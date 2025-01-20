@@ -1,46 +1,65 @@
 import React, { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import Header from "../../Components/Header/Header";
 import NavBar from "../../Components/NavBar/NavBar";
 import MobileNav from "../../Components/MobileNav/MobileNav";
-import { useLocation, useNavigate } from "react-router-dom";
 
 const Marking = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const query = new URLSearchParams(location.search);
 
-  const date = query.get("date") || new Date().toISOString().split("T")[0];
+  const date = query.get("date");
   const programYear = query.get("programYear");
   const department = query.get("department");
   const section = query.get("section");
   const subject = query.get("subject");
+  const period = query.get("period");
 
   const [studentsData, setStudentsData] = useState([]);
   const [topic, setTopic] = useState("");
   const [remarks, setRemarks] = useState("");
   const [attendance, setAttendance] = useState({});
-  const [periods, setPeriods] = useState([]);
-  const [markedPeriods, setMarkedPeriods] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isFetchingPeriods, setIsFetchingPeriods] = useState(true);
 
   useEffect(() => {
-    if (date !== new Date().toISOString().split("T")[0]) {
-      alert("Attendance can only be marked for today's date.");
-      navigate("/attendance");
-    } else {
-      fetchStudents();
-      fetchMarkedPeriods();
-    }
-  }, [date, navigate]);
+    fetchAttendanceData();
+    fetchStudents();
+  }, []);
 
-  // Fetch students
+  const fetchAttendanceData = async () => {
+    try {
+      const response = await fetch(
+        `https://tkrcet-backend.onrender.com/Attendance/period?date=${date}&year=${programYear}&department=${department}&section=${section}&period=${period}`
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+
+      if (result.attendance) {
+        setTopic(result.attendance.topic || "");
+        setRemarks(result.attendance.remarks || "");
+        setAttendance(
+          result.attendance.attendance.reduce((acc, record) => {
+            acc[record.rollNumber] = record.status;
+            return acc;
+          }, {})
+        );
+      }
+    } catch (error) {
+      alert(`Failed to fetch attendance data: ${error.message}`);
+    }
+  };
+
   const fetchStudents = async () => {
     try {
       const response = await fetch(
         `https://tkrcet-backend.onrender.com/Section/${programYear}/${department}/${section}/students`
       );
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -49,14 +68,8 @@ const Marking = () => {
 
       if (result.students && Array.isArray(result.students)) {
         setStudentsData(result.students);
-        setAttendance(
-          result.students.reduce((acc, student) => {
-            acc[student.rollNumber] = "present";
-            return acc;
-          }, {})
-        );
       } else {
-        throw new Error("Unexpected data format. 'students' property is missing or invalid.");
+        throw new Error("Invalid student data format.");
       }
     } catch (error) {
       alert(`Failed to fetch students data: ${error.message}`);
@@ -65,32 +78,6 @@ const Marking = () => {
     }
   };
 
-  // Fetch already marked periods
-  const fetchMarkedPeriods = async () => {
-    try {
-      const response = await fetch(
-        `https://tkrcet-backend.onrender.com/Attendance/check?date=${date}&year=${programYear}&department=${department}&section=${section}`
-      );
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const result = await response.json();
-
-      if (result.periods && Array.isArray(result.periods)) {
-        setMarkedPeriods(result.periods);
-      } else {
-        throw new Error("Unexpected data format. 'periods' property is missing or invalid.");
-      }
-    } catch (error) {
-      alert(`Failed to fetch marked periods: ${error.message}`);
-    } finally {
-      setIsFetchingPeriods(false);
-    }
-  };
-
-  // Handle attendance change
   const handleAttendanceChange = (rollNumber, status) => {
     setAttendance((prev) => ({
       ...prev,
@@ -98,49 +85,25 @@ const Marking = () => {
     }));
   };
 
-  // Handle period selection
-  const handlePeriodChange = (period) => {
-    setPeriods((prev) =>
-      prev.includes(period) ? prev.filter((p) => p !== period) : [...prev, period]
-    );
-  };
-
-  // Handle form submission
   const handleSubmit = async () => {
-    const trimmedSubject = subject.trim();
     const trimmedTopic = topic.trim();
     const trimmedRemarks = remarks.trim();
-
-    if (
-      !trimmedSubject ||
-      !trimmedTopic ||
-      periods.length === 0 ||
-      !programYear ||
-      !department ||
-      !section ||
-      !date
-    ) {
-      alert("Please fill in all mandatory fields (Periods, Subject, Topic, Year, Department, Section, Date).");
-      return;
-    }
 
     const attendanceData = {
       date,
       year: programYear,
       department,
       section,
-      subject: trimmedSubject,
+      subject,
       topic: trimmedTopic,
       remarks: trimmedRemarks,
-      periods,
+      period,
       attendance: studentsData.map((student) => ({
         rollNumber: student.rollNumber,
         name: student.name,
         status: attendance[student.rollNumber],
       })),
     };
-
-    setIsSubmitting(true);
 
     try {
       const response = await fetch(
@@ -154,24 +117,20 @@ const Marking = () => {
         }
       );
 
-      const result = await response.json();
-
       if (response.ok) {
-        alert(result.message || "Attendance submitted successfully!");
+        alert("Attendance updated successfully!");
         navigate("/attendance");
       } else {
-        throw new Error(result.message || "Failed to submit attendance.");
+        throw new Error("Failed to update attendance.");
       }
     } catch (error) {
       alert(error.message);
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
   return (
-    <>
-      <style>{`
+    <div>
+         <style>{`
             .attendanceMain {
     padding: 20px;
     background-color: #fff;
@@ -368,91 +327,60 @@ const Marking = () => {
     }
   }
       `}</style>
+
       <Header />
-      <div className="nav">
-        <NavBar />
-      </div>
-      <div className="mob-nav">
-        <MobileNav />
-      </div>
-      <div className="attendanceMain">
-        <h2 className="attendanceHeading">Mark Attendance</h2>
+      <NavBar />
+      <MobileNav />
+      <div>
+        <h2>Edit Attendance</h2>
         <p>
-          Year: {programYear} | Department: {department} | Section: {section} | Subject: {subject}
+          Year: {programYear} | Department: {department} | Section: {section} | Subject: {subject} | Period: {period}
         </p>
-        <div className="periodSelection">
-          <label>Periods:</label>
-          {[1, 2, 3, 4, 5, 6].map((period) => (
-            <label key={period} title={markedPeriods.includes(period) ? "This period is already marked" : ""}>
-              <input
-                type="checkbox"
-                value={period}
-                checked={periods.includes(period)}
-                disabled={markedPeriods.includes(period)}
-                onChange={() => handlePeriodChange(period)}
-              />
-              {period} {markedPeriods.includes(period) && "(Already Marked)"}
-            </label>
-          ))}
-        </div>
-        <div className="subjectTopicEntry">
-          <label htmlFor="input-topic">Topic:</label>
-          <textarea
-            id="input-topic"
-            value={topic}
-            onChange={(e) => setTopic(e.target.value)}
-            placeholder="Enter Topic"
-          />
-          <label htmlFor="input-remarks">Remarks:</label>
-          <textarea
-            id="input-remarks"
-            value={remarks}
-            onChange={(e) => setRemarks(e.target.value)}
-            placeholder="Enter Remarks"
-          />
-        </div>
-        {isLoading ? (
-          <p>Loading students...</p>
-        ) : (
-          <table className="attendanceList">
-            <thead>
-              <tr>
-                <th>Roll Number</th>
-                <th>Name</th>
-                <th>Present</th>
-                <th>Absent</th>
+        <textarea
+          value={topic}
+          onChange={(e) => setTopic(e.target.value)}
+          placeholder="Enter topic"
+        />
+        <textarea
+          value={remarks}
+          onChange={(e) => setRemarks(e.target.value)}
+          placeholder="Enter remarks"
+        />
+        <table>
+          <thead>
+            <tr>
+              <th>Roll Number</th>
+              <th>Name</th>
+              <th>Present</th>
+              <th>Absent</th>
+            </tr>
+          </thead>
+          <tbody>
+            {studentsData.map((student) => (
+              <tr key={student.rollNumber}>
+                <td>{student.rollNumber}</td>
+                <td>{student.name}</td>
+                <td>
+                  <input
+                    type="radio"
+                    checked={attendance[student.rollNumber] === "present"}
+                    onChange={() => handleAttendanceChange(student.rollNumber, "present")}
+                  />
+                </td>
+                <td>
+                  <input
+                    type="radio"
+                    checked={attendance[student.rollNumber] === "absent"}
+                    onChange={() => handleAttendanceChange(student.rollNumber, "absent")}
+                  />
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {studentsData.map((student) => (
-                <tr key={student.rollNumber}>
-                  <td>{student.rollNumber}</td>
-                  <td>{student.name}</td>
-                  <td>
-                    <input
-                      type="radio"
-                      checked={attendance[student.rollNumber] === "present"}
-                      onChange={() => handleAttendanceChange(student.rollNumber, "present")}
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="radio"
-                      className="absentStatus"
-                      checked={attendance[student.rollNumber] === "absent"}
-                      onChange={() => handleAttendanceChange(student.rollNumber, "absent")}
-                    />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-        <button id="btn-submit" onClick={handleSubmit} disabled={isSubmitting}>
-          {isSubmitting ? "Submitting..." : "Submit"}
-        </button>
+            ))}
+          </tbody>
+        </table>
+        <button onClick={handleSubmit}>Submit</button>
       </div>
-    </>
+    </div>
   );
 };
 
