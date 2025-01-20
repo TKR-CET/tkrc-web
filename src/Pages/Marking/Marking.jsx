@@ -49,9 +49,9 @@ const Marking = () => {
   const fetchStudents = async () => {
     try {
       const response = await fetch(
-        `https://tkrcet-backend.onrender.com/Section/${programYear}/${department}/${section}/students`
+        https://tkrcet-backend.onrender.com/Section/${programYear}/${department}/${section}/students
       );
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      if (!response.ok) throw new Error(HTTP error! status: ${response.status});
 
       const { students } = await response.json();
       setStudentsData(students);
@@ -62,7 +62,7 @@ const Marking = () => {
         }, {})
       );
     } catch (error) {
-      alert(`Failed to fetch students: ${error.message}`);
+      alert(Failed to fetch students: ${error.message});
     } finally {
       setIsLoading(false);
     }
@@ -71,14 +71,14 @@ const Marking = () => {
   const fetchMarkedPeriods = async () => {
     try {
       const response = await fetch(
-        `https://tkrcet-backend.onrender.com/Attendance/check?date=${date}&year=${programYear}&department=${department}&section=${section}`
+        https://tkrcet-backend.onrender.com/Attendance/check?date=${date}&year=${programYear}&department=${department}&section=${section}
       );
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      if (!response.ok) throw new Error(HTTP error! status: ${response.status});
 
       const { periods } = await response.json();
       setMarkedPeriods(periods || []);
     } catch (error) {
-      alert(`Failed to fetch marked periods: ${error.message}`);
+      alert(Failed to fetch marked periods: ${error.message});
     }
   };
 
@@ -148,7 +148,7 @@ const Marking = () => {
 
   return (
     <>
-        <style>{`
+         <style>{`
     .attendanceMain {
     padding: 20px;
     background-color: #fff;
@@ -361,30 +361,22 @@ const Marking = () => {
           <label>Periods:</label>
           {[1, 2, 3, 4, 5, 6].map((period) => (
             <label key={period}>
-            <input
-  type="checkbox"
-  value={period}
-  checked={periods.includes(period)}
-  disabled={markedPeriods.includes(period) && (!editingPeriod || parseInt(editingPeriod) !== period)}
-  onChange={() => handlePeriodChange(period)}
-/>
-              {period} {markedPeriods.includes(period) && period !== parseInt(editingPeriod) && "(Already Marked)"}
+              <input
+                type="checkbox"
+                value={period}
+                checked={periods.includes(period)}
+                disabled={markedPeriods.includes(period) && (!editingPeriod || parseInt(editingPeriod) !== period)}
+                onChange={() => handlePeriodChange(period)}
+              />
+              {period} {markedPeriods.includes(period) && (!editingPeriod || parseInt(editingPeriod) !== period) && "(Already Marked)"}
             </label>
           ))}
         </div>
         <div className="subjectTopicEntry">
           <label>Topic:</label>
-          <textarea
-            value={topic}
-            onChange={(e) => setTopic(e.target.value)}
-            placeholder="Enter Topic"
-          />
+          <textarea value={topic} onChange={(e) => setTopic(e.target.value)} placeholder="Enter Topic" />
           <label>Remarks:</label>
-          <textarea
-            value={remarks}
-            onChange={(e) => setRemarks(e.target.value)}
-            placeholder="Enter Remarks"
-          />
+          <textarea value={remarks} onChange={(e) => setRemarks(e.target.value)} placeholder="Enter Remarks" />
         </div>
         {isLoading ? (
           <p>Loading students...</p>
