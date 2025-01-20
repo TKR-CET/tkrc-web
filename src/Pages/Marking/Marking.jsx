@@ -369,20 +369,24 @@ const Marking = () => {
           Year: {programYear} | Department: {department} | Section: {section} | Subject: {subject}
         </p>
         <div className="periodSelection">
-          <label>Periods:</label>
-          {[1, 2, 3, 4, 5, 6].map((period) => (
-            <label key={period}>
-              <input
-                type="checkbox"
-                value={period}
-                checked={periods.includes(period)}
-                disabled={markedPeriods.includes(period) && !(editingPeriod && parseInt(editingPeriod) === period)}
-                onChange={() => handlePeriodChange(period)}
-              />
-              {period} {markedPeriods.includes(period) && !(editingPeriod && parseInt(editingPeriod) === period) && "(Already Marked)"}
-            </label>
-          ))}
-        </div>
+  <label>Periods:</label>
+  {[1, 2, 3, 4, 5, 6].map((period) => (
+    <label key={period}>
+      <input
+        type="checkbox"
+        value={period}
+        checked={periods.includes(period)}
+        disabled={
+          markedPeriods.includes(period) && 
+          (!editingPeriod || parseInt(editingPeriod) !== period)
+        }
+        onChange={() => handlePeriodChange(period)}
+      />
+      {period} {markedPeriods.includes(period) && (!editingPeriod || parseInt(editingPeriod) !== period) && "(Already Marked)"}
+    </label>
+  ))}
+</div>
+        
         <div className="subjectTopicEntry">
           <label>Topic:</label>
           <textarea value={topic} onChange={(e) => setTopic(e.target.value)} placeholder="Enter Topic" />
