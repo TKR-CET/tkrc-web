@@ -361,13 +361,13 @@ const Marking = () => {
           <label>Periods:</label>
           {[1, 2, 3, 4, 5, 6].map((period) => (
             <label key={period}>
-              <input
-                type="checkbox"
-                value={period}
-                checked={periods.includes(period)}
-                disabled={markedPeriods.includes(period) && period !== parseInt(editingPeriod)}
-                onChange={() => handlePeriodChange(period)}
-              />
+            <input
+  type="checkbox"
+  value={period}
+  checked={periods.includes(period)}
+  disabled={markedPeriods.includes(period) && (!editingPeriod || parseInt(editingPeriod) !== period)}
+  onChange={() => handlePeriodChange(period)}
+/>
               {period} {markedPeriods.includes(period) && period !== parseInt(editingPeriod) && "(Already Marked)"}
             </label>
           ))}
