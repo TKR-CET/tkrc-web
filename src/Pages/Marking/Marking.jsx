@@ -14,84 +14,76 @@ const Marking = () => {
   const department = query.get("department");
   const section = query.get("section");
   const subject = query.get("subject");
-  const editingPeriod = query.get("period");
-  const prefilledTopic = query.get("topic") || "";
-  const prefilledRemarks = query.get("remarks") || "";
-  const prefilledAttendance = query.get("attendance");
 
   const [studentsData, setStudentsData] = useState([]);
-  const [topic, setTopic] = useState(prefilledTopic);
-  const [remarks, setRemarks] = useState(prefilledRemarks);
+  const [topic, setTopic] = useState("");
+  const [remarks, setRemarks] = useState("");
   const [attendance, setAttendance] = useState({});
-  const [periods, setPeriods] = useState(editingPeriod ? [parseInt(editingPeriod)] : []);
-  const [markedPeriods, setMarkedPeriods] = useState([]);
+  const [periods, setPeriods] = useState([]);
+  const [markedPeriods, setMarkedPeriods] = useState([]); // Tracks already marked periods
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     fetchStudents();
     fetchMarkedPeriods();
+  }, []);
 
-    if (prefilledAttendance) {
-      try {
-        const parsedAttendance = JSON.parse(decodeURIComponent(prefilledAttendance));
-        const attendanceMap = parsedAttendance.reduce((acc, student) => {
-          acc[student.rollNumber] = student.status;
-          return acc;
-        }, {});
-        setAttendance(attendanceMap);
-      } catch (error) {
-        console.error("Error parsing attendance data:", error);
-      }
-    }
-  }, [prefilledAttendance, editingPeriod]);
-
+  // Fetch students
   const fetchStudents = async () => {
     try {
       const response = await fetch(
         `https://tkrcet-backend.onrender.com/Section/${programYear}/${department}/${section}/students`
       );
 
-      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-
-      const jsonResponse = await response.json();
-      console.log("Student API Response:", jsonResponse);
-
-      if (!jsonResponse.students || !Array.isArray(jsonResponse.students)) {
-        throw new Error("Invalid student data format received");
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      setStudentsData(jsonResponse.students);
-      setAttendance((prev) =>
-        jsonResponse.students.reduce((acc, student) => {
-          acc[student.rollNumber] = prev[student.rollNumber] || "present";
-          return acc;
-        }, {})
-      );
+      const result = await response.json();
+
+      if (result.students && Array.isArray(result.students)) {
+        setStudentsData(result.students);
+        setAttendance(
+          result.students.reduce((acc, student) => {
+            acc[student.rollNumber] = "present";
+            return acc;
+          }, {})
+        );
+      } else {
+        throw new Error("Unexpected data format. 'students' property is missing or invalid.");
+      }
     } catch (error) {
-      alert(`Failed to fetch students: ${error.message}`);
+      alert(`Failed to fetch data: ${error.message}`);
     } finally {
       setIsLoading(false);
     }
   };
 
+  // Fetch already marked periods
   const fetchMarkedPeriods = async () => {
     try {
       const response = await fetch(
         `https://tkrcet-backend.onrender.com/Attendance/check?date=${date}&year=${programYear}&department=${department}&section=${section}`
       );
 
-      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
-      const jsonResponse = await response.json();
-      console.log("Marked Periods Response:", jsonResponse);
+      const result = await response.json();
 
-      setMarkedPeriods(jsonResponse.periods || []);
+      if (result.periods && Array.isArray(result.periods)) {
+        setMarkedPeriods(result.periods); // Save marked periods
+      } else {
+        throw new Error("Unexpected data format. 'periods' property is missing or invalid.");
+      }
     } catch (error) {
       alert(`Failed to fetch marked periods: ${error.message}`);
     }
   };
 
+  // Handle attendance change
   const handleAttendanceChange = (rollNumber, status) => {
     setAttendance((prev) => ({
       ...prev,
@@ -99,22 +91,14 @@ const Marking = () => {
     }));
   };
 
-  const handlePeriodChange = (period) => {
-    if (markedPeriods.includes(period) && (!editingPeriod || parseInt(editingPeriod) !== period)) {
-      alert(`Period ${period} has already been marked and cannot be selected.`);
-      return;
-    }
-
-    if (!editingPeriod) {
-      setPeriods((prev) =>
-        prev.includes(period) ? prev.filter((p) => p !== period) : [...prev, period]
-      );
-    }
-  };
-
+  // Handle submit
   const handleSubmit = async () => {
-    if (!subject.trim() || !topic.trim() || periods.length === 0) {
-      alert("Please fill in all mandatory fields.");
+    const trimmedSubject = subject.trim();
+    const trimmedTopic = topic.trim();
+    const trimmedRemarks = remarks.trim();
+
+    if (!trimmedSubject || !trimmedTopic || periods.length === 0 || !programYear || !department || !section || !date) {
+      alert("Please fill in all mandatory fields (Periods, Subject, Topic, Year, Department, Section, Date).");
       return;
     }
 
@@ -123,9 +107,9 @@ const Marking = () => {
       year: programYear,
       department,
       section,
-      subject: subject.trim(),
-      topic: topic.trim(),
-      remarks: remarks.trim(),
+      subject: trimmedSubject,
+      topic: trimmedTopic,
+      remarks: trimmedRemarks,
       periods,
       attendance: studentsData.map((student) => ({
         rollNumber: student.rollNumber,
@@ -141,13 +125,14 @@ const Marking = () => {
         "https://tkrcet-backend.onrender.com/Attendance/mark-attendance",
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify(attendanceData),
         }
       );
 
       const result = await response.json();
-      console.log("Attendance Submit Response:", result);
 
       if (response.ok) {
         alert(result.message || "Attendance submitted successfully!");
@@ -164,8 +149,8 @@ const Marking = () => {
 
   return (
     <>
-        <style>{`
-    .attendanceMain {
+       <style>{`
+           .attendanceMain {
     padding: 20px;
     background-color: #fff;
     margin: 20px;
@@ -360,7 +345,7 @@ const Marking = () => {
       top: 0;
     }
   }
-      `}</style>
+        `}</style>
       <Header />
       <div className="nav">
         <NavBar />
@@ -371,7 +356,7 @@ const Marking = () => {
       <div className="attendanceMain">
         <h2 className="attendanceHeading">Mark Attendance</h2>
         <p>
-          Year: {programYear} | Department: {department} | Section: {section} | Subject: {subject}
+          Year: {programYear}  |  Department: {department}   | Section: {section}   |   Subject: {subject}
         </p>
         <div className="periodSelection">
           <label>Periods:</label>
@@ -381,18 +366,32 @@ const Marking = () => {
                 type="checkbox"
                 value={period}
                 checked={periods.includes(period)}
-                disabled={markedPeriods.includes(period) && (!editingPeriod || parseInt(editingPeriod) !== period)}
-                onChange={() => handlePeriodChange(period)}
+                disabled={markedPeriods.includes(period)} // Disable already marked periods
+                onChange={() =>
+                  setPeriods((prev) =>
+                    prev.includes(period) ? prev.filter((p) => p !== period) : [...prev, period]
+                  )
+                }
               />
-              {period} {markedPeriods.includes(period) && (!editingPeriod || parseInt(editingPeriod) !== period) && "(Already Marked)"}
+              {period} {markedPeriods.includes(period) && ""}
             </label>
           ))}
         </div>
         <div className="subjectTopicEntry">
-          <label>Topic:</label>
-          <textarea value={topic} onChange={(e) => setTopic(e.target.value)} placeholder="Enter Topic" />
-          <label>Remarks:</label>
-          <textarea value={remarks} onChange={(e) => setRemarks(e.target.value)} placeholder="Enter Remarks" />
+          <label htmlFor="input-topic">Topic:</label>
+          <textarea
+            id="input-topic"
+            value={topic}
+            onChange={(e) => setTopic(e.target.value)}
+            placeholder="Enter Topic"
+          />
+          <label htmlFor="input-remarks">Remarks:</label>
+          <textarea
+            id="input-remarks"
+            value={remarks}
+            onChange={(e) => setRemarks(e.target.value)}
+            placeholder="Enter Remarks"
+          />
         </div>
         {isLoading ? (
           <p>Loading students...</p>
@@ -412,10 +411,19 @@ const Marking = () => {
                   <td>{student.rollNumber}</td>
                   <td>{student.name}</td>
                   <td>
-                    <input type="radio" checked={attendance[student.rollNumber] === "present"} onChange={() => handleAttendanceChange(student.rollNumber, "present")} />
+                    <input
+                      type="radio"
+                      checked={attendance[student.rollNumber] === "present"}
+                      onChange={() => handleAttendanceChange(student.rollNumber, "present")}
+                    />
                   </td>
                   <td>
-                    <input type="radio" checked={attendance[student.rollNumber] === "absent"} onChange={() => handleAttendanceChange(student.rollNumber, "absent")} />
+                    <input
+                      type="radio"
+                      className="absentStatus"
+                      checked={attendance[student.rollNumber] === "absent"}
+                      onChange={() => handleAttendanceChange(student.rollNumber, "absent")}
+                    />
                   </td>
                 </tr>
               ))}
