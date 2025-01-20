@@ -61,9 +61,9 @@ const Marking = () => {
   const fetchStudents = async () => {
     try {
       const response = await fetch(
-        https://tkrcet-backend.onrender.com/Section/${programYear}/${department}/${section}/students
+        `https://tkrcet-backend.onrender.com/Section/${programYear}/${department}/${section}/students`
       );
-      if (!response.ok) throw new Error(HTTP error! status: ${response.status});
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
       const result = await response.json();
 
@@ -79,7 +79,7 @@ const Marking = () => {
         throw new Error("Invalid student data format.");
       }
     } catch (error) {
-      alert(Failed to fetch students: ${error.message});
+      alert(`Failed to fetch students: ${error.message}`);
     } finally {
       setIsLoading(false);
     }
@@ -89,9 +89,9 @@ const Marking = () => {
   const fetchMarkedPeriods = async () => {
     try {
       const response = await fetch(
-        https://tkrcet-backend.onrender.com/Attendance/check?date=${date}&year=${programYear}&department=${department}&section=${section}
+        `https://tkrcet-backend.onrender.com/Attendance/check?date=${date}&year=${programYear}&department=${department}&section=${section}`
       );
-      if (!response.ok) throw new Error(HTTP error! status: ${response.status});
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
       const result = await response.json();
 
@@ -101,7 +101,7 @@ const Marking = () => {
         throw new Error("Invalid period data format.");
       }
     } catch (error) {
-      alert(Failed to fetch marked periods: ${error.message});
+      alert(`Failed to fetch marked periods: ${error.message}`);
     } finally {
       setIsFetchingPeriods(false);
     }
