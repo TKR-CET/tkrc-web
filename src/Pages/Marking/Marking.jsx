@@ -14,7 +14,7 @@ const Marking = () => {
   const department = query.get("department");
   const section = query.get("section");
   const subject = query.get("subject");
-  const editingPeriod = query.get("period"); // Period being edited
+  const editingPeriod = query.get("period");
   const prefilledTopic = query.get("topic") || "";
   const prefilledRemarks = query.get("remarks") || "";
   const prefilledAttendance = query.get("attendance");
@@ -48,16 +48,22 @@ const Marking = () => {
 
   const fetchStudents = async () => {
     try {
-     const response = await fetch(
-  `https://tkrcet-backend.onrender.com/Section/${programYear}/${department}/${section}/students`
-);
+      const response = await fetch(
+        https://tkrcet-backend.onrender.com/Section/${programYear}/${department}/${section}/students
+      );
 
-      if (!response.ok) throw new Error(HTTP error! status: ${response.status});
+      if (!response.ok) throw new Error(HTTP error! Status: ${response.status});
 
-      const { students } = await response.json();
-      setStudentsData(students);
+      const jsonResponse = await response.json();
+      console.log("Student API Response:", jsonResponse);
+
+      if (!jsonResponse.students || !Array.isArray(jsonResponse.students)) {
+        throw new Error("Invalid student data format received");
+      }
+
+      setStudentsData(jsonResponse.students);
       setAttendance((prev) =>
-        students.reduce((acc, student) => {
+        jsonResponse.students.reduce((acc, student) => {
           acc[student.rollNumber] = prev[student.rollNumber] || "present";
           return acc;
         }, {})
@@ -74,10 +80,13 @@ const Marking = () => {
       const response = await fetch(
         https://tkrcet-backend.onrender.com/Attendance/check?date=${date}&year=${programYear}&department=${department}&section=${section}
       );
-      if (!response.ok) throw new Error(HTTP error! status: ${response.status});
 
-      const { periods } = await response.json();
-      setMarkedPeriods(periods || []);
+      if (!response.ok) throw new Error(HTTP error! Status: ${response.status});
+
+      const jsonResponse = await response.json();
+      console.log("Marked Periods Response:", jsonResponse);
+
+      setMarkedPeriods(jsonResponse.periods || []);
     } catch (error) {
       alert(Failed to fetch marked periods: ${error.message});
     }
@@ -133,6 +142,7 @@ const Marking = () => {
       );
 
       const result = await response.json();
+      console.log("Attendance Submit Response:", result);
 
       if (response.ok) {
         alert(result.message || "Attendance submitted successfully!");
@@ -149,7 +159,7 @@ const Marking = () => {
 
   return (
     <>
-         <style>{`
+       <style>{`
     .attendanceMain {
     padding: 20px;
     background-color: #fff;
@@ -397,19 +407,10 @@ const Marking = () => {
                   <td>{student.rollNumber}</td>
                   <td>{student.name}</td>
                   <td>
-                    <input
-                      type="radio"
-                      checked={attendance[student.rollNumber] === "present"}
-                      onChange={() => handleAttendanceChange(student.rollNumber, "present")}
-                    />
+                    <input type="radio" checked={attendance[student.rollNumber] === "present"} onChange={() => handleAttendanceChange(student.rollNumber, "present")} />
                   </td>
                   <td>
-                    <input
-                      type="radio"
-                      className="absentStatus"
-                      checked={attendance[student.rollNumber] === "absent"}
-                      onChange={() => handleAttendanceChange(student.rollNumber, "absent")}
-                    />
+                    <input type="radio" className="absentStatus" checked={attendance[student.rollNumber] === "absent"} onChange={() => handleAttendanceChange(student.rollNumber, "absent")} />
                   </td>
                 </tr>
               ))}
