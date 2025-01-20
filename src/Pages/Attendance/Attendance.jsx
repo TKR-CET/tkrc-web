@@ -1,18 +1,27 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import "./Attendance.css";
 import Header from "../../Components/Header/Header";
 import NavBar from "../../Components/NavBar/NavBar";
 import MobileNav from "../../Components/MobileNav/MobileNav";
-import "./Attendance.css";
 
 const Attendance = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
+  // Extract query parameters
+  const queryParams = new URLSearchParams(location.search);
+  const programYear = queryParams.get("programYear");
+  const department = queryParams.get("department");
+  const section = queryParams.get("section");
+  const subject = queryParams.get("subject");
+
+  const [date, setDate] = useState(new Date().toISOString().split("T")[0]); // Current date
   const [attendanceData, setAttendanceData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const todayDate = new Date().toISOString().split("T")[0]; // Today's date
 
   // Fetch attendance records for the selected date
   const fetchAttendanceByDate = async () => {
@@ -21,19 +30,20 @@ const Attendance = () => {
 
     try {
       const response = await fetch(
-        `https://tkrcet-backend.onrender.com/Attendance/date?date=${date}`
+        https://tkrcet-backend.onrender.com/Attendance/date?date=${date}
       );
 
       if (!response.ok) {
-        throw new Error(`No attendance record found for the date: ${response.status}`);
+        throw new Error(No attendance record found for the date: ${response.status});
       }
 
       const { data } = await response.json();
 
+      // Process data to include each period as a separate record
       if (Array.isArray(data)) {
         const processedData = data.map((record) => ({
           ...record,
-          classDetails: `${record.year} ${record.department}-${record.section}`,
+          classDetails: ` ${record.year} ${record.department}-${record.section}`,
           absentees: record.attendance
             .filter((student) => student.status === "absent")
             .map((student) => student.rollNumber),
@@ -49,40 +59,68 @@ const Attendance = () => {
     }
   };
 
+  // Automatically fetch attendance when the date changes
   useEffect(() => {
     fetchAttendanceByDate();
   }, [date]);
 
-const handleEdit = (record) => {
-  if (record.date === todayDate) {
+  // Redirect to the marking page with query parameters
+  const handleGoClick = () => {
     navigate(
-      /mark?programYear=${record.year}&department=${record.department}&section=${record.section}&subject=${record.subject}&date=${record.date}&period=${record.period}&topic=${record.topic}&remarks=${record.remarks}&absentees=${record.absentees.join(",")}
+      /mark?programYear=${programYear}&department=${department}&section=${section}&subject=${subject}&date=${date}
     );
-  }
-};
+  };
+
+  // Handle editing a record
+  const handleEdit = (record) => {
+    if (record.date === todayDate) {
+      // Pre-fill attendance and periods when editing
+      const attendanceData = record.attendance.map((student) => ({
+        rollNumber: student.rollNumber,
+        name: student.name,
+        status: student.status,
+      }));
+
+      navigate(
+        `/mark?programYear=${record.year}&department=${record.department}&section=${record.section}&subject=${record.subject}&date=${record.date}&period=${record.period}&topic=${record.topic}&remarks=${record.remarks}&attendance=${encodeURIComponent(
+          JSON.stringify(attendanceData)
+        )}`
+      );
+    }
+  };
 
   return (
     <div>
       <Header />
-      <NavBar />
-      <MobileNav />
+      <div className="nav">
+        <NavBar />
+      </div>
+      <div className="mob-nav">
+        <MobileNav />
+      </div>
       <div className="content">
         <div className="title-bar">
-          <label htmlFor="date">Select Date: </label>
-          <input
-            type="date"
-            id="date"
-            className="date-selector"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-          />
+          <div className="batch-date-selectors">
+            <label htmlFor="date">Select Date: </label>
+            <input
+              type="date"
+              id="date"
+              className="date-selector"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+            />
+            <button onClick={handleGoClick} className="go">
+              Go
+            </button>
+          </div>
         </div>
+
         {loading ? (
           <p>Loading attendance records...</p>
         ) : error ? (
           <p className="error">{error}</p>
         ) : (
-          <div>
+          <div className="attendance-table-wrapper">
             {attendanceData.length > 0 ? (
               <table className="attendance-table">
                 <thead>
@@ -112,7 +150,13 @@ const handleEdit = (record) => {
                           : "None"}
                       </td>
                       <td>
-                        <button onClick={() => handleEdit(record)}>Edit</button>
+                        <button
+                          onClick={() => handleEdit(record)}
+                          disabled={record.date !== todayDate}
+                          title={record.date !== todayDate ? "Editing is only allowed for today's records" : ""}
+                        >
+                          Edit
+                        </button>
                       </td>
                     </tr>
                   ))}
