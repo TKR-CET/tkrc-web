@@ -16,74 +16,65 @@ const Attendance = () => {
   const section = queryParams.get("section");
   const subject = queryParams.get("subject");
 
-  const [date, setDate] = useState(new Date().toISOString().split("T")[0]); // Current date
+  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
   const [attendanceData, setAttendanceData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
-  const todayDate = new Date().toISOString().split("T")[0]; // Today's date
+  
+  const todayDate = new Date().toISOString().split("T")[0];
 
   // Fetch attendance records for the selected date
-  const fetchAttendanceByDate = async () => {
-    setLoading(true);
-    setError("");
-
-    try {
-      const response = await fetch(
-        `https://tkrcet-backend.onrender.com/Attendance/date?date=${date}`
-      );
-
-      if (!response.ok) {
-        throw new Error(`No attendance record found for the date: ${response.status}`);
-      }
-
-      const { data } = await response.json();
-
-      // Process data to include each period as a separate record
-      if (Array.isArray(data)) {
-        const processedData = data.map((record) => ({
-          ...record,
-          classDetails: ` ${record.year} ${record.department}-${record.section}`,
-          absentees: record.attendance
-            .filter((student) => student.status === "absent")
-            .map((student) => student.rollNumber),
-        }));
-        setAttendanceData(processedData);
-      } else {
-        throw new Error("Invalid data format: Expected an array.");
-      }
-    } catch (err) {
-      setError(err.message || "An unknown error occurred.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Automatically fetch attendance when the date changes
   useEffect(() => {
+    const fetchAttendanceByDate = async () => {
+      setLoading(true);
+      setError("");
+
+      try {
+        const response = await fetch(
+          `https://tkrcet-backend.onrender.com/Attendance/date?date=${date}`
+        );
+
+        if (!response.ok) {
+          throw new Error(`No attendance records found for ${date}.`);
+        }
+
+        const { data } = await response.json();
+
+        if (Array.isArray(data)) {
+          const processedData = data.map((record) => ({
+            ...record,
+            classDetails: `${record.year} ${record.department}-${record.section}`,
+            absentees: record.attendance
+              .filter((student) => student.status === "absent")
+              .map((student) => student.rollNumber),
+          }));
+          setAttendanceData(processedData);
+        } else {
+          throw new Error("Invalid data format received.");
+        }
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchAttendanceByDate();
   }, [date]);
 
-  // Redirect to the marking page with query parameters
+  // Navigate to Marking Page
   const handleGoClick = () => {
     navigate(
       `/mark?programYear=${programYear}&department=${department}&section=${section}&subject=${subject}&date=${date}`
     );
   };
 
-  // Handle editing a record
+  // Handle Editing
   const handleEdit = (record) => {
     if (record.date === todayDate) {
-      // Pre-fill attendance and periods when editing
-      const attendanceData = record.attendance.map((student) => ({
-        rollNumber: student.rollNumber,
-        name: student.name,
-        status: student.status,
-      }));
-
       navigate(
         `/mark?programYear=${record.year}&department=${record.department}&section=${record.section}&subject=${record.subject}&date=${record.date}&period=${record.period}&topic=${record.topic}&remarks=${record.remarks}&attendance=${encodeURIComponent(
-          JSON.stringify(attendanceData)
+          JSON.stringify(record.attendance)
         )}`
       );
     }
@@ -144,16 +135,12 @@ const Attendance = () => {
                       <td>{record.period}</td>
                       <td>{record.topic}</td>
                       <td>{record.remarks}</td>
-                      <td>
-                        {record.absentees.length > 0
-                          ? record.absentees.join(", ")
-                          : "None"}
-                      </td>
+                      <td>{record.absentees.length > 0 ? record.absentees.join(", ") : "None"}</td>
                       <td>
                         <button
                           onClick={() => handleEdit(record)}
                           disabled={record.date !== todayDate}
-                          title={record.date !== todayDate ? "Editing is only allowed for today's records" : ""}
+                          title={record.date !== todayDate ? "Editing allowed only for today's records" : ""}
                         >
                           Edit
                         </button>
