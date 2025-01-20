@@ -53,11 +53,13 @@ const Attendance = () => {
     fetchAttendanceByDate();
   }, [date]);
 
-  const handleEdit = (record) => {
+const handleEdit = (record) => {
+  if (record.date === todayDate) {
     navigate(
-      `/mark?programYear=${record.year}&department=${record.department}&section=${record.section}&subject=${record.subject}&date=${record.date}&period=${record.period}`
+      /mark?programYear=${record.year}&department=${record.department}&section=${record.section}&subject=${record.subject}&date=${record.date}&period=${record.period}&topic=${record.topic}&remarks=${record.remarks}&absentees=${record.absentees.join(",")}
     );
-  };
+  }
+};
 
   return (
     <div>
