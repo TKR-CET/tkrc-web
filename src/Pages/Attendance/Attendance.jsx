@@ -30,11 +30,11 @@ const Attendance = () => {
 
     try {
       const response = await fetch(
-        https://tkrcet-backend.onrender.com/Attendance/date?date=${date}
+        `https://tkrcet-backend.onrender.com/Attendance/date?date=${date}`
       );
 
       if (!response.ok) {
-        throw new Error(No attendance record found for the date: ${response.status});
+        throw new Error(`No attendance record found for the date: ${response.status}`);
       }
 
       const { data } = await response.json();
@@ -67,7 +67,7 @@ const Attendance = () => {
   // Redirect to the marking page with query parameters
   const handleGoClick = () => {
     navigate(
-      /mark?programYear=${programYear}&department=${department}&section=${section}&subject=${subject}&date=${date}
+      `/mark?programYear=${programYear}&department=${department}&section=${section}&subject=${subject}&date=${date}`
     );
   };
 
