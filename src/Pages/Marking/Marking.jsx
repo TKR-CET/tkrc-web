@@ -44,7 +44,7 @@ const Marking = () => {
         console.error("Error parsing attendance data:", error);
       }
     }
-  }, [prefilledAttendance, editingPeriod]);
+  }, []);
 
   const fetchStudents = async () => {
     try {
@@ -86,11 +86,7 @@ const Marking = () => {
       const jsonResponse = await response.json();
       console.log("Marked Periods Response:", jsonResponse);
 
-      if (jsonResponse.periods && Array.isArray(jsonResponse.periods)) {
-        setMarkedPeriods(jsonResponse.periods);
-      } else {
-        setMarkedPeriods([]);
-      }
+      setMarkedPeriods(jsonResponse.periods || []);
     } catch (error) {
       alert(`Failed to fetch marked periods: ${error.message}`);
     }
@@ -105,20 +101,18 @@ const Marking = () => {
 
   const handlePeriodChange = (period) => {
     if (markedPeriods.includes(period) && (!editingPeriod || parseInt(editingPeriod) !== period)) {
-      alert(`Period ${period} has already been marked and cannot be selected.`);
+      alert(`❌ Period ${period} is already marked. Please choose another period.`);
       return;
     }
 
-    if (!editingPeriod) {
-      setPeriods((prev) =>
-        prev.includes(period) ? prev.filter((p) => p !== period) : [...prev, period]
-      );
-    }
+    setPeriods((prev) =>
+      prev.includes(period) ? prev.filter((p) => p !== period) : [...prev, period]
+    );
   };
 
   const handleSubmit = async () => {
     if (!subject.trim() || !topic.trim() || periods.length === 0) {
-      alert("Please fill in all mandatory fields.");
+      alert("⚠️ Please fill in all mandatory fields.");
       return;
     }
 
@@ -154,7 +148,7 @@ const Marking = () => {
       console.log("Attendance Submit Response:", result);
 
       if (response.ok) {
-        alert(result.message || "Attendance submitted successfully!");
+        alert("✅ Attendance submitted successfully!");
         navigate("/attendance");
       } else {
         throw new Error(result.message || "Failed to submit attendance.");
@@ -232,7 +226,7 @@ const Marking = () => {
             </tbody>
           </table>
         )}
-        <button id="btn-submit" onClick={handleSubmit} disabled={isSubmitting}>
+        <button onClick={handleSubmit} disabled={isSubmitting}>
           {isSubmitting ? "Submitting..." : "Submit"}
         </button>
       </div>
@@ -240,4 +234,4 @@ const Marking = () => {
   );
 };
 
-export default Marking; 
+export default Marking;
