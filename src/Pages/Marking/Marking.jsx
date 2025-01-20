@@ -24,7 +24,6 @@ const Marking = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Fetch student data and already marked periods
   useEffect(() => {
     fetchStudents();
     fetchMarkedPeriods();
@@ -56,7 +55,7 @@ const Marking = () => {
     }
   }, []);
 
-  // Fetch students for attendance marking
+  // Fetch students
   const fetchStudents = async () => {
     try {
       const response = await fetch(
@@ -114,7 +113,7 @@ const Marking = () => {
     }
   };
 
-  // Handle attendance change for each student
+  // Handle attendance change
   const handleAttendanceChange = (rollNumber, status) => {
     setAttendance((prev) => ({
       ...prev,
@@ -122,7 +121,7 @@ const Marking = () => {
     }));
   };
 
-  // Handle submit of attendance data
+  // Handle submit
   const handleSubmit = async () => {
     if (!subject.trim() || !topic.trim() || periods.length === 0) {
       alert("Please fill in all mandatory fields (Periods, Subject, Topic).");
