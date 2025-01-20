@@ -14,7 +14,10 @@ const Marking = () => {
   const department = query.get("department");
   const section = query.get("section");
   const subject = query.get("subject");
-  const period = query.get("period");
+const period = query.get("period") ? query.get("period").split(",") : [];
+const topic = query.get("topic") || "";
+const remarks = query.get("remarks") || "";
+const absentees = query.get("absentees") ? query.get("absentees").split(",") : [];
 
   const [studentsData, setStudentsData] = useState([]);
   const [topic, setTopic] = useState("");
@@ -23,9 +26,28 @@ const Marking = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetchAttendanceData();
+  if (date !== new Date().toISOString().split("T")[0]) {
+    alert("Attendance can only be marked for today's date.");
+    navigate("/attendance");
+  } else {
     fetchStudents();
-  }, []);
+    fetchMarkedPeriods();
+
+    // Pre-fill fields if editing an existing record
+    if (period.length > 0) setPeriods(period.map((p) => parseInt(p, 10)));
+    setTopic(topic);
+    setRemarks(remarks);
+
+    if (absentees.length > 0) {
+      setAttendance((prev) =>
+        absentees.reduce((acc, rollNumber) => {
+          acc[rollNumber] = "absent";
+          return acc;
+        }, { ...prev })
+      );
+    }
+  }
+}, [date, navigate, period, topic, remarks, absentees]);
 
   const fetchAttendanceData = async () => {
     try {
@@ -54,29 +76,34 @@ const Marking = () => {
     }
   };
 
-  const fetchStudents = async () => {
-    try {
-      const response = await fetch(
-        `https://tkrcet-backend.onrender.com/Section/${programYear}/${department}/${section}/students`
-      );
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const result = await response.json();
-
-      if (result.students && Array.isArray(result.students)) {
-        setStudentsData(result.students);
-      } else {
-        throw new Error("Invalid student data format.");
-      }
-    } catch (error) {
-      alert(`Failed to fetch students data: ${error.message}`);
-    } finally {
-      setIsLoading(false);
+ const fetchStudents = async () => {
+  try {
+    const response = await fetch(
+      https://tkrcet-backend.onrender.com/Section/${programYear}/${department}/${section}/students
+    );
+    if (!response.ok) {
+      throw new Error(HTTP error! status: ${response.status});
     }
-  };
+
+    const result = await response.json();
+
+    if (result.students && Array.isArray(result.students)) {
+      setStudentsData(result.students);
+      setAttendance(
+        result.students.reduce((acc, student) => {
+          acc[student.rollNumber] = absentees.includes(student.rollNumber) ? "absent" : "present";
+          return acc;
+        }, {})
+      );
+    } else {
+      throw new Error("Unexpected data format. 'students' property is missing or invalid.");
+    }
+  } catch (error) {
+    alert(Failed to fetch students data: ${error.message});
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   const handleAttendanceChange = (rollNumber, status) => {
     setAttendance((prev) => ({
