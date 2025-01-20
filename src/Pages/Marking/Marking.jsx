@@ -14,7 +14,7 @@ const Marking = () => {
   const department = query.get("department");
   const section = query.get("section");
   const subject = query.get("subject");
-  const editingPeriod = query.get("period");  // Period when editing
+  const editingPeriod = query.get("period"); // Period being edited
   const prefilledTopic = query.get("topic") || "";
   const prefilledRemarks = query.get("remarks") || "";
   const prefilledAttendance = query.get("attendance");
@@ -23,22 +23,15 @@ const Marking = () => {
   const [topic, setTopic] = useState(prefilledTopic);
   const [remarks, setRemarks] = useState(prefilledRemarks);
   const [attendance, setAttendance] = useState({});
-  const [periods, setPeriods] = useState([]);
+  const [periods, setPeriods] = useState(editingPeriod ? [parseInt(editingPeriod)] : []);
   const [markedPeriods, setMarkedPeriods] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isFetchingPeriods, setIsFetchingPeriods] = useState(true);
 
   useEffect(() => {
-    if (date !== new Date().toISOString().split("T")[0]) {
-      alert("Attendance can only be marked for today's date.");
-      navigate("/attendance");
-    } else {
-      fetchStudents();
-      fetchMarkedPeriods();
-    }
+    fetchStudents();
+    fetchMarkedPeriods();
 
-    // Load attendance when editing
     if (prefilledAttendance) {
       try {
         const parsedAttendance = JSON.parse(decodeURIComponent(prefilledAttendance));
@@ -51,13 +44,8 @@ const Marking = () => {
         console.error("Error parsing attendance data:", error);
       }
     }
+  }, [prefilledAttendance, editingPeriod]);
 
-    if (editingPeriod) {
-      setPeriods([parseInt(editingPeriod)]);
-    }
-  }, [date, navigate, prefilledAttendance, editingPeriod]);
-
-  // Fetch students
   const fetchStudents = async () => {
     try {
       const response = await fetch(
@@ -65,19 +53,14 @@ const Marking = () => {
       );
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
-      const result = await response.json();
-
-      if (Array.isArray(result.students)) {
-        setStudentsData(result.students);
-        setAttendance((prev) =>
-          result.students.reduce((acc, student) => {
-            acc[student.rollNumber] = prev[student.rollNumber] || "present"; // Use existing attendance if editing
-            return acc;
-          }, {})
-        );
-      } else {
-        throw new Error("Invalid student data format.");
-      }
+      const { students } = await response.json();
+      setStudentsData(students);
+      setAttendance((prev) =>
+        students.reduce((acc, student) => {
+          acc[student.rollNumber] = prev[student.rollNumber] || "present";
+          return acc;
+        }, {})
+      );
     } catch (error) {
       alert(`Failed to fetch students: ${error.message}`);
     } finally {
@@ -85,7 +68,6 @@ const Marking = () => {
     }
   };
 
-  // Fetch already marked periods
   const fetchMarkedPeriods = async () => {
     try {
       const response = await fetch(
@@ -93,21 +75,13 @@ const Marking = () => {
       );
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
-      const result = await response.json();
-
-      if (Array.isArray(result.periods)) {
-        setMarkedPeriods(result.periods);
-      } else {
-        throw new Error("Invalid period data format.");
-      }
+      const { periods } = await response.json();
+      setMarkedPeriods(periods || []);
     } catch (error) {
       alert(`Failed to fetch marked periods: ${error.message}`);
-    } finally {
-      setIsFetchingPeriods(false);
     }
   };
 
-  // Handle attendance change
   const handleAttendanceChange = (rollNumber, status) => {
     setAttendance((prev) => ({
       ...prev,
@@ -115,7 +89,6 @@ const Marking = () => {
     }));
   };
 
-  // Handle period selection
   const handlePeriodChange = (period) => {
     if (!editingPeriod) {
       setPeriods((prev) =>
@@ -124,7 +97,6 @@ const Marking = () => {
     }
   };
 
-  // Handle form submission
   const handleSubmit = async () => {
     if (!subject.trim() || !topic.trim() || periods.length === 0) {
       alert("Please fill in all mandatory fields.");
@@ -176,7 +148,7 @@ const Marking = () => {
 
   return (
     <>
-      <style>{`
+        <style>{`
     .attendanceMain {
     padding: 20px;
     background-color: #fff;
@@ -388,15 +360,15 @@ const Marking = () => {
         <div className="periodSelection">
           <label>Periods:</label>
           {[1, 2, 3, 4, 5, 6].map((period) => (
-            <label key={period} title={markedPeriods.includes(period) && !editingPeriod ? "Already marked" : ""}>
+            <label key={period}>
               <input
                 type="checkbox"
                 value={period}
                 checked={periods.includes(period)}
-                disabled={markedPeriods.includes(period) && !editingPeriod}
+                disabled={markedPeriods.includes(period) && period !== parseInt(editingPeriod)}
                 onChange={() => handlePeriodChange(period)}
               />
-              {period} {markedPeriods.includes(period) && !editingPeriod && "(Already Marked)"}
+              {period} {markedPeriods.includes(period) && period !== parseInt(editingPeriod) && "(Already Marked)"}
             </label>
           ))}
         </div>
