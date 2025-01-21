@@ -35,7 +35,7 @@ const ActivityDiary = () => {
 
       try {
         const response = await axios.get(
-          `https://tkrcet-backend-g3zu.onrender.com/${providedFacultyId.facultyId}/unique`
+          `https://tkrcet-backend-g3zu.onrender.com/faculty/${providedFacultyId.facultyId}/unique`
         );
         setCombinations(response.data.uniqueCombinations || []);
       } catch (error) {
