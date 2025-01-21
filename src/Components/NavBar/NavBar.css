@@ -41,10 +41,9 @@ nav {
 }
 
 .nav-menu-links a:hover {
-  color: #003366;
-  background-color:#FFA500;
-  padding:8px 12px;
-  border-radius:4px;
+  color: #FFA500;
+  
+  
   
   
 }
