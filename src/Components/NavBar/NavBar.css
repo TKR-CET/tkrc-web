@@ -40,7 +40,9 @@ nav {
 }
 
 .nav-menu-links a:hover {
-  color: #ffc505;
+  color: blue;
+  backend-color:#ffc505;
+  
 }
 
 /* Dropdown Styling */
