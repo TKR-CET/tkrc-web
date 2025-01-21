@@ -2,14 +2,13 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "./Attendance.css";
 import Header from "../../Components/Header/Header";
-import NavBar from "../../Components/NavBar/NavBar"; 
+import NavBar from "../../Components/NavBar/NavBar";
 import MobileNav from "../../Components/MobileNav/MobileNav";
 
 const Attendance = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Extract query parameters
   const queryParams = new URLSearchParams(location.search);
   const programYear = queryParams.get("programYear");
   const department = queryParams.get("department");
@@ -20,60 +19,66 @@ const Attendance = () => {
   const [attendanceData, setAttendanceData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  
+  const [markedPeriods, setMarkedPeriods] = useState([]);
+
   const todayDate = new Date().toISOString().split("T")[0];
 
-  // Fetch attendance records for the selected date
   useEffect(() => {
-    const fetchAttendanceByDate = async () => {
-      setLoading(true);
-      setError("");
-
-      try {
-        const response = await fetch(
-          `https://tkrcet-backend-g3zu.onrender.com/Attendance/date?date=${date}`
-        );
-
-        if (!response.ok) {
-          throw new Error(`No attendance records found for ${date}.`);
-        }
-
-        const { data } = await response.json();
-
-        if (Array.isArray(data)) {
-          const processedData = data.map((record) => ({
-            ...record,
-            classDetails: `${record.year} ${record.department}-${record.section}`,
-            absentees: record.attendance
-              .filter((student) => student.status === "absent")
-              .map((student) => student.rollNumber),
-          }));
-          setAttendanceData(processedData);
-        } else {
-          throw new Error("Invalid data format received.");
-        }
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAttendanceByDate();
+    fetchAttendanceRecords();
   }, [date]);
 
-  // Navigate to Marking Page
+  const fetchAttendanceRecords = async () => {
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await fetch(
+        `https://tkrcet-backend-g3zu.onrender.com/Attendance/date?date=${date}`
+      );
+
+      if (!response.ok) {
+        throw new Error(`No attendance records found for ${date}.`);
+      }
+
+      const { data } = await response.json();
+
+      if (Array.isArray(data)) {
+        const processedData = data.map((record) => ({
+          ...record,
+          classDetails: `${record.year} ${record.department}-${record.section}`,
+          absentees: record.attendance
+            .filter((student) => student.status === "absent")
+            .map((student) => student.rollNumber),
+        }));
+
+        setAttendanceData(processedData);
+        setMarkedPeriods(processedData.map((record) => record.period)); // Store marked periods
+      } else {
+        throw new Error("Invalid data format received.");
+      }
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleGoClick = () => {
     navigate(
       `/mark?programYear=${programYear}&department=${department}&section=${section}&subject=${subject}&date=${date}`
     );
   };
 
-  // Handle Editing
   const handleEdit = (record) => {
     if (record.date === todayDate) {
       navigate(
-        `/mark?programYear=${record.year}&department=${record.department}&section=${record.section}&subject=${record.subject}&date=${record.date}&period=${record.period}&topic=${record.topic}&remarks=${record.remarks}&attendance=${encodeURIComponent(
+        `/mark?programYear=${record.year}&department=${record.department}&section=${record.section}&subject=${record.subject}&date=${record.date}&periods=${encodeURIComponent(
+          JSON.stringify([record.period])
+        )}&topic=${encodeURIComponent(
+          record.topic
+        )}&remarks=${encodeURIComponent(
+          record.remarks
+        )}&attendance=${encodeURIComponent(
           JSON.stringify(record.attendance)
         )}`
       );
