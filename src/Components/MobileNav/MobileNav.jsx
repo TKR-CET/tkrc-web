@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import './MobileNav.css';
+import React, { useState, useEffect } from "react";
+import "./MobileNav.css";
 import { Link, useNavigate } from "react-router-dom";
-import axios from 'axios';
+import axios from "axios";
 
 const MenuItem = ({ label, onClick, active }) => (
   <div
-    className={`menu-item ${active ? 'active' : ''}`}
+    className={`menu-item ${active ? "active" : ""}`}
     onClick={onClick}
     role="button"
     tabIndex="0"
@@ -16,50 +16,50 @@ const MenuItem = ({ label, onClick, active }) => (
 );
 
 const Dropdown = ({ children, isOpen }) => (
-  <div className={`dropdown ${isOpen ? 'open' : ''}`}>
-    {children}
-  </div>
+  <div className={`dropdown ${isOpen ? "open" : ""}`}>{children}</div>
 );
 
 const MobileNav = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeMenu, setActiveMenu] = useState(null);
-  const [activeSubmenu, setActiveSubmenu] = useState(null);
+  const [showDynamicClasses, setShowDynamicClasses] = useState(false);
   const [classOptions, setClassOptions] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [facultyId, setFacultyId] = useState(null);
+  const [facultyData, setFacultyData] = useState(null);
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
 
-  const mongoDbId = localStorage.getItem("facultyId");
+  const facultyIdFromStorage = localStorage.getItem("facultyId");
   const navigate = useNavigate();
 
-  // Fetch facultyId based on mongoDbId
-  const fetchFacultyId = async () => {
-    if (!mongoDbId) return;
+  // Fetch faculty details using stored facultyId
+  const fetchFacultyData = async () => {
+    if (!facultyIdFromStorage) return;
 
     try {
-      const response = await axios.get(`https://tkrcet-backend-g3zu.onrender.com/faculty/${mongoDbId}`);
-      setFacultyId(response.data.facultyId);
+      const response = await axios.get(
+        `https://tkrcet-backend-g3zu.onrender.com/faculty/${facultyIdFromStorage}`
+      );
+      setFacultyData(response.data);
     } catch (error) {
-      console.error("Error fetching facultyId:", error);
+      console.error("Error fetching faculty data:", error);
     }
   };
 
   // Fetch today's timetable dynamically
   const fetchClassOptions = async () => {
-    if (!facultyId) return;
+    if (!facultyData) return;
 
     setLoading(true);
     try {
       const response = await axios.get(
-        `https://tkrcet-backend-g3zu.onrender.com/faculty/${facultyId}/timetable-today`
+        `https://tkrcet-backend-g3zu.onrender.com/faculty/${facultyData.facultyId}/timetable-today`
       );
       const classes = response.data.classes || [];
 
-      // Filter out duplicates and exclude 4th period (Lunch)
+      // Filter out duplicates and exclude empty periods
       const uniqueClasses = classes.filter((period, index, self) => {
-        if (index === 3) return false; // Exclude 4th period (lunch)
         return (
+          period.subject && // Exclude empty periods
           self.findIndex(
             (item) =>
               item.subject === period.subject &&
@@ -81,33 +81,39 @@ const MobileNav = () => {
 
   // Logout function
   const handleLogout = () => {
-    localStorage.removeItem("facultyId"); // Remove facultyId from localStorage
+    localStorage.removeItem("facultyId");
     navigate("/"); // Redirect to login page
   };
 
-  // Toggle Menu
+  // Toggle main menu
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
     setActiveMenu(null);
-    setActiveSubmenu(null);
-    setAccountMenuOpen(false); // Close account menu when toggling main menu
+    setShowDynamicClasses(false);
+    setAccountMenuOpen(false);
   };
 
-  // Toggle Account Dropdown Menu
-  const toggleAccountMenu = () => {
-    setAccountMenuOpen(!accountMenuOpen);
+  // Handle navigation to attendance page
+  const handleClassSelect = (option) => {
+    const { programYear, department, section, subject } = option;
+    navigate(
+      `/attendance?programYear=${programYear}&department=${department}&section=${section}&subject=${subject}`
+    );
   };
 
-  // Fetch facultyId and timetable data on component load
+  // Fetch faculty data on component mount
   useEffect(() => {
-    fetchFacultyId();
-  }, [mongoDbId]);
-
-  useEffect(() => {
-    if (facultyId) {
-      fetchClassOptions(); // Fetch timetable once facultyId is available
+    if (facultyIdFromStorage) {
+      fetchFacultyData();
     }
-  }, [facultyId]);
+  }, [facultyIdFromStorage]);
+
+  // Fetch timetable data once faculty data is available
+  useEffect(() => {
+    if (facultyData) {
+      fetchClassOptions();
+    }
+  }, [facultyData]);
 
   return (
     <div className="mobile-nav-container">
@@ -116,31 +122,38 @@ const MobileNav = () => {
         <button
           className="menu-toggle"
           onClick={toggleMenu}
-          aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+          aria-label={menuOpen ? "Close menu" : "Open menu"}
         >
-          {menuOpen ? '×' : '☰'}
+          {menuOpen ? "×" : "☰"}
         </button>
       </div>
 
       {menuOpen && (
         <div className="menu">
-          <Link id="link" to="/index">
-            <MenuItem label="Home" onClick={() => setActiveMenu('home')} active={activeMenu === 'home'} />
+          <Link to="/index">
+            <MenuItem label="Home" />
           </Link>
-          <Link id="link" to="/timetable">
-            <MenuItem label="Timetable" onClick={() => setActiveMenu('timetable')} active={activeMenu === 'timetable'} />
+          <Link to="/timetable">
+            <MenuItem label="Timetable" />
           </Link>
-          <MenuItem label="Notifications" onClick={() => setActiveMenu('notifications')} active={activeMenu === 'notifications'} />
+          <MenuItem label="Notifications" />
 
-          {/* Attendance Dropdown in the Main Menu */}
-          <MenuItem label="Attendance" onClick={() => setActiveMenu('attendance')} active={activeMenu === 'attendance'} />
-          
-          {activeMenu === 'attendance' && (
-            <Dropdown isOpen={activeMenu === 'attendance'}>
-              {/* Class Dropdown */}
-              <MenuItem label="Class" onClick={() => setActiveSubmenu('class')} active={activeSubmenu === 'class'} />
-              {activeSubmenu === 'class' && (
-                <Dropdown isOpen={activeSubmenu === 'class'}>
+          {/* Attendance Dropdown */}
+          <MenuItem
+            label="Attendance"
+            onClick={() => setActiveMenu(activeMenu === "attendance" ? null : "attendance")}
+            active={activeMenu === "attendance"}
+          />
+
+          {activeMenu === "attendance" && (
+            <Dropdown isOpen>
+              <MenuItem
+                label="Class"
+                onClick={() => setShowDynamicClasses(!showDynamicClasses)}
+                active={showDynamicClasses}
+              />
+              {showDynamicClasses && (
+                <Dropdown isOpen>
                   {loading ? (
                     <MenuItem label="Loading..." />
                   ) : classOptions.length === 0 ? (
@@ -150,34 +163,30 @@ const MobileNav = () => {
                       <MenuItem
                         key={index}
                         label={`${option.programYear} ${option.department}-${option.section} - ${option.subject}`}
-                        onClick={() =>
-                          navigate(
-                            `/attendance?programYear=${option.programYear}&department=${option.department}&section=${option.section}&subject=${option.subject}`
-                          )
-                        }
+                        onClick={() => handleClassSelect(option)}
                       />
                     ))
                   )}
                 </Dropdown>
               )}
-
-              {/* Register and Activity Diary */}
-              {activeSubmenu !== 'class' && (
-                <>
-                  <MenuItem label="Register" onClick={() => setActiveSubmenu('register')} active={activeSubmenu === 'register'} />
-                  <Link id="link" to="/activity">
-                    <MenuItem label="Activity Diary" onClick={() => setActiveSubmenu('activityDiary')} active={activeSubmenu === 'activityDiary'} />
-                  </Link>
-                </>
-              )}
+              <Link to="/register">
+                <MenuItem label="Register" />
+              </Link>
+              <Link to="/activity">
+                <MenuItem label="Activity Diary" />
+              </Link>
             </Dropdown>
           )}
 
-          {/* Account Menu */}
-          <MenuItem label="Account" onClick={toggleAccountMenu} active={accountMenuOpen} />
+          {/* Account Dropdown */}
+          <MenuItem
+            label="Account"
+            onClick={() => setAccountMenuOpen(!accountMenuOpen)}
+            active={accountMenuOpen}
+          />
           {accountMenuOpen && (
-            <Dropdown isOpen={accountMenuOpen}>
-              <MenuItem label="Settings"  />
+            <Dropdown isOpen>
+              <MenuItem label="Settings" />
               <MenuItem label="Logout" onClick={handleLogout} />
             </Dropdown>
           )}
