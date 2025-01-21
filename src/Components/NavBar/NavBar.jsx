@@ -6,10 +6,10 @@ import "./NavBar.css";
 function NavBar() {
   const [attendanceMenuVisible, setAttendanceMenuVisible] = useState(false);
   const [classOptions, setClassOptions] = useState([]);
-  const [loading, setLoading] = useState(false); // Loading state for fetching timetable
+  const [loading, setLoading] = useState(false);
   const [accountMenuVisible, setAccountMenuVisible] = useState(false);
-  const [showDynamicClasses, setShowDynamicClasses] = useState(false); // Track if "Class" is clicked
-  const [providedFacultyId, setProvidedFacultyId] = useState(null); // Faculty object
+  const [showDynamicClasses, setShowDynamicClasses] = useState(false);
+  const [providedFacultyId, setProvidedFacultyId] = useState(null);
 
   const navRef = useRef(null);
   const navigate = useNavigate();
@@ -25,14 +25,13 @@ function NavBar() {
     setAccountMenuVisible(!accountMenuVisible);
   };
 
-  // Fetch faculty-provided ID (e.g., M100) and name using MongoDB _id
+  // Fetch faculty details using MongoDB _id
   const fetchProvidedFacultyId = async () => {
     try {
       const response = await axios.get(
         `https://tkrcet-backend-g3zu.onrender.com/faculty/${mongoDbFacultyId}`
       );
-      // Assuming response.data contains { facultyId: 'M100', name: 'John Doe' }
-      setProvidedFacultyId(response.data); // Store the whole object
+      setProvidedFacultyId(response.data); // Store full faculty object
     } catch (error) {
       console.error("Error fetching faculty-provided ID:", error);
     }
@@ -47,22 +46,26 @@ function NavBar() {
       const response = await axios.get(
         `https://tkrcet-backend-g3zu.onrender.com/faculty/${providedFacultyId.facultyId}/timetable-today`
       );
-      const classes = response.data.classes || [];
+      console.log("API Response:", response.data); // Debugging
 
-      // Filter out duplicates and exclude 4th period
-      const uniqueClasses = classes.filter((period, index, self) => {
-        if (index === 3) return false; // Exclude 4th period (lunch)
-        return (
-          self.findIndex(
-            (item) =>
-              item.subject === period.subject &&
-              item.programYear === period.programYear &&
-              item.department === period.department &&
-              item.section === period.section
-          ) === index
-        );
-      });
+      let classes = response.data.classes || [];
 
+      // Filter out empty periods and avoid skipping valid ones
+      const uniqueClasses = classes
+        .filter((period) => period.subject && period.subject.trim() !== "") // Ignore empty periods
+        .filter((period, index, self) => {
+          return (
+            self.findIndex(
+              (item) =>
+                item.subject === period.subject &&
+                item.programYear === period.programYear &&
+                item.department === period.department &&
+                item.section === period.section
+            ) === index
+          );
+        });
+
+      console.log("Filtered Classes:", uniqueClasses); // Debugging
       setClassOptions(uniqueClasses);
     } catch (error) {
       console.error("Error fetching class options:", error);
@@ -80,14 +83,12 @@ function NavBar() {
 
   // Handle Class click: Show dynamic class dropdown, hide other items
   const handleClassClick = () => {
-    setShowDynamicClasses(true); // Show class options dynamically
+    setShowDynamicClasses(true);
   };
 
   // Handle redirection to the attendance page with selected class details
   const handleClassSelect = (option) => {
     const { programYear, department, section, subject } = option;
-
-    // Navigate to Attendance component with query parameters
     const route = `/attendance?programYear=${programYear}&department=${department}&section=${section}&subject=${subject}`;
     navigate(route);
   };
@@ -98,7 +99,7 @@ function NavBar() {
       if (navRef.current && !navRef.current.contains(event.target)) {
         setAttendanceMenuVisible(false);
         setAccountMenuVisible(false);
-        setShowDynamicClasses(false); // Reset state when clicking outside
+        setShowDynamicClasses(false);
       }
     };
 
@@ -108,16 +109,16 @@ function NavBar() {
     };
   }, []);
 
-  // Fetch faculty-provided ID on component load
+  // Fetch faculty ID on component mount
   useEffect(() => {
     if (mongoDbFacultyId) {
       fetchProvidedFacultyId();
     }
   }, [mongoDbFacultyId]);
 
-  // Fetch timetable data once the provided facultyId is available
+  // Fetch timetable once faculty ID is available
   useEffect(() => {
-    if (providedFacultyId) {
+    if (providedFacultyId && providedFacultyId.facultyId) {
       fetchClassOptions();
     }
   }, [providedFacultyId]);
