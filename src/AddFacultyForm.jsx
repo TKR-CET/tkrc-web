@@ -47,7 +47,7 @@ const AddFacultyForm = () => {
       if (image) data.append("image", image);
 
       // Send data to the backend
-      const response = await axios.post("http://localhost:5000/faculty/addfaculty", data, {
+      const response = await axios.post("https://tkrcet-backend-g3zu.onrender.com/faculty/addfaculty", data, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setResponseMessage(response.data.message);
