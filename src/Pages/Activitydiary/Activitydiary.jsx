@@ -72,14 +72,14 @@ const ActivityDiary = () => {
             ))}
           </select>
           <a href="#" id="lab-link-btn">
-            CAD / CAM Lab
+            
           </a>
         </div>
 
         {/* Main Content */}
         <div className="activity-content">
           <h2 id="activity-title">
-            Activity Diary Section: CAD / CAM Lab
+            Activity Diary Section: 
           </h2>
           <table id="activity-table">
             <thead>
