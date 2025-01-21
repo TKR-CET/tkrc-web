@@ -29,7 +29,7 @@ function NavBar() {
   const fetchProvidedFacultyId = async () => {
     try {
       const response = await axios.get(
-        `https://tkrcet-backend.onrender.com/faculty/${mongoDbFacultyId}`
+        `https://tkrcet-backend-g3zu.onrender.com/faculty/${mongoDbFacultyId}`
       );
       // Assuming response.data contains { facultyId: 'M100', name: 'John Doe' }
       setProvidedFacultyId(response.data); // Store the whole object
@@ -45,7 +45,7 @@ function NavBar() {
     setLoading(true);
     try {
       const response = await axios.get(
-        `https://tkrcet-backend.onrender.com/faculty/${providedFacultyId.facultyId}/timetable-today`
+        `https://tkrcet-backend-g3zu.onrender.com/faculty/${providedFacultyId.facultyId}/timetable-today`
       );
       const classes = response.data.classes || [];
 
