@@ -31,7 +31,7 @@ const Attendance = () => {
 
       try {
         const response = await fetch(
-          `https://tkrcet-backend.onrender.com/Attendance/date?date=${date}`
+          `https://tkrcet-backend-g3zu.onrender.com/Attendance/date?date=${date}`
         );
 
         if (!response.ok) {
