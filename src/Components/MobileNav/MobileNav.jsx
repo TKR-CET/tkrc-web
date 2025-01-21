@@ -38,7 +38,7 @@ const MobileNav = () => {
     if (!mongoDbId) return;
 
     try {
-      const response = await axios.get(`https://tkrcet-backend.onrender.com/faculty/${mongoDbId}`);
+      const response = await axios.get(`https://tkrcet-backend-g3zu.onrender.com/faculty/${mongoDbId}`);
       setFacultyId(response.data.facultyId);
     } catch (error) {
       console.error("Error fetching facultyId:", error);
@@ -52,7 +52,7 @@ const MobileNav = () => {
     setLoading(true);
     try {
       const response = await axios.get(
-        `https://tkrcet-backend.onrender.com/faculty/${facultyId}/timetable-today`
+        `https://tkrcet-backend-g3zu.onrender.com/faculty/${facultyId}/timetable-today`
       );
       const classes = response.data.classes || [];
 
