@@ -91,7 +91,7 @@ const ActivityDiary = () => {
             {combinations.map((combo, index) => (
               <option
                 key={index}
-                value={`${combo.year}-${combo.department}-${combo.section}-${combo.subject}`}
+                value={B.Tech `${combo.year}-${combo.department}-${combo.section}-${combo.subject}`}
               >
                 {combo.year} {combo.department}-{combo.section} ({combo.subject})
               </option>
