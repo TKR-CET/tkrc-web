@@ -15,7 +15,7 @@ const Timetable = () => {
         const fetchTimetable = async () => {
             try {
                 const response = await axios.get(
-                    `https://tkrcet-backend.onrender.com/faculty/${facultyId}/timetable`
+                    `https://tkrcet-backend-g3zu.onrender.com/faculty/${facultyId}/timetable`
                 );
                 setTimetable(response.data.timetable);
             } catch (error) {
@@ -37,7 +37,7 @@ const Timetable = () => {
         const fetchFacultyDetails = async () => {
             try {
                 const response = await axios.get(
-                    `https://tkrcet-backend.onrender.com/faculty/${facultyId}`
+                    `https://tkrcet-backend-g3zu.onrender.com/faculty/${facultyId}`
                 );
                 setFacultyDetails(response.data);
             } catch (error) {
