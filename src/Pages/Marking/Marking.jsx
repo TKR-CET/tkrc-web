@@ -59,7 +59,7 @@ const Marking = () => {
   const fetchStudents = async () => {
     try {
       const response = await fetch(
-        `https://tkrcet-backend.onrender.com/Section/${programYear}/${department}/${section}/students`
+        `https://tkrcet-backend-g3zu.onrender.com/Section/${programYear}/${department}/${section}/students`
       );
 
       if (!response.ok) {
@@ -94,7 +94,7 @@ const Marking = () => {
   const fetchMarkedPeriods = async () => {
     try {
       const response = await fetch(
-        `https://tkrcet-backend.onrender.com/Attendance/check?date=${date}&year=${programYear}&department=${department}&section=${section}`
+        `https://tkrcet-backend-g3zu.onrender.com/Attendance/check?date=${date}&year=${programYear}&department=${department}&section=${section}`
       );
 
       if (!response.ok) {
@@ -148,7 +148,7 @@ const Marking = () => {
 
     try {
       const response = await fetch(
-        "https://tkrcet-backend.onrender.com/Attendance/mark-attendance",
+        "https://tkrcet-backend-g3zu.onrender.com/Attendance/mark-attendance",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
