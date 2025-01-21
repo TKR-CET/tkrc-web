@@ -83,7 +83,7 @@ const Homepage = () => {
 
     const handleLogin = async () => {
     try {
-        const response = await axios.post('https://tkrcet-backend.onrender.com/faculty/login', {
+        const response = await axios.post('https://tkrcet-backend-g3zu.onrender.com/faculty/login', {
             username,
             password,
         });
