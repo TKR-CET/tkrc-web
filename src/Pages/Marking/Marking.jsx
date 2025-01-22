@@ -380,30 +380,36 @@ const Marking = () => {
       <div className="attendanceMain">
         <h2 className="attendanceHeading">Mark Attendance</h2>
         <p>Year: {programYear} | Department: {department} | Section: {section} | Subject: {subject}</p>
+           <div className="periodSelection">
+  <label>Periods:</label>
+  {[1, 2, 3, 4, 5, 6].map((period) => {
+    const isMarked = markedPeriods.includes(period);
+    const isEditable = query.get("periods")
+      ? JSON.parse(decodeURIComponent(query.get("periods"))).includes(period)
+      : false;
 
-        <div className="periodSelection">
-          <label>Periods:</label>
-          {[1, 2, 3, 4, 5, 6].map((period) => (
-            <label key={period}>
-            <input
-  type="checkbox"
-  value={period}
-  checked={periods.includes(period)}
-  disabled={
-    markedPeriods.includes(period) &&
-    (!periods.includes(period) || !query.get("attendance"))
-  }
-  onChange={() =>
-    setPeriods((prev) =>
-      prev.includes(period) ? prev.filter((p) => p !== period) : [...prev, period]
-    )
-  }
-/>
-              {period} {markedPeriods.includes(period) && "(Marked)"}
-            </label>
-          ))}
-        </div>
+    return (
+      <label key={period}>
+        <input
+          type="checkbox"
+          value={period}
+          checked={periods.includes(period)}
+          disabled={isMarked && !isEditable} // Disable if marked and not in editable periods
+          onChange={() =>
+            setPeriods((prev) =>
+              prev.includes(period)
+                ? prev.filter((p) => p !== period)
+                : [...prev, period]
+            )
+          }
+        />
+        {period} {isMarked && "(Marked)"}
+      </label>
+    );
+  })}
+</div>
 
+      
         <div className="subjectTopicEntry">
           <label>Topic:</label>
           <textarea value={topic} onChange={(e) => setTopic(e.target.value)} placeholder="Enter Topic" />
