@@ -13,23 +13,17 @@ const Register = () => {
   const [periods, setPeriods] = useState([]); // Periods for the attendance table
   const [providedFacultyId, setProvidedFacultyId] = useState(null); // Faculty object
   const mongoDbFacultyId = localStorage.getItem("facultyId"); // Retrieve MongoDB _id from local storage
-  const [loading, setLoading] = useState(false); // Loading state
-  const [error, setError] = useState(""); // Error message
 
-  // Fetch faculty-provided ID using MongoDB _id
   useEffect(() => {
+    // Fetch faculty-provided ID using MongoDB _id
     const fetchProvidedFacultyId = async () => {
       try {
-        setLoading(true);
         const response = await axios.get(
           `https://tkrcet-backend-g3zu.onrender.com/faculty/${mongoDbFacultyId}`
         );
         setProvidedFacultyId(response.data); // Store the faculty object
       } catch (error) {
-        setError("Error fetching faculty-provided ID.");
-        console.error(error);
-      } finally {
-        setLoading(false);
+        console.error("Error fetching faculty-provided ID:", error);
       }
     };
 
@@ -44,16 +38,12 @@ const Register = () => {
       if (!providedFacultyId) return;
 
       try {
-        setLoading(true);
         const response = await axios.get(
           `https://tkrcet-backend-g3zu.onrender.com/faculty/${providedFacultyId.facultyId}/unique`
         );
         setCombinations(response.data.uniqueCombinations || []);
       } catch (error) {
-        setError("Error fetching unique combinations.");
-        console.error(error);
-      } finally {
-        setLoading(false);
+        console.error("Error fetching unique combinations:", error);
       }
     };
 
@@ -68,7 +58,6 @@ const Register = () => {
 
     const fetchAttendanceRecords = async () => {
       try {
-        setLoading(true);
         const [year, department, section, subject] = selectedCombination.split("-");
         const response = await axios.get(
           `https://tkrcet-backend-g3zu.onrender.com/Attendance/filters?year=B.Tech ${year}&department=${department}&section=${section}&subject=${subject}`
@@ -79,10 +68,7 @@ const Register = () => {
         setDates(data.dates || []);
         setPeriods(data.periods || []);
       } catch (error) {
-        setError("Error fetching attendance records.");
-        console.error(error);
-      } finally {
-        setLoading(false);
+        console.error("Error fetching attendance records:", error);
       }
     };
 
@@ -91,7 +77,6 @@ const Register = () => {
 
   const handleSelectionChange = (event) => {
     setSelectedCombination(event.target.value); // Update selected combination
-    setError(""); // Clear any previous error
   };
 
   return (
@@ -106,11 +91,7 @@ const Register = () => {
       <div className="table-container">
         {/* Dropdown for selecting combination */}
         <div className="dropdown-container">
-          <select
-            id="section-dropdown"
-            onChange={handleSelectionChange}
-            disabled={loading || combinations.length === 0}
-          >
+          <select id="section-dropdown" onChange={handleSelectionChange}>
             <option value="">Select Section</option>
             {combinations.map((combo, index) => (
               <option
@@ -123,21 +104,18 @@ const Register = () => {
           </select>
         </div>
 
-        {loading && <p>Loading...</p>}
-        {error && <p className="error">{error}</p>}
-
         {/* Attendance Table */}
         <table className="attendance-table">
           <thead>
             <tr>
-              <th colSpan={dates.length * periods.length + 4} className="header-title">
+              <th colSpan={dates.length * 2 + 3} className="header-title">
                 Attendance Register Section: {selectedCombination || "None"}
               </th>
             </tr>
             <tr>
               <th>Roll No.</th>
-              {dates.map((date) => (
-                <th key={date} colSpan={periods.length}>
+              {dates.map((date, index) => (
+                <th key={index} colSpan={periods[index]?.length || 1}>
                   {date}
                 </th>
               ))}
@@ -147,8 +125,8 @@ const Register = () => {
             </tr>
             <tr>
               <th></th>
-              {dates.flatMap((date) =>
-                periods.map((period, index) => <th key={`${date}-${period}-${index}`}>P{period}</th>)
+              {periods.map((periodRow, index) =>
+                periodRow.map((period, idx) => <th key={`${index}-${idx}`}>{period}</th>)
               )}
               <th></th>
               <th></th>
@@ -158,30 +136,21 @@ const Register = () => {
           <tbody>
             {attendanceRecords.length === 0 ? (
               <tr>
-                <td colSpan={dates.length * periods.length + 4}>No attendance records found</td>
+                <td colSpan={dates.length * 2 + 3}>No attendance records found</td>
               </tr>
             ) : (
               attendanceRecords.map((student, index) => (
                 <tr key={index}>
                   <td>{student.rollNo}</td>
-                  {dates.flatMap((date) =>
-                    periods.map((period, idx) => {
-                      const attendanceStatus =
-                        student.attendance?.[date]?.[period] || "A";
-                      return (
-                        <td
-                          key={`${student.rollNo}-${date}-${period}-${idx}`}
-                          className={attendanceStatus === "A" ? "absent" : "present"}
-                        >
-                          {attendanceStatus}
-                        </td>
-                      );
-                    })
-                  )}
-                  <td>{student.total || 0}</td>
-                  <td>{student.attended || 0}</td>
+                  {student.attendance.map((att, idx) => (
+                    <td key={idx} className={att === "A" ? "absent" : "present"}>
+                      {att}
+                    </td>
+                  ))}
+                  <td>{student.total}</td>
+                  <td>{student.attended}</td>
                   <td className={student.percentage === 0 ? "zero-percent" : "low-percent"}>
-                    {student.percentage ? student.percentage.toFixed(2) : "0.00"}
+                    {student.percentage.toFixed(2)}
                   </td>
                 </tr>
               ))
