@@ -20,10 +20,11 @@ const Marking = () => {
   const [remarks, setRemarks] = useState(query.get("remarks") || "");
   const [attendance, setAttendance] = useState({});
   const [periods, setPeriods] = useState([]);
-  const [markedPeriods, setMarkedPeriods] = useState([]); // Tracks already marked periods
+  const [markedPeriods, setMarkedPeriods] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Fetch students and marked periods
   useEffect(() => {
     fetchStudents();
     fetchMarkedPeriods();
@@ -55,7 +56,6 @@ const Marking = () => {
     }
   }, []);
 
-  // Fetch students
   const fetchStudents = async () => {
     try {
       const response = await fetch(
@@ -63,15 +63,14 @@ const Marking = () => {
       );
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(`Failed to fetch students data: ${response.status}`);
       }
 
       const result = await response.json();
-
       if (result.students && Array.isArray(result.students)) {
         setStudentsData(result.students);
 
-        // If not editing, initialize attendance with "present"
+        // Initialize attendance if not editing
         if (!query.get("attendance")) {
           setAttendance(
             result.students.reduce((acc, student) => {
@@ -81,16 +80,15 @@ const Marking = () => {
           );
         }
       } else {
-        throw new Error("Unexpected data format. 'students' property is missing or invalid.");
+        throw new Error("Invalid data format: Missing 'students'");
       }
     } catch (error) {
-      alert(`Failed to fetch data: ${error.message}`);
+      alert(`Error fetching students: ${error.message}`);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Fetch already marked periods
   const fetchMarkedPeriods = async () => {
     try {
       const response = await fetch(
@@ -98,22 +96,20 @@ const Marking = () => {
       );
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(`Failed to fetch marked periods: ${response.status}`);
       }
 
       const result = await response.json();
-
       if (result.periods && Array.isArray(result.periods)) {
-        setMarkedPeriods(result.periods); // Save marked periods
+        setMarkedPeriods(result.periods);
       } else {
-        throw new Error("Unexpected data format. 'periods' property is missing or invalid.");
+        throw new Error("Invalid data format: Missing 'periods'");
       }
     } catch (error) {
-      alert(`Failed to fetch marked periods: ${error.message}`);
+      alert(`Error fetching marked periods: ${error.message}`);
     }
   };
 
-  // Handle attendance change
   const handleAttendanceChange = (rollNumber, status) => {
     setAttendance((prev) => ({
       ...prev,
@@ -121,7 +117,6 @@ const Marking = () => {
     }));
   };
 
-  // Handle submit
   const handleSubmit = async () => {
     if (!subject.trim() || !topic.trim() || periods.length === 0) {
       alert("Please fill in all mandatory fields (Periods, Subject, Topic).");
@@ -173,7 +168,7 @@ const Marking = () => {
 
   return (
     <>
-<style>{`
+      <style>{`
     .attendanceMain {
     padding: 20px;
     background-color: #fff;
@@ -379,42 +374,51 @@ const Marking = () => {
       </div>
       <div className="attendanceMain">
         <h2 className="attendanceHeading">Mark Attendance</h2>
-        <p>Year: {programYear} | Department: {department} | Section: {section} | Subject: {subject}</p>
-           <div className="periodSelection">
-  <label>Periods:</label>
-  {[1, 2, 3, 4, 5, 6].map((period) => {
-    const isMarked = markedPeriods.includes(period);
-    const isEditable = query.get("periods")
-      ? JSON.parse(decodeURIComponent(query.get("periods"))).includes(period)
-      : false;
+        <p>
+          Year: {programYear} | Department: {department} | Section: {section} |
+          Subject: {subject}
+        </p>
 
-    return (
-      <label key={period}>
-        <input
-          type="checkbox"
-          value={period}
-          checked={periods.includes(period)}
-          disabled={isMarked && !isEditable} // Disable if marked and not in editable periods
-          onChange={() =>
-            setPeriods((prev) =>
-              prev.includes(period)
-                ? prev.filter((p) => p !== period)
-                : [...prev, period]
-            )
-          }
-        />
-        {period} {isMarked && "(Marked)"}
-      </label>
-    );
-  })}
-</div>
+        <div className="periodSelection">
+          <label>Periods:</label>
+          {[1, 2, 3, 4, 5, 6].map((period) => {
+            const isMarked = markedPeriods.includes(period);
+            const isEditable = periods.includes(period);
 
-      
+            return (
+              <label key={period}>
+                <input
+                  type="checkbox"
+                  value={period}
+                  checked={periods.includes(period)}
+                  disabled={isMarked && !isEditable} // Disable if marked and not part of editable periods
+                  onChange={() =>
+                    setPeriods((prev) =>
+                      prev.includes(period)
+                        ? prev.filter((p) => p !== period)
+                        : [...prev, period]
+                    )
+                  }
+                />
+                {period} {isMarked && "(Marked)"}
+              </label>
+            );
+          })}
+        </div>
+
         <div className="subjectTopicEntry">
           <label>Topic:</label>
-          <textarea value={topic} onChange={(e) => setTopic(e.target.value)} placeholder="Enter Topic" />
+          <textarea
+            value={topic}
+            onChange={(e) => setTopic(e.target.value)}
+            placeholder="Enter Topic"
+          />
           <label>Remarks:</label>
-          <textarea value={remarks} onChange={(e) => setRemarks(e.target.value)} placeholder="Enter Remarks" />
+          <textarea
+            value={remarks}
+            onChange={(e) => setRemarks(e.target.value)}
+            placeholder="Enter Remarks"
+          />
         </div>
 
         {isLoading ? (
@@ -435,10 +439,23 @@ const Marking = () => {
                   <td>{student.rollNumber}</td>
                   <td>{student.name}</td>
                   <td>
-                    <input type="radio" checked={attendance[student.rollNumber] === "present"} onChange={() => handleAttendanceChange(student.rollNumber, "present")} />
+                    <input
+                      type="radio"
+                      checked={attendance[student.rollNumber] === "present"}
+                      onChange={() =>
+                        handleAttendanceChange(student.rollNumber, "present")
+                      }
+                    />
                   </td>
                   <td>
-                    <input type="radio" className="absentStatus" checked={attendance[student.rollNumber] === "absent"} onChange={() => handleAttendanceChange(student.rollNumber, "absent")} />
+                    <input
+                      type="radio"
+                      className="absentStatus"
+                      checked={attendance[student.rollNumber] === "absent"}
+                      onChange={() =>
+                        handleAttendanceChange(student.rollNumber, "absent")
+                      }
+                    />
                   </td>
                 </tr>
               ))}
@@ -446,7 +463,13 @@ const Marking = () => {
           </table>
         )}
 
-        <button id="btn-submit" onClick={handleSubmit} disabled={isSubmitting}>{isSubmitting ? "Submitting..." : "Submit"}</button>
+        <button
+          id="btn-submit"
+          onClick={handleSubmit}
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? "Submitting..." : "Submit"}
+        </button>
       </div>
     </>
   );
