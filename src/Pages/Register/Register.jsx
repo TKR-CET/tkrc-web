@@ -9,6 +9,7 @@ const Register = () => {
   const [combinations, setCombinations] = useState([]); // Dropdown options
   const [selectedCombination, setSelectedCombination] = useState(""); // Selected dropdown value
   const [attendanceRecords, setAttendanceRecords] = useState([]); // Attendance data
+  const [allStudents, setAllStudents] = useState([]); // All students in the class
   const [providedFacultyId, setProvidedFacultyId] = useState(null); // Faculty object
   const mongoDbFacultyId = localStorage.getItem("facultyId"); // Faculty ID from local storage
 
@@ -61,6 +62,21 @@ const Register = () => {
 
         const data = response.data.data || [];
         setAttendanceRecords(data);
+
+        // Get all unique roll numbers
+        const students = Array.from(
+          new Set(
+            data.flatMap((record) => record.attendance.map((entry) => entry.rollNumber))
+          )
+        ).map((rollNumber) => ({
+          rollNumber,
+          name:
+            data.find((record) =>
+              record.attendance.find((entry) => entry.rollNumber === rollNumber)
+            )?.attendance.find((entry) => entry.rollNumber === rollNumber)?.name || "",
+        }));
+
+        setAllStudents(students);
       } catch (error) {
         console.error("Error fetching attendance records:", error);
       }
@@ -104,36 +120,47 @@ const Register = () => {
           <thead>
             <tr>
               <th>S.No</th>
-              <th>Date</th>
-              <th>Period</th>
-              <th>Subject</th>
-              <th>Topic</th>
-              <th>Remarks</th>
-              <th>Absentees</th>
+              <th>Roll No.</th>
+              <th>Name</th>
+              <th>Present Dates</th>
+              <th>Absent Dates</th>
             </tr>
           </thead>
           <tbody>
-            {attendanceRecords.length === 0 ? (
+            {allStudents.length === 0 ? (
               <tr>
-                <td colSpan="7">No attendance records found</td>
+                <td colSpan="5">No students found</td>
               </tr>
             ) : (
-              attendanceRecords.map((record, index) => (
-                <tr key={index}>
-                  <td>{index + 1}</td>
-                  <td>{record.date}</td>
-                  <td>{record.period}</td>
-                  <td>{record.subject}</td>
-                  <td>{record.topic || "N/A"}</td>
-                  <td>{record.remarks || "N/A"}</td>
-                  <td>
-                    {record.attendance
-                      .filter((entry) => entry.status === "absent")
-                      .map((entry) => entry.rollNumber)
-                      .join(", ") || "None"}
-                  </td>
-                </tr>
-              ))
+              allStudents.map((student, index) => {
+                const presentDates = attendanceRecords
+                  .filter((record) =>
+                    record.attendance.some(
+                      (entry) => entry.rollNumber === student.rollNumber && entry.status === "present"
+                    )
+                  )
+                  .map((record) => record.date)
+                  .join(", ");
+
+                const absentDates = attendanceRecords
+                  .filter((record) =>
+                    record.attendance.some(
+                      (entry) => entry.rollNumber === student.rollNumber && entry.status === "absent"
+                    )
+                  )
+                  .map((record) => record.date)
+                  .join(", ");
+
+                return (
+                  <tr key={index}>
+                    <td>{index + 1}</td>
+                    <td>{student.rollNumber}</td>
+                    <td>{student.name}</td>
+                    <td>{presentDates || "None"}</td>
+                    <td>{absentDates || "None"}</td>
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>
