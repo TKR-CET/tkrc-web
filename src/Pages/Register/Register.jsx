@@ -1,22 +1,104 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import "./Register.css";
 
 const Register = () => {
-  const data = [
-    { rollNo: "20K91A0328", attendance: ["A", "A", "A", "A", "A", "A", "A", "1", "2", "3", "A", "A", "A", "A", "A", "A"], total: 26, attended: 3, percentage: 11.54 },
-    { rollNo: "20K91A0335", attendance: ["A", "A", "A", "A", "A", "A", "A", "A", "A", "A", "A", "A", "A", "A", "A", "A"], total: 26, attended: 0, percentage: 0.00 },
-  ];
+  const [combinations, setCombinations] = useState([]); // Dropdown options
+  const [selectedCombination, setSelectedCombination] = useState(""); // Selected dropdown value
+  const [attendanceRecords, setAttendanceRecords] = useState([]); // Attendance data for the table
+  const [dates, setDates] = useState([]); // Dates for the attendance table
+  const [periods, setPeriods] = useState([]); // Periods for the attendance table
+  const [providedFacultyId, setProvidedFacultyId] = useState(null); // Faculty object
+  const mongoDbFacultyId = localStorage.getItem("facultyId"); // Retrieve MongoDB _id from local storage
 
-  const dates = ["12.08.24", "13.08.24", "03.09.24", "10.09.24", "23.09.24", "30.09.24", "15.10.24", "21.10.24", "28.10.24"];
-  const periods = [4, 5, 6, 3, 4, 5, 1, 2, 3, 1, 2, 3, 4, 5, 6];
+  useEffect(() => {
+    // Fetch faculty-provided ID using MongoDB _id
+    const fetchProvidedFacultyId = async () => {
+      try {
+        const response = await axios.get(
+          `https://tkrcet-backend-g3zu.onrender.com/faculty/${mongoDbFacultyId}`
+        );
+        setProvidedFacultyId(response.data); // Store the faculty object
+      } catch (error) {
+        console.error("Error fetching faculty-provided ID:", error);
+      }
+    };
+
+    if (mongoDbFacultyId) {
+      fetchProvidedFacultyId();
+    }
+  }, [mongoDbFacultyId]);
+
+  // Fetch unique combinations for the dropdown
+  useEffect(() => {
+    const fetchCombinations = async () => {
+      if (!providedFacultyId) return;
+
+      try {
+        const response = await axios.get(
+          `https://tkrcet-backend-g3zu.onrender.com/faculty/${providedFacultyId.facultyId}/unique`
+        );
+        setCombinations(response.data.uniqueCombinations || []);
+      } catch (error) {
+        console.error("Error fetching unique combinations:", error);
+      }
+    };
+
+    if (providedFacultyId) {
+      fetchCombinations();
+    }
+  }, [providedFacultyId]);
+
+  // Fetch attendance records based on selected combination
+  useEffect(() => {
+    if (!selectedCombination) return;
+
+    const fetchAttendanceRecords = async () => {
+      try {
+        const [year, department, section, subject] = selectedCombination.split("-");
+        const response = await axios.get(
+          `https://tkrcet-backend-g3zu.onrender.com/Attendance/filters?year=B.Tech ${year}&department=${department}&section=${section}&subject=${subject}`
+        );
+
+        const data = response.data || {};
+        setAttendanceRecords(data.students || []);
+        setDates(data.dates || []);
+        setPeriods(data.periods || []);
+      } catch (error) {
+        console.error("Error fetching attendance records:", error);
+      }
+    };
+
+    fetchAttendanceRecords();
+  }, [selectedCombination]);
+
+  const handleSelectionChange = (event) => {
+    setSelectedCombination(event.target.value); // Update selected combination
+  };
 
   return (
     <div className="table-container">
+      {/* Dropdown for selecting combination */}
+      <div className="dropdown-container">
+        <select id="section-dropdown" onChange={handleSelectionChange}>
+          <option value="">Select Section</option>
+          {combinations.map((combo, index) => (
+            <option
+              key={index}
+              value={`${combo.year}-${combo.department}-${combo.section}-${combo.subject}`}
+            >
+              {combo.year} {combo.department}-{combo.section} ({combo.subject})
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Attendance Table */}
       <table className="attendance-table">
         <thead>
           <tr>
             <th colSpan={dates.length + 4} className="header-title">
-              Attendance Register (CAD / CAM Lab) Section : IV ME I A - 2024-25
+              Attendance Register Section: {selectedCombination || "None"}
             </th>
           </tr>
           <tr>
@@ -39,17 +121,24 @@ const Register = () => {
           </tr>
         </thead>
         <tbody>
-          {data.map((student, index) => (
-            <tr key={index}>
-              <td>{student.rollNo}</td>
-              {student.attendance.map((att, idx) => (
-                <td key={idx} className={att === "A" ? "absent" : "present"}>{att}</td>
-              ))}
-              <td>{student.total}</td>
-              <td>{student.attended}</td>
-              <td className={student.percentage === 0 ? "zero-percent" : "low-percent"}>{student.percentage.toFixed(2)}</td>
+          {attendanceRecords.length === 0 ? (
+            <tr>
+              <td colSpan={dates.length + 4}>No attendance records found</td>
             </tr>
-          ))}
+          ) : (
+            attendanceRecords.map((student, index) => (
+              <tr key={index}>
+                <td>{student.rollNo}</td>
+                {student.attendance.map((att, idx) => (
+                  <td key={idx} className={att === "A" ? "absent" : "present"}>{att}</td>
+                ))}
+                <td>{student.total}</td>
+                <td>{student.attended}</td>
+                <td className={student.percentage === 0 ? "zero-percent" : "low-percent"}>
+                  {student.percentage.toFixed(2)}</td>
+              </tr>
+            ))
+          )}
         </tbody>
       </table>
     </div>
