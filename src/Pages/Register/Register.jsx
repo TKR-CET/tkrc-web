@@ -8,49 +8,25 @@ import "./Register.css";
 const Register = () => {
   const [combinations, setCombinations] = useState([]); // Dropdown options
   const [selectedCombination, setSelectedCombination] = useState(""); // Selected dropdown value
-  const [attendanceRecords, setAttendanceRecords] = useState([]); // Attendance data for the table
+  const [attendanceData, setAttendanceData] = useState([]); // Fetched attendance records
   const [dates, setDates] = useState([]); // Unique dates
   const [periods, setPeriods] = useState([]); // Periods grouped by date
-  const [providedFacultyId, setProvidedFacultyId] = useState(null); // Faculty object
-  const mongoDbFacultyId = localStorage.getItem("facultyId"); // Retrieve MongoDB _id from local storage
 
-  useEffect(() => {
-    // Fetch faculty-provided ID using MongoDB _id
-    const fetchProvidedFacultyId = async () => {
-      try {
-        const response = await axios.get(
-          `https://tkrcet-backend-g3zu.onrender.com/faculty/${mongoDbFacultyId}`
-        );
-        setProvidedFacultyId(response.data); // Store the faculty object
-      } catch (error) {
-        console.error("Error fetching faculty-provided ID:", error);
-      }
-    };
-
-    if (mongoDbFacultyId) {
-      fetchProvidedFacultyId();
-    }
-  }, [mongoDbFacultyId]);
-
-  // Fetch unique combinations for the dropdown
+  // Fetch unique combinations for dropdown
   useEffect(() => {
     const fetchCombinations = async () => {
-      if (!providedFacultyId) return;
-
       try {
         const response = await axios.get(
-          `https://tkrcet-backend-g3zu.onrender.com/faculty/${providedFacultyId.facultyId}/unique`
+          `https://tkrcet-backend-g3zu.onrender.com/faculty/unique`
         );
         setCombinations(response.data.uniqueCombinations || []);
       } catch (error) {
-        console.error("Error fetching unique combinations:", error);
+        console.error("Error fetching combinations:", error);
       }
     };
 
-    if (providedFacultyId) {
-      fetchCombinations();
-    }
-  }, [providedFacultyId]);
+    fetchCombinations();
+  }, []);
 
   // Fetch attendance records based on selected combination
   useEffect(() => {
@@ -60,59 +36,25 @@ const Register = () => {
       try {
         const [year, department, section, subject] = selectedCombination.split("-");
         const response = await axios.get(
-          `https://tkrcet-backend-g3zu.onrender.com/Attendance/filters?year=${year}&department=${department}&section=${section}&subject=${subject}`
+          `https://tkrcet-backend-g3zu.onrender.com/Attendance/filters`,
+          {
+            params: { year, department, section, subject },
+          }
         );
 
-        const rawData = response.data.data || []; // Attendance data array
+        const rawData = response.data.data || [];
+        setAttendanceData(rawData);
 
-        // Extract unique dates
+        // Extract unique dates and periods
         const uniqueDates = [...new Set(rawData.map((record) => record.date))];
-
-        // Extract periods grouped by date
         const periodsByDate = uniqueDates.map((date) =>
           rawData
             .filter((record) => record.date === date)
             .map((record) => record.period)
         );
 
-        // Build student attendance records
-        const studentAttendance = {};
-        rawData.forEach((record) => {
-          record.attendance.forEach((student) => {
-            if (!studentAttendance[student.rollNumber]) {
-              studentAttendance[student.rollNumber] = {
-                rollNo: student.rollNumber,
-                name: student.name,
-                attendance: [],
-                total: 0,
-                attended: 0,
-              };
-            }
-
-            // Mark attendance for the corresponding period
-            studentAttendance[student.rollNumber].attendance.push({
-              date: record.date,
-              period: record.period,
-              status: student.status === "present" ? "P" : "A",
-            });
-
-            // Update totals
-            studentAttendance[student.rollNumber].total++;
-            if (student.status === "present") {
-              studentAttendance[student.rollNumber].attended++;
-            }
-          });
-        });
-
-        // Calculate percentages for each student
-        Object.values(studentAttendance).forEach((student) => {
-          student.percentage =
-            student.attended > 0 ? (student.attended / student.total) * 100 : 0;
-        });
-
         setDates(uniqueDates);
         setPeriods(periodsByDate);
-        setAttendanceRecords(Object.values(studentAttendance));
       } catch (error) {
         console.error("Error fetching attendance records:", error);
       }
@@ -122,7 +64,84 @@ const Register = () => {
   }, [selectedCombination]);
 
   const handleSelectionChange = (event) => {
-    setSelectedCombination(event.target.value); // Update selected combination
+    setSelectedCombination(event.target.value);
+  };
+
+  const renderTableRows = () => {
+    if (attendanceData.length === 0) {
+      return (
+        <tr>
+          <td colSpan={dates.length * 2 + 3}>No attendance records found</td>
+        </tr>
+      );
+    }
+
+    const students = {};
+
+    // Process student data
+    attendanceData.forEach((record) => {
+      record.attendance.forEach((student) => {
+        if (!students[student.rollNumber]) {
+          students[student.rollNumber] = {
+            rollNo: student.rollNumber,
+            name: student.name,
+            attendance: {},
+            total: 0,
+            attended: 0,
+          };
+        }
+
+        // Mark attendance for the specific date and period
+        students[student.rollNumber].attendance[`${record.date}-${record.period}`] =
+          student.status === "present" ? "P" : "A";
+
+        // Update totals
+        students[student.rollNumber].total++;
+        if (student.status === "present") {
+          students[student.rollNumber].attended++;
+        }
+      });
+    });
+
+    // Calculate percentages
+    Object.values(students).forEach((student) => {
+      student.percentage =
+        student.attended > 0 ? (student.attended / student.total) * 100 : 0;
+    });
+
+    // Render rows
+    return Object.values(students).map((student, index) => (
+      <tr key={index}>
+        <td>{student.rollNo}</td>
+        {dates.map((date) =>
+          periods[dates.indexOf(date)].map((period) => {
+            const attendanceStatus =
+              student.attendance[`${date}-${period}`] || "-";
+            return (
+              <td
+                key={`${date}-${period}`}
+                className={attendanceStatus === "A" ? "absent" : "present"}
+              >
+                {attendanceStatus}
+              </td>
+            );
+          })
+        )}
+        <td>{student.total}</td>
+        <td>{student.attended}</td>
+        <td
+          className={
+            student.percentage === 0
+              ? "zero-percent"
+              : student.percentage < 75
+              ? "low-percent"
+              : ""
+          }
+        >
+          {student.percentage.toFixed(2)}
+        </td>
+      </tr>
+    ));
   };
 
   return (
@@ -181,49 +200,7 @@ const Register = () => {
               <th></th>
             </tr>
           </thead>
-          <tbody>
-            {attendanceRecords.length === 0 ? (
-              <tr>
-                <td colSpan={dates.length * 2 + 3}>No attendance records found</td>
-              </tr>
-            ) : (
-              attendanceRecords.map((student, studentIndex) => (
-                <tr key={studentIndex}>
-                  <td>{student.rollNo}</td>
-                  {dates.map((date, dateIndex) =>
-                    periods[dateIndex].map((period, periodIndex) => {
-                      const attendance = student.attendance.find(
-                        (att) => att.date === date && att.period === period
-                      );
-                      return (
-                        <td
-                          key={`${dateIndex}-${periodIndex}`}
-                          className={
-                            attendance?.status === "A" ? "absent" : "present"
-                          }
-                        >
-                          {attendance ? attendance.status : "-"}
-                        </td>
-                      );
-                    })
-                  )}
-                  <td>{student.total}</td>
-                  <td>{student.attended}</td>
-                  <td
-                    className={
-                      student.percentage === 0
-                        ? "zero-percent"
-                        : student.percentage < 75
-                        ? "low-percent"
-                        : ""
-                    }
-                  >
-                    {student.percentage.toFixed(2)}
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
+          <tbody>{renderTableRows()}</tbody>
         </table>
       </div>
     </>
