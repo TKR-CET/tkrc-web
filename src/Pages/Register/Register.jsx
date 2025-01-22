@@ -122,45 +122,34 @@ const Register = () => {
               <th>S.No</th>
               <th>Roll No.</th>
               <th>Name</th>
-              <th>Present Dates</th>
-              <th>Absent Dates</th>
+              {attendanceRecords.map((record, index) => (
+                <th key={index}>{record.date}</th>
+              ))}
             </tr>
           </thead>
           <tbody>
             {allStudents.length === 0 ? (
               <tr>
-                <td colSpan="5">No students found</td>
+                <td colSpan={attendanceRecords.length + 3}>No students found</td>
               </tr>
             ) : (
-              allStudents.map((student, index) => {
-                const presentDates = attendanceRecords
-                  .filter((record) =>
-                    record.attendance.some(
-                      (entry) => entry.rollNumber === student.rollNumber && entry.status === "present"
-                    )
-                  )
-                  .map((record) => record.date)
-                  .join(", ");
-
-                const absentDates = attendanceRecords
-                  .filter((record) =>
-                    record.attendance.some(
-                      (entry) => entry.rollNumber === student.rollNumber && entry.status === "absent"
-                    )
-                  )
-                  .map((record) => record.date)
-                  .join(", ");
-
-                return (
-                  <tr key={index}>
-                    <td>{index + 1}</td>
-                    <td>{student.rollNumber}</td>
-                    <td>{student.name}</td>
-                    <td>{presentDates || "None"}</td>
-                    <td>{absentDates || "None"}</td>
-                  </tr>
-                );
-              })
+              allStudents.map((student, index) => (
+                <tr key={index}>
+                  <td>{index + 1}</td>
+                  <td>{student.rollNumber}</td>
+                  <td>{student.name}</td>
+                  {attendanceRecords.map((record, recordIndex) => {
+                    const status = record.attendance.find(
+                      (entry) => entry.rollNumber === student.rollNumber
+                    )?.status;
+                    return (
+                      <td key={recordIndex} className={status === "absent" ? "absent" : "present"}>
+                        {status === "present" ? "P" : status === "absent" ? "A" : "N/A"}
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))
             )}
           </tbody>
         </table>
