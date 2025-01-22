@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import './Register.css';
 
 const Register = () => {
   const [attendanceData, setAttendanceData] = useState([]);
