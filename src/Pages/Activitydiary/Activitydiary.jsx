@@ -98,7 +98,7 @@ const ActivityDiary = () => {
             ))}
           </select>
           <a href="#" id="lab-link-btn">
-            CAD / CAM Lab
+            
           </a>
         </div>
 
