@@ -438,7 +438,9 @@ const Marking = () => {
           </table>
         )}
 
-        <button id="btn-submit" onClick={handleSubmit} disabled={isSubmitting}>{isSubmitting ? "Submitting..." : "Submit"}</button>
+        <button id="btn-submit" onClick={handleSubmit} disabled={isSubmitting || date !== todayDate}>
+  {isSubmitting ? "Submitting..." : "Submit"}
+</button>
       </div>
     </>
   );
