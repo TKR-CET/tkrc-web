@@ -385,21 +385,19 @@ const Marking = () => {
           <label>Periods:</label>
           {[1, 2, 3, 4, 5, 6].map((period) => (
             <label key={period}>
-            <input
+         <input
   type="checkbox"
   value={period}
   checked={periods.includes(period)}
   disabled={
-    markedPeriods.includes(period) &&
-    (!periods.includes(period) || !query.get("attendance"))
+    (markedPeriods.includes(period) && !query.get("attendance")) || date !== todayDate
   }
   onChange={() =>
     setPeriods((prev) =>
       prev.includes(period) ? prev.filter((p) => p !== period) : [...prev, period]
     )
   }
-/>
-              {period} {markedPeriods.includes(period) && "(Marked)"}
+/>         {period} {markedPeriods.includes(period) && "(Marked)"}
             </label>
           ))}
         </div>
