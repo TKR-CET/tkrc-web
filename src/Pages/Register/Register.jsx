@@ -1,61 +1,53 @@
-import React, { useState, useEffect } from "react";
-import './Register.css';
+import React from "react";
+import "./Register.css";
 
 const Register = () => {
-  const [attendanceData, setAttendanceData] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const data = [
+    { rollNo: "20K91A0328", attendance: ["A", "A", "A", "A", "A", "A", "A", "1", "2", "3", "A", "A", "A", "A", "A", "A"], total: 26, attended: 3, percentage: 11.54 },
+    { rollNo: "20K91A0335", attendance: ["A", "A", "A", "A", "A", "A", "A", "A", "A", "A", "A", "A", "A", "A", "A", "A"], total: 26, attended: 0, percentage: 0.00 },
+  ];
 
-  // Fetch attendance data from backend (replace with your API)
-  useEffect(() => {
-    const fetchAttendance = async () => {
-      try {
-        // Placeholder API URL, replace it when backend is ready
-        const response = await fetch("https://your-backend-api.com/attendance");
-        const data = await response.json();
-        setAttendanceData(data);
-      } catch (error) {
-        console.error("Error fetching attendance:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAttendance();
-  }, []);
-
-  if (loading) {
-    return <p>Loading attendance...</p>;
-  }
+  const dates = ["12.08.24", "13.08.24", "03.09.24", "10.09.24", "23.09.24", "30.09.24", "15.10.24", "21.10.24", "28.10.24"];
+  const periods = [4, 5, 6, 3, 4, 5, 1, 2, 3, 1, 2, 3, 4, 5, 6];
 
   return (
-    <div className="attendance-table">
-      <h2>Attendance Register (CAD / CAM Lab)</h2>
-      <table border="1">
+    <div className="table-container">
+      <table className="attendance-table">
         <thead>
           <tr>
+            <th colSpan={dates.length + 4} className="header-title">
+              Attendance Register (CAD / CAM Lab) Section : IV ME I A - 2024-25
+            </th>
+          </tr>
+          <tr>
             <th>Roll No.</th>
-            {attendanceData.dates.map((date, index) => (
-              <th key={index}>{date}</th>
+            {dates.map((date, index) => (
+              <th key={index} colSpan="2">{date}</th>
             ))}
             <th>Total</th>
             <th>Attend</th>
             <th>%</th>
           </tr>
+          <tr>
+            <th></th>
+            {periods.map((period, index) => (
+              <th key={index}>{period}</th>
+            ))}
+            <th></th>
+            <th></th>
+            <th></th>
+          </tr>
         </thead>
         <tbody>
-          {attendanceData.students.map((student, index) => (
+          {data.map((student, index) => (
             <tr key={index}>
               <td>{student.rollNo}</td>
-              {student.attendance.map((status, idx) => (
-                <td key={idx} style={{ color: status === "A" ? "red" : "green" }}>
-                  {status}
-                </td>
+              {student.attendance.map((att, idx) => (
+                <td key={idx} className={att === "A" ? "absent" : "present"}>{att}</td>
               ))}
               <td>{student.total}</td>
               <td>{student.attended}</td>
-              <td style={{ color: student.percentage === "0.00" ? "red" : "black" }}>
-                {student.percentage}%
-              </td>
+              <td className={student.percentage === 0 ? "zero-percent" : "low-percent"}>{student.percentage.toFixed(2)}</td>
             </tr>
           ))}
         </tbody>
