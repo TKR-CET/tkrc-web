@@ -9,8 +9,6 @@ const Register = () => {
   const [combinations, setCombinations] = useState([]); // Dropdown options
   const [selectedCombination, setSelectedCombination] = useState(""); // Selected dropdown value
   const [attendanceRecords, setAttendanceRecords] = useState([]); // Attendance data
-  const [dates, setDates] = useState([]); // Dates from the database
-  const [periods, setPeriods] = useState([]); // Periods for each date
   const [providedFacultyId, setProvidedFacultyId] = useState(null); // Faculty object
   const mongoDbFacultyId = localStorage.getItem("facultyId"); // Faculty ID from local storage
 
@@ -61,10 +59,8 @@ const Register = () => {
           `https://tkrcet-backend-g3zu.onrender.com/Attendance/filters?year=B.Tech ${year}&department=${department}&section=${section}&subject=${subject}`
         );
 
-        const data = response.data || {};
-        setAttendanceRecords(data.students || []);
-        setDates(data.dates || []);
-        setPeriods(data.periods || []);
+        const data = response.data.data || [];
+        setAttendanceRecords(data);
       } catch (error) {
         console.error("Error fetching attendance records:", error);
       }
@@ -107,47 +103,34 @@ const Register = () => {
         <table className="attendance-table">
           <thead>
             <tr>
-              <th colSpan={dates.length + 4} className="header-title">
-                Attendance Register Section: {selectedCombination || "None"}
-              </th>
-            </tr>
-            <tr>
-              <th>Roll No.</th>
-              {dates.map((date, index) => (
-                <th key={index} colSpan="2">{date}</th>
-              ))}
-              <th>Total</th>
-              <th>Attend</th>
-              <th>%</th>
-            </tr>
-            <tr>
-              <th></th>
-              {periods.map((period, index) => (
-                <th key={index}>{period}</th>
-              ))}
-              <th></th>
-              <th></th>
-              <th></th>
+              <th>S.No</th>
+              <th>Date</th>
+              <th>Period</th>
+              <th>Subject</th>
+              <th>Topic</th>
+              <th>Remarks</th>
+              <th>Absentees</th>
             </tr>
           </thead>
           <tbody>
             {attendanceRecords.length === 0 ? (
               <tr>
-                <td colSpan={dates.length + 4}>No attendance records found</td>
+                <td colSpan="7">No attendance records found</td>
               </tr>
             ) : (
-              attendanceRecords.map((student, index) => (
+              attendanceRecords.map((record, index) => (
                 <tr key={index}>
-                  <td>{student.rollNo}</td>
-                  {student.attendance.map((att, idx) => (
-                    <td key={idx} className={att === "A" ? "absent" : "present"}>
-                      {att}
-                    </td>
-                  ))}
-                  <td>{student.total}</td>
-                  <td>{student.attended}</td>
-                  <td className={student.percentage < 50 ? "low-percent" : ""}>
-                    {student.percentage.toFixed(2)}
+                  <td>{index + 1}</td>
+                  <td>{record.date}</td>
+                  <td>{record.period}</td>
+                  <td>{record.subject}</td>
+                  <td>{record.topic || "N/A"}</td>
+                  <td>{record.remarks || "N/A"}</td>
+                  <td>
+                    {record.attendance
+                      .filter((entry) => entry.status === "absent")
+                      .map((entry) => entry.rollNumber)
+                      .join(", ") || "None"}
                   </td>
                 </tr>
               ))
