@@ -15,7 +15,7 @@ function Mainpage() {
   const location = useLocation();
 
   // List of routes where the other components should be hidden
-  const hideComponentsPaths = ['/timetable', '/index','/attendance','/activity','/home','/mark']; // Add more paths here
+  const hideComponentsPaths = ['/timetable', '/index','/attendance','/activity','/home','/mark','/register']; // Add more paths here
 
   return (
     <div className="maindiv">
