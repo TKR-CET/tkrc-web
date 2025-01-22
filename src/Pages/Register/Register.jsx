@@ -80,6 +80,14 @@ const Register = () => {
   };
 
   return (
+    <>
+       <Header />
+      <div className="nav">
+        <NavBar />
+      </div>
+      <div className="mob-nav">
+        <MobileNav />
+      </div>
     <div className="table-container">
       {/* Dropdown for selecting combination */}
       <div className="dropdown-container">
@@ -145,6 +153,7 @@ const Register = () => {
         </tbody>
       </table>
     </div>
+    </>
   );
 };
 
