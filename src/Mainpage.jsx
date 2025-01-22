@@ -8,7 +8,7 @@ import Activitydiary from './Pages/Activitydiary/Activitydiary';
 import Homepage from "./Homepage/Homepage";
 import Marking from "./Pages/Marking/Marking.jsx";
 import AddFacultyForm from "./AddFacultyForm";
-
+import Register from "./Pages/Register/Register.jsx";
 
 
 function Mainpage() {
@@ -29,6 +29,7 @@ function Mainpage() {
       )}
      
       <Routes>
+        <Route path="/register"  element={<Register/>}/>
         <Route path="/timetable" element={<Timetable />} />
         
         <Route path="/index" element={<Landingpage/>}/>
