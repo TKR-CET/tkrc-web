@@ -13,7 +13,6 @@ const Register = () => {
 
   const mongoDbFacultyId = localStorage.getItem("facultyId");
 
-  // Step 1: Fetch faculty-provided ID using MongoDB faculty _id
   useEffect(() => {
     if (!mongoDbFacultyId) return;
 
@@ -31,7 +30,6 @@ const Register = () => {
     fetchFacultyId();
   }, [mongoDbFacultyId]);
 
-  // Step 2: Fetch unique class combinations based on facultyId
   useEffect(() => {
     if (!facultyId) return;
 
@@ -49,7 +47,6 @@ const Register = () => {
     fetchCombinations();
   }, [facultyId]);
 
-  // Step 3: Fetch attendance records
   useEffect(() => {
     if (!selectedCombination) return;
 
@@ -75,40 +72,73 @@ const Register = () => {
     tableContainer: {
       width: "100%",
       overflowX: "auto",
-      margin: "20px auto",
+      margin: "30px auto",
+      padding: "0 10px",
+      backgroundColor: "#fafafa",
+      borderRadius: "8px",
+      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
     },
     table: {
       width: "100%",
       borderCollapse: "collapse",
       textAlign: "center",
+      marginBottom: "20px",
     },
     thTd: {
       border: "1px solid #ddd",
-      padding: "8px",
+      padding: "12px 15px",
+      fontSize: "14px",
     },
     th: {
-      backgroundColor: "#b3e5fc",
-      color: "#4a148c",
+      backgroundColor: "#4caf50", // Darker green for headers
+      color: "#fff",
       fontWeight: "bold",
+      textTransform: "uppercase",
     },
     headerTitle: {
-      backgroundColor: "#e0f7fa",
-      fontSize: "18px",
+      backgroundColor: "#2196f3", // Blue header
+      color: "#fff",
+      fontSize: "20px",
       fontWeight: "bold",
       textAlign: "center",
-      padding: "10px",
+      padding: "15px 0",
+      borderRadius: "8px",
+      marginBottom: "20px",
     },
     present: {
-      color: "green",
+      backgroundColor: "#81c784", // Green background for "Present"
+      color: "#fff",
       fontWeight: "bold",
     },
     absent: {
-      color: "red",
+      backgroundColor: "#e57373", // Red background for "Absent"
+      color: "#fff",
       fontWeight: "bold",
     },
     lowAttendance: {
-      backgroundColor: "#ffccbc",
+      backgroundColor: "#ffccbc", // Light red for low attendance
       fontWeight: "bold",
+    },
+    dropdownContainer: {
+      marginBottom: "20px",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    dropdown: {
+      padding: "10px",
+      fontSize: "16px",
+      width: "250px",
+      border: "1px solid #ddd",
+      borderRadius: "4px",
+      backgroundColor: "#fff",
+      boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
+    },
+    noData: {
+      textAlign: "center",
+      fontSize: "18px",
+      color: "#757575",
+      padding: "20px 0",
     },
   };
 
@@ -122,8 +152,12 @@ const Register = () => {
         <MobileNav />
       </div>
       <div style={styles.tableContainer}>
-        <div className="dropdown-container">
-          <select id="section-dropdown" onChange={(e) => setSelectedCombination(e.target.value)}>
+        <div style={styles.dropdownContainer}>
+          <select
+            id="section-dropdown"
+            onChange={(e) => setSelectedCombination(e.target.value)}
+            style={styles.dropdown}
+          >
             <option value="">Select Section</option>
             {combinations.map((combo, index) => (
               <option
@@ -168,12 +202,12 @@ const Register = () => {
             {percentageData.length === 0 ? (
               <tr>
                 <td style={styles.thTd} colSpan={attendanceRecords.length + 4}>
-                  No attendance records found
+                  <div style={styles.noData}>No attendance records found</div>
                 </td>
               </tr>
             ) : (
               percentageData.map((student, index) => (
-                <tr key={index}>
+                <tr key={index} style={index % 2 === 0 ? { backgroundColor: "#f9f9f9" } : {}}>
                   <td style={styles.thTd}>{student.rollNumber}</td>
                   {attendanceRecords.map((record) =>
                     record.students[student.rollNumber]
