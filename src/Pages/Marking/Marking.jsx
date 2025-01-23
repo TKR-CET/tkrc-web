@@ -395,18 +395,20 @@ useEffect(() => {
 <div className="periodSelection">
   <label>Periods:</label>
   {[1, 2, 3, 4, 5, 6].map((period) => {
-    const isMarked = markedPeriods.includes(period); // Check if this period is marked
-    const isEditable = periods.includes(period); // Check if this period is in the selected 'editable' periods
+    const isMarked = markedPeriods.includes(period); // Check if period is marked
+    const isEditable = periods.includes(period);     // Check if period is editable
+
+    alert(`Period ${period}: marked = ${isMarked}, editable = ${isEditable}`); // Alert for each period
 
     return (
       <label key={period}>
         <input
           type="checkbox"
           value={period}
-          checked={periods.includes(period)} // Check if the period is selected for editing
-          disabled={isMarked && !isEditable} // Disable if the period is marked but not selected for editing
+          checked={periods.includes(period)}  // Mark it as checked if it's selected
+          disabled={isMarked && !isEditable}   // Disable if the period is marked but not editable
           onChange={() => {
-            if (!isMarked) { // Only allow changes if not already marked
+            if (!isMarked) { // Only allow changes if not marked
               setPeriods((prev) =>
                 prev.includes(period)
                   ? prev.filter((p) => p !== period)
