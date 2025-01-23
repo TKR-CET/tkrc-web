@@ -103,8 +103,12 @@ const fetchMarkedPeriods = async () => {
     }
 
     const result = await response.json();
+
+    // Debug: Alert the fetched periods
+    alert("Fetched marked periods: " + JSON.stringify(result.periods));
+
     if (result.periods && Array.isArray(result.periods)) {
-      setMarkedPeriods(result.periods);  // Ensure marked periods are correctly set
+      setMarkedPeriods(result.periods);  // Set marked periods from backend
     } else {
       throw new Error("Invalid data format: Missing 'periods'");
     }
@@ -114,10 +118,8 @@ const fetchMarkedPeriods = async () => {
 };
 
 useEffect(() => {
-  fetchMarkedPeriods();  // Ensure this is called on component mount
-}, [date, programYear, department, section]); // Trigger on relevant state changes
-
-
+  fetchMarkedPeriods();  // Ensure this is called when relevant state changes
+}, [date, programYear, department, section]);  // Trigger fetch on relevant state change
 
 
   const handleAttendanceChange = (rollNumber, status) => {
