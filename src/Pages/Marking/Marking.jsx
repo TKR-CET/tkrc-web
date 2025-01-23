@@ -90,7 +90,7 @@ const Marking = () => {
   const fetchAttendanceRecord = async () => {
     try {
       const response = await fetch(
-        `https://tkrcet-backend-g3zu.onrender.com/Attendance/record?date=${date}&year=${programYear}&department=${department}&section=${section}&period=${editPeriod}`
+        `https://tkrcet-backend-g3zu.onrender.com/Attendance/check?date=${date}&year=${programYear}&department=${department}&section=${section}&period=${editPeriod}`
       );
 
       if (!response.ok) {
