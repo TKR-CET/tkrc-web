@@ -379,32 +379,32 @@ const Marking = () => {
           Subject: {subject}
         </p>
 
-        <div className="periodSelection">
-          <label>Periods:</label>
-          {[1, 2, 3, 4, 5, 6].map((period) => {
-            const isMarked = markedPeriods.includes(period);
-            const isEditable = periods.includes(period);
+       <div className="periodSelection">
+  <label>Periods:</label>
+  {[1, 2, 3, 4, 5, 6].map((period) => {
+    const isMarked = markedPeriods.includes(period); // Period already marked
+    const isEditable = periods.includes(period); // Period to be edited
 
-            return (
-              <label key={period}>
-                <input
-                  type="checkbox"
-                  value={period}
-                  checked={periods.includes(period)}
-                  disabled={isMarked && !isEditable} // Disable if marked and not part of editable periods
-                  onChange={() =>
-                    setPeriods((prev) =>
-                      prev.includes(period)
-                        ? prev.filter((p) => p !== period)
-                        : [...prev, period]
-                    )
-                  }
-                />
-                {period} {isMarked && "(Marked)"}
-              </label>
-            );
-          })}
-        </div>
+    return (
+      <label key={period}>
+        <input
+          type="checkbox"
+          value={period}
+          checked={periods.includes(period)}
+          disabled={isMarked && !isEditable} // Disable if marked and not part of editable periods
+          onChange={() =>
+            setPeriods((prev) =>
+              prev.includes(period)
+                ? prev.filter((p) => p !== period)
+                : [...prev, period]
+            )
+          }
+        />
+        {period} {isMarked && "(Marked)"}
+      </label>
+    );
+  })}
+</div>
 
         <div className="subjectTopicEntry">
           <label>Topic:</label>
