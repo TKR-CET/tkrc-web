@@ -90,13 +90,13 @@ const Register = () => {
       fontSize: "14px",
     },
     th: {
-      backgroundColor: "#4caf50",
+      backgroundColor: "#4caf50", // Darker green for headers
       color: "#fff",
       fontWeight: "bold",
       textTransform: "uppercase",
     },
     headerTitle: {
-      backgroundColor: "#2196f3",
+      backgroundColor: "#2196f3", // Blue header
       color: "#fff",
       fontSize: "20px",
       fontWeight: "bold",
@@ -106,15 +106,17 @@ const Register = () => {
       marginBottom: "20px",
     },
     present: {
-      color: "#4caf50",
+      backgroundColor: "#81c784", // Green background for "Present"
+      color: "#fff",
       fontWeight: "bold",
     },
     absent: {
-      color: "#f44336",
+      backgroundColor: "#e57373", // Red background for "Absent"
+      color: "#fff",
       fontWeight: "bold",
     },
     lowAttendance: {
-      backgroundColor: "#ffebee",
+      backgroundColor: "#ffccbc", // Light red for low attendance
       fontWeight: "bold",
     },
     dropdownContainer: {
