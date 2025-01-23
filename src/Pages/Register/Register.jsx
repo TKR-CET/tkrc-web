@@ -10,6 +10,7 @@ const Register = () => {
   const [selectedCombination, setSelectedCombination] = useState(""); // Selected dropdown value
   const [attendanceRecords, setAttendanceRecords] = useState([]); // Attendance data
   const [allStudents, setAllStudents] = useState([]); // All students in the class
+  const [percentageData, setPercentageData] = useState([]); // Attendance percentage
   const [providedFacultyId, setProvidedFacultyId] = useState(null); // Faculty object
   const mongoDbFacultyId = localStorage.getItem("facultyId"); // Faculty ID from local storage
 
@@ -22,7 +23,7 @@ const Register = () => {
         const response = await axios.get(
           `https://tkrcet-backend-g3zu.onrender.com/faculty/${mongoDbFacultyId}`
         );
-        setProvidedFacultyId(response.data); // Store faculty details
+        setProvidedFacultyId(response.data);
       } catch (error) {
         console.error("Error fetching faculty data:", error);
       }
@@ -57,23 +58,24 @@ const Register = () => {
       try {
         const [year, department, section, subject] = selectedCombination.split("-");
         const response = await axios.get(
-          `https://tkrcet-backend-g3zu.onrender.com/Attendance/filters?year=B.Tech ${year}&department=${department}&section=${section}&subject=${subject}`
+          `https://tkrcet-backend-g3zu.onrender.com/Attendance/fetch-records?year=B.Tech ${year}&department=${department}&section=${section}&subject=${subject}`
         );
 
-        const data = response.data.data || [];
-        setAttendanceRecords(data);
+        const { data, percentageData } = response.data || {};
+        setAttendanceRecords(data || []);
+        setPercentageData(percentageData || []);
 
         // Get all unique roll numbers
         const students = Array.from(
           new Set(
-            data.flatMap((record) => record.attendance.map((entry) => entry.rollNumber))
+            data.flatMap((record) => record.students.map((entry) => entry.rollNumber))
           )
         ).map((rollNumber) => ({
           rollNumber,
           name:
             data.find((record) =>
-              record.attendance.find((entry) => entry.rollNumber === rollNumber)
-            )?.attendance.find((entry) => entry.rollNumber === rollNumber)?.name || "",
+              record.students.find((entry) => entry.rollNumber === rollNumber)
+            )?.students.find((entry) => entry.rollNumber === rollNumber)?.name || "",
         }));
 
         setAllStudents(students);
@@ -123,33 +125,58 @@ const Register = () => {
               <th>Roll No.</th>
               <th>Name</th>
               {attendanceRecords.map((record, index) => (
-                <th key={index}>{record.date}</th>
+                <th key={index}>
+                  {record.date}
+                  <table>
+                    <thead>
+                      <tr>
+                        {record.periods.map((period, pIndex) => (
+                          <th key={pIndex}>P{period}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                  </table>
+                </th>
               ))}
+              <th>Percentage</th>
             </tr>
           </thead>
           <tbody>
             {allStudents.length === 0 ? (
               <tr>
-                <td colSpan={attendanceRecords.length + 3}>No students found</td>
+                <td colSpan={attendanceRecords.length + 4}>No students found</td>
               </tr>
             ) : (
-              allStudents.map((student, index) => (
-                <tr key={index}>
-                  <td>{index + 1}</td>
-                  <td>{student.rollNumber}</td>
-                  <td>{student.name}</td>
-                  {attendanceRecords.map((record, recordIndex) => {
-                    const status = record.attendance.find(
-                      (entry) => entry.rollNumber === student.rollNumber
-                    )?.status;
-                    return (
-                      <td key={recordIndex} className={status === "absent" ? "absent" : "present"}>
-                        {status === "present" ? "P" : status === "absent" ? "A" : "N/A"}
+              allStudents.map((student, index) => {
+                const percentageEntry = percentageData.find(
+                  (entry) => entry.rollNumber === student.rollNumber
+                );
+                return (
+                  <tr key={index}>
+                    <td>{index + 1}</td>
+                    <td>{student.rollNumber}</td>
+                    <td>{student.name}</td>
+                    {attendanceRecords.map((record, recordIndex) => (
+                      <td key={recordIndex}>
+                        <table>
+                          <tbody>
+                            <tr>
+                              {record.students
+                                .find((entry) => entry.rollNumber === student.rollNumber)
+                                ?.statuses.map((status, sIndex) => (
+                                  <td key={sIndex} className={status === "A" ? "absent" : "present"}>
+                                    {status}
+                                  </td>
+                                ))}
+                            </tr>
+                          </tbody>
+                        </table>
                       </td>
-                    );
-                  })}
-                </tr>
-              ))
+                    ))}
+                    <td>{percentageEntry ? `${percentageEntry.percentage}%` : "N/A"}</td>
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>
