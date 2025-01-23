@@ -1,144 +1,46 @@
-/* Global Styles */
 .table-container {
   width: 100%;
-  padding: 20px;
   overflow-x: auto;
+  margin: 20px auto;
 }
 
-.dropdown-container {
-  margin-bottom: 15px;
-  text-align: center;
-}
-
-.dropdown-container select {
-  padding: 10px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  background: #fff;
-  cursor: pointer;
-}
-
-/* Attendance Table */
 .attendance-table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 800px;
-  background: #fff;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-  border-radius: 5px;
-  overflow: hidden;
+  text-align: center;
 }
 
-/* Table Headers */
-.attendance-table thead {
-  background: #007bff;
-  color: #fff;
+.attendance-table th, 
+.attendance-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
 }
 
 .attendance-table th {
-  padding: 12px;
-  text-align: center;
+  background-color: #b3e5fc;
+  color: #4a148c;
   font-weight: bold;
-  border: 1px solid #ddd;
 }
 
-.attendance-table thead th {
-  position: sticky;
-  top: 0;
-  background: #007bff;
-  z-index: 10;
-}
-
-/* Table Body */
-.attendance-table tbody tr:nth-child(even) {
-  background: #f8f9fa;
-}
-
-.attendance-table td {
-  padding: 10px;
+.header-title {
+  background-color: #e0f7fa;
+  font-size: 18px;
+  font-weight: bold;
   text-align: center;
-  border: 1px solid #ddd;
+  padding: 10px;
 }
 
-/* Present & Absent Styling */
 .present {
-  background: #d4edda;
-  color: #155724;
+  color: green;
   font-weight: bold;
 }
 
 .absent {
-  background: #f8d7da;
-  color: #721c24;
+  color: red;
   font-weight: bold;
 }
 
-/* Nested Table for Periods */
-.attendance-table th table,
-.attendance-table td table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.attendance-table th table th,
-.attendance-table td table td {
-  padding: 5px;
-  border: 1px solid #ccc;
-  text-align: center;
-}
-
-/* Percentage Column */
-.attendance-table th:last-child,
-.attendance-table td:last-child {
+.low-attendance {
+  background-color: #ffccbc;
   font-weight: bold;
-  background: #e9ecef;
-}
-
-/* Responsive Design */
-@media screen and (max-width: 1024px) {
-  .attendance-table {
-    font-size: 14px;
-  }
-
-  .dropdown-container select {
-    width: 90%;
-  }
-}
-
-@media screen and (max-width: 768px) {
-  .table-container {
-    padding: 10px;
-  }
-
-  .attendance-table {
-    font-size: 12px;
-    min-width: 600px;
-  }
-
-  .attendance-table th,
-  .attendance-table td {
-    padding: 8px;
-  }
-
-  .dropdown-container select {
-    font-size: 14px;
-  }
-}
-
-@media screen and (max-width: 480px) {
-  .attendance-table {
-    font-size: 10px;
-    min-width: 500px;
-  }
-
-  .attendance-table th,
-  .attendance-table td {
-    padding: 5px;
-  }
-
-  .dropdown-container select {
-    font-size: 12px;
-    width: 100%;
-  }
 }
