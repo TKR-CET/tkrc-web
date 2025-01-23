@@ -6,40 +6,40 @@ import MobileNav from "../../Components/MobileNav/MobileNav";
 import "./Register.css";
 
 const Register = () => {
-  const [combinations, setCombinations] = useState([]); // Dropdown options
-  const [selectedCombination, setSelectedCombination] = useState(""); // Selected dropdown value
-  const [attendanceRecords, setAttendanceRecords] = useState([]); // Attendance data
-  const [allStudents, setAllStudents] = useState([]); // All students in the class
-  const [percentageData, setPercentageData] = useState([]); // Attendance percentage
-  const [providedFacultyId, setProvidedFacultyId] = useState(null); // Faculty object
-  const mongoDbFacultyId = localStorage.getItem("facultyId"); // Faculty ID from local storage
+  const [combinations, setCombinations] = useState([]);
+  const [selectedCombination, setSelectedCombination] = useState("");
+  const [attendanceRecords, setAttendanceRecords] = useState([]);
+  const [percentageData, setPercentageData] = useState([]);
+  const [facultyId, setFacultyId] = useState(null);
 
-  // Fetch faculty-provided ID using MongoDB faculty _id
+  const mongoDbFacultyId = localStorage.getItem("facultyId");
+
+  // Step 1: Fetch faculty-provided ID using MongoDB faculty _id
   useEffect(() => {
     if (!mongoDbFacultyId) return;
 
-    const fetchProvidedFacultyId = async () => {
+    const fetchFacultyId = async () => {
       try {
         const response = await axios.get(
           `https://tkrcet-backend-g3zu.onrender.com/faculty/${mongoDbFacultyId}`
         );
-        setProvidedFacultyId(response.data);
+        setFacultyId(response.data.facultyId);
       } catch (error) {
         console.error("Error fetching faculty data:", error);
       }
     };
 
-    fetchProvidedFacultyId();
+    fetchFacultyId();
   }, [mongoDbFacultyId]);
 
-  // Fetch unique class combinations
+  // Step 2: Fetch unique class combinations based on facultyId
   useEffect(() => {
-    if (!providedFacultyId) return;
+    if (!facultyId) return;
 
     const fetchCombinations = async () => {
       try {
         const response = await axios.get(
-          `https://tkrcet-backend-g3zu.onrender.com/faculty/${providedFacultyId.facultyId}/unique`
+          `https://tkrcet-backend-g3zu.onrender.com/faculty/${facultyId}/unique`
         );
         setCombinations(response.data.uniqueCombinations || []);
       } catch (error) {
@@ -48,9 +48,9 @@ const Register = () => {
     };
 
     fetchCombinations();
-  }, [providedFacultyId]);
+  }, [facultyId]);
 
-  // Fetch attendance records dynamically
+  // Step 3: Fetch attendance records
   useEffect(() => {
     if (!selectedCombination) return;
 
@@ -61,24 +61,8 @@ const Register = () => {
           `https://tkrcet-backend-g3zu.onrender.com/Attendance/fetch-records?year=B.Tech ${year}&department=${department}&section=${section}&subject=${subject}`
         );
 
-        const { data, percentageData } = response.data || {};
-        setAttendanceRecords(data || []);
-        setPercentageData(percentageData || []);
-
-        // Get all unique roll numbers
-        const students = Array.from(
-          new Set(
-            data.flatMap((record) => record.students.map((entry) => entry.rollNumber))
-          )
-        ).map((rollNumber) => ({
-          rollNumber,
-          name:
-            data.find((record) =>
-              record.students.find((entry) => entry.rollNumber === rollNumber)
-            )?.students.find((entry) => entry.rollNumber === rollNumber)?.name || "",
-        }));
-
-        setAllStudents(students);
+        setAttendanceRecords(response.data.data || []);
+        setPercentageData(response.data.percentageData || []);
       } catch (error) {
         console.error("Error fetching attendance records:", error);
       }
@@ -86,11 +70,6 @@ const Register = () => {
 
     fetchAttendanceRecords();
   }, [selectedCombination]);
-
-  // Handle dropdown selection
-  const handleSelectionChange = (event) => {
-    setSelectedCombination(event.target.value);
-  };
 
   return (
     <>
@@ -102,9 +81,8 @@ const Register = () => {
         <MobileNav />
       </div>
       <div className="table-container">
-        {/* Dropdown for selecting a section */}
         <div className="dropdown-container">
-          <select id="section-dropdown" onChange={handleSelectionChange}>
+          <select id="section-dropdown" onChange={(e) => setSelectedCombination(e.target.value)}>
             <option value="">Select Section</option>
             {combinations.map((combo, index) => (
               <option
@@ -117,66 +95,57 @@ const Register = () => {
           </select>
         </div>
 
-        {/* Attendance Table */}
         <table className="attendance-table">
           <thead>
             <tr>
-              <th>S.No</th>
+              <th className="header-title" colSpan={attendanceRecords.length + 4}>
+                Attendance Register ({selectedCombination}) - {new Date().getFullYear()}
+              </th>
+            </tr>
+            <tr>
               <th>Roll No.</th>
-              <th>Name</th>
               {attendanceRecords.map((record, index) => (
-                <th key={index}>
-                  {record.date}
-                  <table>
-                    <thead>
-                      <tr>
-                        {record.periods.map((period, pIndex) => (
-                          <th key={pIndex}>P{period}</th>
-                        ))}
-                      </tr>
-                    </thead>
-                  </table>
-                </th>
+                <th key={index} colSpan={record.periods.length}>{record.date}</th>
               ))}
-              <th>Percentage</th>
+              <th>Total</th>
+              <th>Attend</th>
+              <th>%</th>
+            </tr>
+            <tr>
+              <th></th>
+              {attendanceRecords.map((record) =>
+                record.periods.map((period, idx) => (
+                  <th key={idx}>{period}</th>
+                ))
+              )}
+              <th></th>
+              <th></th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
-            {allStudents.length === 0 ? (
+            {percentageData.length === 0 ? (
               <tr>
-                <td colSpan={attendanceRecords.length + 4}>No students found</td>
+                <td colSpan={attendanceRecords.length + 4}>No attendance records found</td>
               </tr>
             ) : (
-              allStudents.map((student, index) => {
-                const percentageEntry = percentageData.find(
-                  (entry) => entry.rollNumber === student.rollNumber
-                );
-                return (
-                  <tr key={index}>
-                    <td>{index + 1}</td>
-                    <td>{student.rollNumber}</td>
-                    <td>{student.name}</td>
-                    {attendanceRecords.map((record, recordIndex) => (
-                      <td key={recordIndex}>
-                        <table>
-                          <tbody>
-                            <tr>
-                              {record.students
-                                .find((entry) => entry.rollNumber === student.rollNumber)
-                                ?.statuses.map((status, sIndex) => (
-                                  <td key={sIndex} className={status === "A" ? "absent" : "present"}>
-                                    {status}
-                                  </td>
-                                ))}
-                            </tr>
-                          </tbody>
-                        </table>
-                      </td>
-                    ))}
-                    <td>{percentageEntry ? `${percentageEntry.percentage}%` : "N/A"}</td>
-                  </tr>
-                );
-              })
+              percentageData.map((student, index) => (
+                <tr key={index}>
+                  <td>{student.rollNumber}</td>
+                  {attendanceRecords.map((record) =>
+                    record.students[student.rollNumber]
+                      ? record.students[student.rollNumber].map((status, idx) => (
+                          <td key={idx} className={status === "A" ? "absent" : "present"}>
+                            {status}
+                          </td>
+                        ))
+                      : record.periods.map((_, idx) => <td key={idx}>-</td>)
+                  )}
+                  <td>{student.total}</td>
+                  <td>{student.attended}</td>
+                  <td className={student.percentage < 75 ? "low-attendance" : ""}>{student.percentage}</td>
+                </tr>
+              ))
             )}
           </tbody>
         </table>
