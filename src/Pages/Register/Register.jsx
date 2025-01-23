@@ -8,51 +8,48 @@ import "./Register.css";
 const Register = () => {
   const [combinations, setCombinations] = useState([]); // Dropdown options
   const [selectedCombination, setSelectedCombination] = useState(""); // Selected dropdown value
-  const [attendanceRecords, setAttendanceRecords] = useState([]); // Attendance data for the table
-  const [dates, setDates] = useState([]); // Dates for the attendance table
-  const [periods, setPeriods] = useState([]); // Periods for the attendance table
+  const [attendanceRecords, setAttendanceRecords] = useState([]); // Attendance data
+  const [allStudents, setAllStudents] = useState([]); // All students in the class
   const [providedFacultyId, setProvidedFacultyId] = useState(null); // Faculty object
-  const mongoDbFacultyId = localStorage.getItem("facultyId"); // Retrieve MongoDB _id from local storage
+  const mongoDbFacultyId = localStorage.getItem("facultyId"); // Faculty ID from local storage
 
+  // Fetch faculty-provided ID using MongoDB faculty _id
   useEffect(() => {
-    // Fetch faculty-provided ID using MongoDB _id
+    if (!mongoDbFacultyId) return;
+
     const fetchProvidedFacultyId = async () => {
       try {
         const response = await axios.get(
           `https://tkrcet-backend-g3zu.onrender.com/faculty/${mongoDbFacultyId}`
         );
-        setProvidedFacultyId(response.data); // Store the faculty object
+        setProvidedFacultyId(response.data); // Store faculty details
       } catch (error) {
-        console.error("Error fetching faculty-provided ID:", error);
+        console.error("Error fetching faculty data:", error);
       }
     };
 
-    if (mongoDbFacultyId) {
-      fetchProvidedFacultyId();
-    }
+    fetchProvidedFacultyId();
   }, [mongoDbFacultyId]);
 
-  // Fetch unique combinations for the dropdown
+  // Fetch unique class combinations
   useEffect(() => {
-    const fetchCombinations = async () => {
-      if (!providedFacultyId) return;
+    if (!providedFacultyId) return;
 
+    const fetchCombinations = async () => {
       try {
         const response = await axios.get(
           `https://tkrcet-backend-g3zu.onrender.com/faculty/${providedFacultyId.facultyId}/unique`
         );
         setCombinations(response.data.uniqueCombinations || []);
       } catch (error) {
-        console.error("Error fetching unique combinations:", error);
+        console.error("Error fetching combinations:", error);
       }
     };
 
-    if (providedFacultyId) {
-      fetchCombinations();
-    }
+    fetchCombinations();
   }, [providedFacultyId]);
 
-  // Fetch attendance records based on selected combination
+  // Fetch attendance records dynamically
   useEffect(() => {
     if (!selectedCombination) return;
 
@@ -63,10 +60,23 @@ const Register = () => {
           `https://tkrcet-backend-g3zu.onrender.com/Attendance/filters?year=B.Tech ${year}&department=${department}&section=${section}&subject=${subject}`
         );
 
-        const data = response.data || {};
-        setAttendanceRecords(data.students || []);
-        setDates(data.dates || []);
-        setPeriods(data.periods || []);
+        const data = response.data.data || [];
+        setAttendanceRecords(data);
+
+        // Get all unique roll numbers
+        const students = Array.from(
+          new Set(
+            data.flatMap((record) => record.attendance.map((entry) => entry.rollNumber))
+          )
+        ).map((rollNumber) => ({
+          rollNumber,
+          name:
+            data.find((record) =>
+              record.attendance.find((entry) => entry.rollNumber === rollNumber)
+            )?.attendance.find((entry) => entry.rollNumber === rollNumber)?.name || "",
+        }));
+
+        setAllStudents(students);
       } catch (error) {
         console.error("Error fetching attendance records:", error);
       }
@@ -75,88 +85,77 @@ const Register = () => {
     fetchAttendanceRecords();
   }, [selectedCombination]);
 
+  // Handle dropdown selection
   const handleSelectionChange = (event) => {
-    setSelectedCombination(event.target.value); // Update selected combination
+    setSelectedCombination(event.target.value);
   };
 
   return (
     <>
-       <Header />
+      <Header />
       <div className="nav">
         <NavBar />
       </div>
       <div className="mob-nav">
         <MobileNav />
       </div>
-    <div className="table-container">
-      {/* Dropdown for selecting combination */}
-      <div className="dropdown-container">
-        <select id="section-dropdown" onChange={handleSelectionChange}>
-          <option value="">Select Section</option>
-          {combinations.map((combo, index) => (
-            <option
-              key={index}
-              value={`${combo.year}-${combo.department}-${combo.section}-${combo.subject}`}
-            >
-              {combo.year} {combo.department}-{combo.section} ({combo.subject})
-            </option>
-          ))}
-        </select>
-      </div>
+      <div className="table-container">
+        {/* Dropdown for selecting a section */}
+        <div className="dropdown-container">
+          <select id="section-dropdown" onChange={handleSelectionChange}>
+            <option value="">Select Section</option>
+            {combinations.map((combo, index) => (
+              <option
+                key={index}
+                value={`${combo.year}-${combo.department}-${combo.section}-${combo.subject}`}
+              >
+                {combo.year} {combo.department}-{combo.section} ({combo.subject})
+              </option>
+            ))}
+          </select>
+        </div>
 
-      {/* Attendance Table */}
-      <table className="attendance-table">
-        <thead>
-          <tr>
-            <th colSpan={dates.length + 4} className="header-title">
-              Attendance Register Section: {selectedCombination || "None"}
-            </th>
-          </tr>
-          <tr>
-            <th>Roll No.</th>
-            {dates.map((date, index) => (
-              <th key={index} colSpan="2">{date}</th>
-            ))}
-            <th>Total</th>
-            <th>Attend</th>
-            <th>%</th>
-          </tr>
-          <tr>
-            <th></th>
-            {periods.map((period, index) => (
-              <th key={index}>{period}</th>
-            ))}
-            <th></th>
-            <th></th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {attendanceRecords.length === 0 ? (
+        {/* Attendance Table */}
+        <table className="attendance-table">
+          <thead>
             <tr>
-              <td colSpan={dates.length + 4}>No attendance records found</td>
+              <th>S.No</th>
+              <th>Roll No.</th>
+              <th>Name</th>
+              {attendanceRecords.map((record, index) => (
+                <th key={index}>{record.date}</th>
+              ))}
             </tr>
-          ) : (
-            attendanceRecords.map((student, index) => (
-              <tr key={index}>
-                <td>{student.rollNo}</td>
-                {student.attendance.map((att, idx) => (
-                  <td key={idx} className={att === "A" ? "absent" : "present"}>{att}</td>
-                ))}
-                <td>{student.total}</td>
-                <td>{student.attended}</td>
-                <td className={student.percentage === 0 ? "zero-percent" : "low-percent"}>
-                  {student.percentage.toFixed(2)}</td>
+          </thead>
+          <tbody>
+            {allStudents.length === 0 ? (
+              <tr>
+                <td colSpan={attendanceRecords.length + 3}>No students found</td>
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
-    </div>
+            ) : (
+              allStudents.map((student, index) => (
+                <tr key={index}>
+                  <td>{index + 1}</td>
+                  <td>{student.rollNumber}</td>
+                  <td>{student.name}</td>
+                  {attendanceRecords.map((record, recordIndex) => {
+                    const status = record.attendance.find(
+                      (entry) => entry.rollNumber === student.rollNumber
+                    )?.status;
+                    return (
+                      <td key={recordIndex} className={status === "absent" ? "absent" : "present"}>
+                        {status === "present" ? "P" : status === "absent" ? "A" : "N/A"}
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
     </>
   );
 };
 
 export default Register;
-
-
