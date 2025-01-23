@@ -85,12 +85,12 @@ const Register = () => {
       marginBottom: "20px",
     },
     thTd: {
-      border: "1px solid #ddd",
+      border: "1px solid #000", // Changed border color to black
       padding: "12px 15px",
       fontSize: "14px",
     },
     th: {
-      backgroundColor: "#4caf50",
+      backgroundColor: "#2196f3",
       color: "#fff",
       fontWeight: "bold",
       textTransform: "uppercase",
