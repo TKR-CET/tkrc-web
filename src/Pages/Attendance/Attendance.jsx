@@ -72,16 +72,16 @@ const Attendance = () => {
   const handleEdit = (record) => {
     if (record.date === todayDate) {
       navigate(
-        `/mark?programYear=${record.year}&department=${record.department}&section=${record.section}&subject=${record.subject}&date=${record.date}&periods=${encodeURIComponent(
-          JSON.stringify([record.period])
-        )}&topic=${encodeURIComponent(
-          record.topic
-        )}&remarks=${encodeURIComponent(
-          record.remarks
-        )}&attendance=${encodeURIComponent(
-          JSON.stringify(record.attendance)
-        )}`
-      );
+       
+  `/mark?programYear=${record.year}&department=${record.department}&section=${record.section}&subject=${record.subject}&date=${record.date}&editPeriod=${record.period}&topic=${encodeURIComponent(
+    record.topic
+  )}&remarks=${encodeURIComponent(
+    record.remarks
+  )}&attendance=${encodeURIComponent(
+    JSON.stringify(record.attendance)
+  )}`
+);
+      
     }
   };
 
