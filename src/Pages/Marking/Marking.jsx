@@ -89,26 +89,36 @@ const Marking = () => {
     }
   };
 
-  const fetchMarkedPeriods = async () => {
-    try {
-      const response = await fetch(
-        `https://tkrcet-backend-g3zu.onrender.com/Attendance/check?date=${date}&year=${programYear}&department=${department}&section=${section}`
-      );
+  
 
-      if (!response.ok) {
-        throw new Error(`Failed to fetch marked periods: ${response.status}`);
-      }
 
-      const result = await response.json();
-      if (result.periods && Array.isArray(result.periods)) {
-        setMarkedPeriods(result.periods);
-      } else {
-        throw new Error("Invalid data format: Missing 'periods'");
-      }
-    } catch (error) {
-      alert(`Error fetching marked periods: ${error.message}`);
+const fetchMarkedPeriods = async () => {
+  try {
+    const response = await fetch(
+      `https://tkrcet-backend-g3zu.onrender.com/Attendance/check?date=${date}&year=${programYear}&department=${department}&section=${section}`
+    );
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch marked periods: ${response.status}`);
     }
-  };
+
+    const result = await response.json();
+    if (result.periods && Array.isArray(result.periods)) {
+      setMarkedPeriods(result.periods);  // Ensure marked periods are correctly set
+    } else {
+      throw new Error("Invalid data format: Missing 'periods'");
+    }
+  } catch (error) {
+    alert(`Error fetching marked periods: ${error.message}`);
+  }
+};
+
+useEffect(() => {
+  fetchMarkedPeriods();  // Ensure this is called on component mount
+}, [date, programYear, department, section]); // Trigger on relevant state changes
+
+
+
 
   const handleAttendanceChange = (rollNumber, status) => {
     setAttendance((prev) => ({
