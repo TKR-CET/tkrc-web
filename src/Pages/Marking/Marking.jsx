@@ -14,22 +14,27 @@ const Marking = () => {
   const department = query.get("department");
   const section = query.get("section");
   const subject = query.get("subject");
+  const editPeriod = query.get("editPeriod"); // The period being edited
 
   const [studentsData, setStudentsData] = useState([]);
   const [topic, setTopic] = useState("");
   const [remarks, setRemarks] = useState("");
   const [attendance, setAttendance] = useState({});
   const [periods, setPeriods] = useState([]);
-  const [markedPeriods, setMarkedPeriods] = useState([]); // Tracks already marked periods
+  const [markedPeriods, setMarkedPeriods] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     fetchStudents();
     fetchMarkedPeriods();
+
+    // If editing, fetch attendance record for the selected period
+    if (editPeriod) {
+      fetchAttendanceRecord();
+    }
   }, []);
 
-  // Fetch students
   const fetchStudents = async () => {
     try {
       const response = await fetch(
@@ -60,7 +65,6 @@ const Marking = () => {
     }
   };
 
-  // Fetch already marked periods
   const fetchMarkedPeriods = async () => {
     try {
       const response = await fetch(
@@ -74,7 +78,7 @@ const Marking = () => {
       const result = await response.json();
 
       if (result.periods && Array.isArray(result.periods)) {
-        setMarkedPeriods(result.periods); // Save marked periods
+        setMarkedPeriods(result.periods);
       } else {
         throw new Error("Unexpected data format. 'periods' property is missing or invalid.");
       }
@@ -83,7 +87,37 @@ const Marking = () => {
     }
   };
 
-  // Handle attendance change
+  const fetchAttendanceRecord = async () => {
+    try {
+      const response = await fetch(
+        `https://tkrcet-backend-g3zu.onrender.com/Attendance/record?date=${date}&year=${programYear}&department=${department}&section=${section}&period=${editPeriod}`
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+
+      if (result && result.attendance) {
+        // Pre-fill the fields with fetched data
+        setTopic(result.topic || "");
+        setRemarks(result.remarks || "");
+        setAttendance(
+          result.attendance.reduce((acc, record) => {
+            acc[record.rollNumber] = record.status;
+            return acc;
+          }, {})
+        );
+        setPeriods([parseInt(editPeriod)]); // Enable only the selected period
+      } else {
+        throw new Error("Unexpected data format. Attendance record is missing or invalid.");
+      }
+    } catch (error) {
+      alert(`Failed to fetch attendance record: ${error.message}`);
+    }
+  };
+
   const handleAttendanceChange = (rollNumber, status) => {
     setAttendance((prev) => ({
       ...prev,
@@ -91,14 +125,13 @@ const Marking = () => {
     }));
   };
 
-  // Handle submit
   const handleSubmit = async () => {
     const trimmedSubject = subject.trim();
     const trimmedTopic = topic.trim();
     const trimmedRemarks = remarks.trim();
 
-    if (!trimmedSubject || !trimmedTopic || periods.length === 0 || !programYear || !department || !section || !date) {
-      alert("Please fill in all mandatory fields (Periods, Subject, Topic, Year, Department, Section, Date).");
+    if (!trimmedSubject || !trimmedTopic || periods.length === 0) {
+      alert("Please fill in all mandatory fields (Periods, Subject, Topic).");
       return;
     }
 
@@ -149,8 +182,8 @@ const Marking = () => {
 
   return (
     <>
-       <style>{`
-           .attendanceMain {
+<style>{`
+    .attendanceMain {
     padding: 20px;
     background-color: #fff;
     margin: 20px;
@@ -345,7 +378,7 @@ const Marking = () => {
       top: 0;
     }
   }
-        `}</style>
+      `}</style>
       <Header />
       <div className="nav">
         <NavBar />
@@ -356,7 +389,7 @@ const Marking = () => {
       <div className="attendanceMain">
         <h2 className="attendanceHeading">Mark Attendance</h2>
         <p>
-          Year: {programYear}  |  Department: {department}   | Section: {section}   |   Subject: {subject}
+          Year: {programYear} | Department: {department} | Section: {section} | Subject: {subject}
         </p>
         <div className="periodSelection">
           <label>Periods:</label>
@@ -366,7 +399,7 @@ const Marking = () => {
                 type="checkbox"
                 value={period}
                 checked={periods.includes(period)}
-                disabled={markedPeriods.includes(period)} // Disable already marked periods
+                disabled={editPeriod ? period !== parseInt(editPeriod) : markedPeriods.includes(period)}
                 onChange={() =>
                   setPeriods((prev) =>
                     prev.includes(period) ? prev.filter((p) => p !== period) : [...prev, period]
