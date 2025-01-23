@@ -85,19 +85,19 @@ const Register = () => {
       marginBottom: "20px",
     },
     thTd: {
-      border: "1px solid #000", // Changed border color to black
+      border: "1px solid #000", // Black borders for all cells
       padding: "12px 15px",
       fontSize: "14px",
     },
     th: {
-      backgroundColor: "#2196f3",
-      color: "#fff",
+      backgroundColor: "#f5f5f5", // Changed header background to neutral
+      color: "#000",
       fontWeight: "bold",
       textTransform: "uppercase",
     },
     headerTitle: {
-      backgroundColor: "#2196f3",
-      color: "#fff",
+      backgroundColor: "#f5f5f5", // Neutral background for header
+      color: "#000",
       fontSize: "20px",
       fontWeight: "bold",
       textAlign: "center",
@@ -108,10 +108,12 @@ const Register = () => {
     present: {
       color: "#4caf50",
       fontWeight: "bold",
+      border: "1px solid #000", // Added black border for present cells
     },
     absent: {
       color: "#f44336",
       fontWeight: "bold",
+      border: "1px solid #000", // Added black border for absent cells
     },
     lowAttendance: {
       backgroundColor: "#ffebee",
