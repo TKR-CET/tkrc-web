@@ -159,7 +159,7 @@ const fetchAttendanceRecord = async () => {
 
   return (
     <>
-     <style>{`
+    <style>{`
     .attendanceMain {
     padding: 20px;
     background-color: #fff;
