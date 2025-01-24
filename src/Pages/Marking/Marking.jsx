@@ -14,7 +14,7 @@ const Marking = () => {
   const department = query.get("department");
   const section = query.get("section");
   const subject = query.get("subject");
-  const editPeriod = query.get("editPeriod"); // The period being edited
+  const editPeriod = query.get("editPeriod");
 
   const [studentsData, setStudentsData] = useState([]);
   const [topic, setTopic] = useState("");
@@ -28,10 +28,8 @@ const Marking = () => {
   useEffect(() => {
     fetchStudents();
     fetchMarkedPeriods();
-
-    // If editing, fetch attendance record for the selected period
     if (editPeriod) {
-      fetchAttendanceRecord();
+      fetchAttendanceRecord(); // Fetch data for the selected period when editing
     }
   }, []);
 
@@ -40,26 +38,20 @@ const Marking = () => {
       const response = await fetch(
         `https://tkrcet-backend-g3zu.onrender.com/Section/${programYear}/${department}/${section}/students`
       );
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
       const result = await response.json();
-
       if (result.students && Array.isArray(result.students)) {
         setStudentsData(result.students);
         setAttendance(
           result.students.reduce((acc, student) => {
-            acc[student.rollNumber] = "present";
+            acc[student.rollNumber] = "present"; // Default all students to "present"
             return acc;
           }, {})
         );
       } else {
-        throw new Error("Unexpected data format. 'students' property is missing or invalid.");
+        throw new Error("Failed to fetch students.");
       }
     } catch (error) {
-      alert(`Failed to fetch data: ${error.message}`);
+      alert(`Error: ${error.message}`);
     } finally {
       setIsLoading(false);
     }
@@ -70,20 +62,14 @@ const Marking = () => {
       const response = await fetch(
         `https://tkrcet-backend-g3zu.onrender.com/Attendance/check?date=${date}&year=${programYear}&department=${department}&section=${section}`
       );
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
       const result = await response.json();
-
       if (result.periods && Array.isArray(result.periods)) {
         setMarkedPeriods(result.periods);
       } else {
-        throw new Error("Unexpected data format. 'periods' property is missing or invalid.");
+        throw new Error("Failed to fetch marked periods.");
       }
     } catch (error) {
-      alert(`Failed to fetch marked periods: ${error.message}`);
+      alert(`Error: ${error.message}`);
     }
   };
 
@@ -92,15 +78,9 @@ const Marking = () => {
       const response = await fetch(
         `https://tkrcet-backend-g3zu.onrender.com/Attendance/check?date=${date}&year=${programYear}&department=${department}&section=${section}&period=${editPeriod}`
       );
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
       const result = await response.json();
 
       if (result && result.attendance) {
-        // Pre-fill the fields with fetched data
         setTopic(result.topic || "");
         setRemarks(result.remarks || "");
         setAttendance(
@@ -109,12 +89,12 @@ const Marking = () => {
             return acc;
           }, {})
         );
-        setPeriods([parseInt(editPeriod)]); // Enable only the selected period
+        setPeriods([parseInt(editPeriod)]); // Pre-select the edited period
       } else {
-        throw new Error("Unexpected data format. Attendance record is missing or invalid.");
+        throw new Error("Failed to fetch attendance record.");
       }
     } catch (error) {
-      alert(`Failed to fetch attendance record: ${error.message}`);
+      alert(`Error: ${error.message}`);
     }
   };
 
@@ -126,11 +106,7 @@ const Marking = () => {
   };
 
   const handleSubmit = async () => {
-    const trimmedSubject = subject.trim();
-    const trimmedTopic = topic.trim();
-    const trimmedRemarks = remarks.trim();
-
-    if (!trimmedSubject || !trimmedTopic || periods.length === 0) {
+    if (!subject.trim() || !topic.trim() || periods.length === 0) {
       alert("Please fill in all mandatory fields (Periods, Subject, Topic).");
       return;
     }
@@ -140,9 +116,9 @@ const Marking = () => {
       year: programYear,
       department,
       section,
-      subject: trimmedSubject,
-      topic: trimmedTopic,
-      remarks: trimmedRemarks,
+      subject,
+      topic,
+      remarks,
       periods,
       attendance: studentsData.map((student) => ({
         rollNumber: student.rollNumber,
@@ -158,9 +134,7 @@ const Marking = () => {
         "https://tkrcet-backend-g3zu.onrender.com/Attendance/mark-attendance",
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(attendanceData),
         }
       );
@@ -174,7 +148,7 @@ const Marking = () => {
         throw new Error(result.message || "Failed to submit attendance.");
       }
     } catch (error) {
-      alert(error.message);
+      alert(`Error: ${error.message}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -182,7 +156,7 @@ const Marking = () => {
 
   return (
     <>
-<style>{`
+     <style>{`
     .attendanceMain {
     padding: 20px;
     background-color: #fff;
@@ -387,7 +361,7 @@ const Marking = () => {
         <MobileNav />
       </div>
       <div className="attendanceMain">
-        <h2 className="attendanceHeading">Mark Attendance</h2>
+        <h2>{editPeriod ? "Edit Attendance" : "Mark Attendance"}</h2>
         <p>
           Year: {programYear} | Department: {department} | Section: {section} | Subject: {subject}
         </p>
@@ -399,37 +373,39 @@ const Marking = () => {
                 type="checkbox"
                 value={period}
                 checked={periods.includes(period)}
-                disabled={editPeriod ? period !== parseInt(editPeriod) : markedPeriods.includes(period)}
+                disabled={
+                  editPeriod ? period !== parseInt(editPeriod) : markedPeriods.includes(period)
+                }
                 onChange={() =>
                   setPeriods((prev) =>
-                    prev.includes(period) ? prev.filter((p) => p !== period) : [...prev, period]
+                    prev.includes(period)
+                      ? prev.filter((p) => p !== period)
+                      : [...prev, period]
                   )
                 }
               />
-              {period} {markedPeriods.includes(period) && ""}
+              {period}
             </label>
           ))}
         </div>
-        <div className="subjectTopicEntry">
-          <label htmlFor="input-topic">Topic:</label>
+        <div>
+          <label>Topic:</label>
           <textarea
-            id="input-topic"
             value={topic}
             onChange={(e) => setTopic(e.target.value)}
-            placeholder="Enter Topic"
+            placeholder="Enter topic"
           />
-          <label htmlFor="input-remarks">Remarks:</label>
+          <label>Remarks:</label>
           <textarea
-            id="input-remarks"
             value={remarks}
             onChange={(e) => setRemarks(e.target.value)}
-            placeholder="Enter Remarks"
+            placeholder="Enter remarks"
           />
         </div>
         {isLoading ? (
           <p>Loading students...</p>
         ) : (
-          <table className="attendanceList">
+          <table>
             <thead>
               <tr>
                 <th>Roll Number</th>
@@ -453,7 +429,6 @@ const Marking = () => {
                   <td>
                     <input
                       type="radio"
-                      className="absentStatus"
                       checked={attendance[student.rollNumber] === "absent"}
                       onChange={() => handleAttendanceChange(student.rollNumber, "absent")}
                     />
@@ -463,7 +438,7 @@ const Marking = () => {
             </tbody>
           </table>
         )}
-        <button id="btn-submit" onClick={handleSubmit} disabled={isSubmitting}>
+        <button onClick={handleSubmit} disabled={isSubmitting}>
           {isSubmitting ? "Submitting..." : "Submit"}
         </button>
       </div>
