@@ -73,30 +73,33 @@ const Marking = () => {
     }
   };
 
-  const fetchAttendanceRecord = async () => {
-    try {
-      const response = await fetch(
-        `https://tkrcet-backend-g3zu.onrender.com/Attendance/check?date=${date}&year=${programYear}&department=${department}&section=${section}&period=${editPeriod}`
-      );
-      const result = await response.json();
+  
+const fetchAttendanceRecord = async () => {
+  try {
+    const response = await fetch(
+      `https://tkrcet-backend-g3zu.onrender.com/Attendance/check?date=${date}&year=${programYear}&department=${department}&section=${section}&period=${editPeriod}`
+    );
+    const result = await response.json();
 
-      if (result && result.attendance) {
-        setTopic(result.topic || "");
-        setRemarks(result.remarks || "");
-        setAttendance(
-          result.attendance.reduce((acc, record) => {
-            acc[record.rollNumber] = record.status;
-            return acc;
-          }, {})
-        );
-        setPeriods([parseInt(editPeriod)]); // Pre-select the edited period
-      } else {
-        throw new Error("Failed to fetch attendance record.");
-      }
-    } catch (error) {
-      alert(`Error: ${error.message}`);
+    if (result && result.records && result.records.length > 0) {
+      const record = result.records[0]; // Get the first record (if multiple are returned)
+      setTopic(record.topic || "");
+      setRemarks(record.remarks || "");
+      setAttendance(
+        record.attendance.reduce((acc, student) => {
+          acc[student.rollNumber] = student.status;
+          return acc;
+        }, {})
+      );
+      setPeriods([parseInt(editPeriod)]); // Pre-select the edited period
+    } else {
+      throw new Error("No attendance record found for the selected period.");
     }
-  };
+  } catch (error) {
+    alert(`Error: ${error.message}`);
+  }
+};
+
 
   const handleAttendanceChange = (rollNumber, status) => {
     setAttendance((prev) => ({
@@ -365,29 +368,31 @@ const Marking = () => {
         <p>
           Year: {programYear} | Department: {department} | Section: {section} | Subject: {subject}
         </p>
-        <div className="periodSelection">
-          <label>Periods:</label>
-          {[1, 2, 3, 4, 5, 6].map((period) => (
-            <label key={period}>
-              <input
-                type="checkbox"
-                value={period}
-                checked={periods.includes(period)}
-                disabled={
-                  editPeriod ? period !== parseInt(editPeriod) : markedPeriods.includes(period)
-                }
-                onChange={() =>
-                  setPeriods((prev) =>
-                    prev.includes(period)
-                      ? prev.filter((p) => p !== period)
-                      : [...prev, period]
-                  )
-                }
-              />
-              {period}
-            </label>
-          ))}
-        </div>
+       <div className="periodSelection">
+  <label>Periods:</label>
+  {[1, 2, 3, 4, 5, 6].map((period) => (
+    <label key={period}>
+      <input
+        type="checkbox"
+        value={period}
+        checked={periods.includes(period)}
+        disabled={
+          editPeriod
+            ? period !== parseInt(editPeriod) // Disable all except `editPeriod` when editing
+            : markedPeriods.includes(period) // Disable already marked periods when creating new
+        }
+        onChange={() =>
+          setPeriods((prev) =>
+            prev.includes(period)
+              ? prev.filter((p) => p !== period)
+              : [...prev, period]
+          )
+        }
+      />
+      {period}
+    </label>
+  ))}
+</div>
         <div>
           <label>Topic:</label>
           <textarea
