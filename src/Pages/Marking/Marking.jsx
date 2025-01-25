@@ -101,14 +101,7 @@ const Marking = () => {
 
 
 
-if (editing) {
-  const invalidPeriods = periods.filter((p) => !markedPeriodNumbers.includes(p));
-  if (invalidPeriods.length > 0) {
-    return res.status(400).json({
-      message: `Invalid periods provided for editing: ${invalidPeriods.join(", ")}`,
-    });
-  }
-}
+
 
   const handleAttendanceChange = (rollNumber, status) => {
     setAttendance((prev) => ({
@@ -122,6 +115,19 @@ if (editing) {
       alert("Please fill in all mandatory fields (Periods, Subject, Topic).");
       return;
     }
+
+
+
+     if (editing) {
+  const invalidPeriods = periods.filter((p) => !markedPeriodNumbers.includes(p));
+  if (invalidPeriods.length > 0) {
+    return res.status(400).json({
+      message: `Invalid periods provided for editing: ${invalidPeriods.join(", ")}`,
+    });
+  }
+}
+
+
 
     const attendanceData = {
       date,
