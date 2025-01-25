@@ -83,7 +83,7 @@ const Marking = () => {
   const fetchPeriodsForSubject = async () => {
     try {
       const response = await fetch(
-        `https://tkrcet-backend-g3zu.onrender.com/faculty/S600/${department}/${section}/${subject}`
+        `https://tkrcet-backend-g3zu.onrender.com/faculty/S500/${department}/${section}/${subject}`
       );
       const result = await response.json();
       if (result.periods && Array.isArray(result.periods)) {
