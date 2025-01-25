@@ -14,7 +14,7 @@ const Marking = () => {
   const department = query.get("department");
   const section = query.get("section");
   const subject = query.get("subject");
-  const editPeriod = query.get("editPeriod");
+  const editPeriod = query.get("editPeriod"); // The period being edited
 
   const [studentsData, setStudentsData] = useState([]);
   const [topic, setTopic] = useState("");
@@ -28,8 +28,9 @@ const Marking = () => {
   useEffect(() => {
     fetchStudents();
     fetchMarkedPeriods();
+
     if (editPeriod) {
-      fetchAttendanceRecord(); // Fetch data for the selected period when editing
+      fetchAttendanceRecord();
     }
   }, []);
 
@@ -38,20 +39,25 @@ const Marking = () => {
       const response = await fetch(
         `https://tkrcet-backend-g3zu.onrender.com/Section/${programYear}/${department}/${section}/students`
       );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
       const result = await response.json();
       if (result.students && Array.isArray(result.students)) {
         setStudentsData(result.students);
         setAttendance(
           result.students.reduce((acc, student) => {
-            acc[student.rollNumber] = "present"; // Default all students to "present"
+            acc[student.rollNumber] = "present";
             return acc;
           }, {})
         );
       } else {
-        throw new Error("Failed to fetch students.");
+        throw new Error("Unexpected data format. 'students' property is missing or invalid.");
       }
     } catch (error) {
-      alert(`Error: ${error.message}`);
+      alert(`Failed to fetch data: ${error.message}`);
     } finally {
       setIsLoading(false);
     }
@@ -62,44 +68,50 @@ const Marking = () => {
       const response = await fetch(
         `https://tkrcet-backend-g3zu.onrender.com/Attendance/check?date=${date}&year=${programYear}&department=${department}&section=${section}`
       );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
       const result = await response.json();
       if (result.periods && Array.isArray(result.periods)) {
         setMarkedPeriods(result.periods);
       } else {
-        throw new Error("Failed to fetch marked periods.");
+        throw new Error("Unexpected data format. 'periods' property is missing or invalid.");
       }
     } catch (error) {
-      alert(`Error: ${error.message}`);
+      alert(`Failed to fetch marked periods: ${error.message}`);
     }
   };
 
-  
-const fetchAttendanceRecord = async () => {
-  try {
-    const response = await fetch(
-      `https://tkrcet-backend-g3zu.onrender.com/Attendance/check?date=${date}&year=${programYear}&department=${department}&section=${section}&period=${editPeriod}`
-    );
-    const result = await response.json();
-
-    if (result && result.records && result.records.length > 0) {
-      const record = result.records[0]; // Get the first record (if multiple are returned)
-      setTopic(record.topic || "");
-      setRemarks(record.remarks || "");
-      setAttendance(
-        record.attendance.reduce((acc, student) => {
-          acc[student.rollNumber] = student.status;
-          return acc;
-        }, {})
+  const fetchAttendanceRecord = async () => {
+    try {
+      const response = await fetch(
+        `https://tkrcet-backend-g3zu.onrender.com/Attendance/check?date=${date}&year=${programYear}&department=${department}&section=${section}&period=${editPeriod}`
       );
-      setPeriods([parseInt(editPeriod)]); // Pre-select the edited period
-    } else {
-      throw new Error("No attendance record found for the selected period.");
-    }
-  } catch (error) {
-    alert(`Error: ${error.message}`);
-  }
-};
 
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      if (result && result.attendance) {
+        setTopic(result.topic || "");
+        setRemarks(result.remarks || "");
+        setAttendance(
+          result.attendance.reduce((acc, record) => {
+            acc[record.rollNumber] = record.status;
+            return acc;
+          }, {})
+        );
+        setPeriods([parseInt(editPeriod)]); // Enable only the selected period
+      } else {
+        throw new Error("Unexpected data format. Attendance record is missing or invalid.");
+      }
+    } catch (error) {
+      alert(`Failed to fetch attendance record: ${error.message}`);
+    }
+  };
 
   const handleAttendanceChange = (rollNumber, status) => {
     setAttendance((prev) => ({
@@ -109,7 +121,11 @@ const fetchAttendanceRecord = async () => {
   };
 
   const handleSubmit = async () => {
-    if (!subject.trim() || !topic.trim() || periods.length === 0) {
+    const trimmedSubject = subject.trim();
+    const trimmedTopic = topic.trim();
+    const trimmedRemarks = remarks.trim();
+
+    if (!trimmedSubject || !trimmedTopic || periods.length === 0) {
       alert("Please fill in all mandatory fields (Periods, Subject, Topic).");
       return;
     }
@@ -119,9 +135,9 @@ const fetchAttendanceRecord = async () => {
       year: programYear,
       department,
       section,
-      subject,
-      topic,
-      remarks,
+      subject: trimmedSubject,
+      topic: trimmedTopic,
+      remarks: trimmedRemarks,
       periods,
       attendance: studentsData.map((student) => ({
         rollNumber: student.rollNumber,
@@ -137,7 +153,9 @@ const fetchAttendanceRecord = async () => {
         "https://tkrcet-backend-g3zu.onrender.com/Attendance/mark-attendance",
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify(attendanceData),
         }
       );
@@ -151,7 +169,7 @@ const fetchAttendanceRecord = async () => {
         throw new Error(result.message || "Failed to submit attendance.");
       }
     } catch (error) {
-      alert(`Error: ${error.message}`);
+      alert(error.message);
     } finally {
       setIsSubmitting(false);
     }
@@ -159,7 +177,7 @@ const fetchAttendanceRecord = async () => {
 
   return (
     <>
-    <style>{`
+<style>{`
     .attendanceMain {
     padding: 20px;
     background-color: #fff;
@@ -364,53 +382,51 @@ const fetchAttendanceRecord = async () => {
         <MobileNav />
       </div>
       <div className="attendanceMain">
-        <h2>{editPeriod ? "Edit Attendance" : "Mark Attendance"}</h2>
+        <h2 className="attendanceHeading">Mark Attendance</h2>
         <p>
           Year: {programYear} | Department: {department} | Section: {section} | Subject: {subject}
         </p>
-       <div className="periodSelection">
-  <label>Periods:</label>
-  {[1, 2, 3, 4, 5, 6].map((period) => (
-    <label key={period}>
-      <input
-        type="checkbox"
-        value={period}
-        checked={periods.includes(period)}
-        disabled={
-          editPeriod
-            ? period !== parseInt(editPeriod) // Disable all except `editPeriod` when editing
-            : markedPeriods.includes(period) // Disable already marked periods when creating new
-        }
-        onChange={() =>
-          setPeriods((prev) =>
-            prev.includes(period)
-              ? prev.filter((p) => p !== period)
-              : [...prev, period]
-          )
-        }
-      />
-      {period}
-    </label>
-  ))}
-</div>
-        <div>
-          <label>Topic:</label>
+        <div className="periodSelection">
+          <label>Periods:</label>
+          {[1, 2, 3, 4, 5, 6].map((period) => (
+            <label key={period}>
+              <input
+                type="checkbox"
+                value={period}
+                checked={periods.includes(period)}
+                disabled={
+                  editPeriod ? period !== parseInt(editPeriod) : markedPeriods.includes(period)
+                }
+                onChange={() =>
+                  setPeriods((prev) =>
+                    prev.includes(period) ? prev.filter((p) => p !== period) : [...prev, period]
+                  )
+                }
+              />
+              {period}
+            </label>
+          ))}
+        </div>
+        <div className="subjectTopicEntry">
+          <label htmlFor="input-topic">Topic:</label>
           <textarea
+            id="input-topic"
             value={topic}
             onChange={(e) => setTopic(e.target.value)}
-            placeholder="Enter topic"
+            placeholder="Enter Topic"
           />
-          <label>Remarks:</label>
+          <label htmlFor="input-remarks">Remarks:</label>
           <textarea
+            id="input-remarks"
             value={remarks}
             onChange={(e) => setRemarks(e.target.value)}
-            placeholder="Enter remarks"
+            placeholder="Enter Remarks"
           />
         </div>
         {isLoading ? (
           <p>Loading students...</p>
         ) : (
-          <table>
+          <table className="attendanceList">
             <thead>
               <tr>
                 <th>Roll Number</th>
@@ -434,6 +450,7 @@ const fetchAttendanceRecord = async () => {
                   <td>
                     <input
                       type="radio"
+                      className="absentStatus"
                       checked={attendance[student.rollNumber] === "absent"}
                       onChange={() => handleAttendanceChange(student.rollNumber, "absent")}
                     />
@@ -443,7 +460,7 @@ const fetchAttendanceRecord = async () => {
             </tbody>
           </table>
         )}
-        <button onClick={handleSubmit} disabled={isSubmitting}>
+        <button id="btn-submit" onClick={handleSubmit} disabled={isSubmitting}>
           {isSubmitting ? "Submitting..." : "Submit"}
         </button>
       </div>
