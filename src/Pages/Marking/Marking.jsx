@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect } from "react";
 import Header from "../../Components/Header/Header";
 import NavBar from "../../Components/NavBar/NavBar";
@@ -101,10 +99,6 @@ const Marking = () => {
     }
   };
 
-
-
-
-
   const handleAttendanceChange = (rollNumber, status) => {
     setAttendance((prev) => ({
       ...prev,
@@ -117,12 +111,6 @@ const Marking = () => {
       alert("Please fill in all mandatory fields (Periods, Subject, Topic).");
       return;
     }
-
-
-
-     
-
-
 
     const attendanceData = {
       date,
@@ -138,6 +126,7 @@ const Marking = () => {
         name: student.name,
         status: attendance[student.rollNumber],
       })),
+      editing: !!editPeriod, // Add editing flag
     };
 
     setIsSubmitting(true);
@@ -169,7 +158,8 @@ const Marking = () => {
 
   return (
     <>
-     <style>{`
+       
+      <style>{`
     .attendanceMain {
     padding: 20px;
     background-color: #fff;
@@ -374,7 +364,7 @@ const Marking = () => {
         <MobileNav />
       </div>
       <div className="attendanceMain">
-        <h2>{editPeriod ? "Edit Attendance" : "Mark Attendance"}</h2>
+        <h2>{editPeriod ? `Editing Attendance for Period ${editPeriod}` : "Mark Attendance"}</h2>
         <p>
           Year: {programYear} | Department: {department} | Section: {section} |
           Subject: {subject}
