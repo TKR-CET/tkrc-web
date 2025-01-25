@@ -120,14 +120,7 @@ const Marking = () => {
 
 
 
-     if (editing) {
-  const invalidPeriods = periods.filter((p) => !markedPeriodNumbers.includes(p));
-  if (invalidPeriods.length > 0) {
-    return res.status(400).json({
-      message: `Invalid periods provided for editing: ${invalidPeriods.join(", ")}`,
-    });
-  }
-}
+     
 
 
 
