@@ -70,7 +70,7 @@ const Marking = () => {
         throw new Error("Failed to fetch marked periods.");
       }
     } catch (error) {
-      alert(`Error: ${error.message}`);
+       console.log(error);
     }
   };
 
@@ -87,7 +87,7 @@ const Marking = () => {
         throw new Error("Failed to fetch periods.");
       }
     } catch (error) {
-      alert(`Error: ${error.message}`);
+      console.log(error)
     }
   };
 
