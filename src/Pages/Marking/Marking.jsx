@@ -20,7 +20,7 @@ const Marking = () => {
   const [topic, setTopic] = useState("");
   const [remarks, setRemarks] = useState("");
   const [attendance, setAttendance] = useState({});
-  const [periods, setPeriods] = useState([]);
+  const [periods, setPeriods] = useState([]); // This will store selected periods
   const [markedPeriods, setMarkedPeriods] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -28,12 +28,12 @@ const Marking = () => {
   useEffect(() => {
     fetchStudents();
     fetchMarkedPeriods();
+    fetchPeriodsForSubject();  // Fetch periods based on subject, department, etc.
     if (editPeriod) {
       fetchAttendanceRecord();
     }
-  }, [editPeriod, date, programYear, department, section, subject]);
+  }, []);
 
-  // Fetch students for the given section
   const fetchStudents = async () => {
     try {
       const response = await fetch(
@@ -58,7 +58,6 @@ const Marking = () => {
     }
   };
 
-  // Fetch periods for the given date and subject details
   const fetchMarkedPeriods = async () => {
     try {
       const response = await fetch(
@@ -67,7 +66,6 @@ const Marking = () => {
       const result = await response.json();
       if (result.periods && Array.isArray(result.periods)) {
         setMarkedPeriods(result.periods);
-        setPeriods(result.periods); // Automatically select the fetched periods
       } else {
         throw new Error("Failed to fetch marked periods.");
       }
@@ -76,7 +74,23 @@ const Marking = () => {
     }
   };
 
-  // Fetch attendance record for editing an existing attendance entry
+  const fetchPeriodsForSubject = async () => {
+    try {
+      const response = await fetch(
+        `https://tkrcet-backend-g3zu.onrender.com/faculty/S600/${programYear}/${department}/${section}/${subject}`
+      );
+      const result = await response.json();
+      if (result.periods && Array.isArray(result.periods)) {
+        // Set the periods from the response
+        setPeriods(result.periods);
+      } else {
+        throw new Error("Failed to fetch periods.");
+      }
+    } catch (error) {
+      alert(`Error: ${error.message}`);
+    }
+  };
+
   const fetchAttendanceRecord = async () => {
     try {
       const response = await fetch(
@@ -94,7 +108,7 @@ const Marking = () => {
             return acc;
           }, {})
         );
-        setPeriods([parseInt(editPeriod)]); // Select the period for editing
+        setPeriods([parseInt(editPeriod)]);
       } else {
         throw new Error("No attendance record found for the selected period.");
       }
@@ -103,7 +117,6 @@ const Marking = () => {
     }
   };
 
-  // Handle attendance change (marking present or absent)
   const handleAttendanceChange = (rollNumber, status) => {
     setAttendance((prev) => ({
       ...prev,
@@ -111,7 +124,6 @@ const Marking = () => {
     }));
   };
 
-  // Handle form submission
   const handleSubmit = async () => {
     if (!subject.trim() || !topic.trim() || periods.length === 0) {
       alert("Please fill in all mandatory fields (Periods, Subject, Topic).");
