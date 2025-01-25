@@ -63,11 +63,21 @@ const Attendance = () => {
     }
   };
 
-  const handleGoClick = () => {
+  
+    const handleGoClick = () => {
+  const selectedDate = new Date(date).toISOString().split("T")[0];
+  const todayDate = new Date().toISOString().split("T")[0];
+
+  if (selectedDate !== todayDate) {
+    alert("You can only mark attendance for today's date.");
+    setDate(todayDate); // Reset the date to today's date
+  } else {
     navigate(
       `/mark?programYear=${programYear}&department=${department}&section=${section}&subject=${subject}&date=${date}`
     );
-  };
+  }
+};
+ 
 
   const handleEdit = (record) => {
   if (record.date === todayDate) {
