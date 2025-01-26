@@ -3,6 +3,7 @@ import axios from "axios";
 import Header from "../../Components/Header/Header";
 import NavBar from "../../Components/NavBar/NavBar";
 import MobileNav from "../../Components/MobileNav/MobileNav";
+import "./Register.css";
 
 const Register = () => {
   const [combinations, setCombinations] = useState([]);
@@ -13,6 +14,7 @@ const Register = () => {
 
   const mongoDbFacultyId = localStorage.getItem("facultyId");
 
+  // Fetch faculty ID based on MongoDB facultyId from localStorage
   useEffect(() => {
     if (!mongoDbFacultyId) return;
 
@@ -30,6 +32,7 @@ const Register = () => {
     fetchFacultyId();
   }, [mongoDbFacultyId]);
 
+  // Fetch unique combinations for the dropdown based on facultyId
   useEffect(() => {
     if (!facultyId) return;
 
@@ -47,6 +50,7 @@ const Register = () => {
     fetchCombinations();
   }, [facultyId]);
 
+  // Fetch attendance records and percentage data based on the selected combination
   useEffect(() => {
     if (!selectedCombination) return;
 
@@ -76,41 +80,41 @@ const Register = () => {
       <div className="mob-nav">
         <MobileNav />
       </div>
-     
 
- <div className="dropdown-container">
-          <select
-            id="section-dropdown"
-            onChange={(e) => setSelectedCombination(e.target.value)}
-            className="dropdown"
-          >
-            <option value="">Select Section</option>
-            {combinations.map((combo, index) => (
-              <option
-                key={index}
-                value={`${combo.year}-${combo.department}-${combo.section}-${combo.subject}`}
-              >
-                {combo.year} {combo.department}-{combo.section} ({combo.subject})
-              </option>
-            ))}
-          </select>
-        </div>
+      {/* Dropdown Section */}
+      <div className="dropdown-container">
+        <select
+          id="section-dropdown"
+          onChange={(e) => setSelectedCombination(e.target.value)}
+          className="dropdown"
+        >
+          <option value="">Select Section</option>
+          {combinations.map((combo, index) => (
+            <option
+              key={index}
+              value={`${combo.year}-${combo.department}-${combo.section}-${combo.subject}`}
+            >
+              {combo.year} {combo.department}-{combo.section} ({combo.subject})
+            </option>
+          ))}
+        </select>
+      </div>
 
-
+      {/* Table Section */}
       <div className="table-container">
-       
-
         <table>
           <thead>
             <tr>
               <th className="header-title" colSpan={attendanceRecords.length + 4}>
-                Attendance Register ({selectedCombination}) - {new Date().getFullYear()}
+                Attendance Register ({selectedCombination || "None"}) - {new Date().getFullYear()}
               </th>
             </tr>
             <tr>
               <th>Roll No.</th>
               {attendanceRecords.map((record, index) => (
-                <th key={index} colSpan={record.periods.length}>{record.date}</th>
+                <th key={index} colSpan={record.periods.length}>
+                  {record.date}
+                </th>
               ))}
               <th>Total</th>
               <th>Attend</th>
