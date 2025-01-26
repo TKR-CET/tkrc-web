@@ -169,14 +169,16 @@ const Register = () => {
           font-weight: bold;
         }
 
+        /* Header Title Style */
         .table-header-title {
-          font-size: 18px;
+          font-size: 20px;
           font-weight: bold;
-          color: #2c3e50;
+          color: #004d99; /* Use a distinct color */
           text-transform: uppercase;
           background-color: #e6f2ff;
           text-align: center;
-          padding: 10px;
+          padding: 15px;
+          border-bottom: 2px solid #004d99;
         }
 
         .even-row {
@@ -323,7 +325,7 @@ const Register = () => {
                   <td className="no-attendance-data" colSpan={attendanceRecords.length + 4}>
                     No attendance records found
                   </td>
-                </tr>
+                </</tr>
               ) : (
                 percentageData.map((student, index) => (
                   <tr
