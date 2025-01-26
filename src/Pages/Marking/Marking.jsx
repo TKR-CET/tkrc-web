@@ -25,6 +25,10 @@ const Marking = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+
+  const mongoDbFacultyId = localStorage.getItem("facultyId"); // Retrieve MongoDB _id from local storage
+
+
   useEffect(() => {
     fetchStudents();
     fetchMarkedSubjects();
