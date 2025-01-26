@@ -3,7 +3,7 @@ import axios from "axios";
 import Header from "../../Components/Header/Header";
 import NavBar from "../../Components/NavBar/NavBar";
 import MobileNav from "../../Components/MobileNav/MobileNav";
-import "./Register.css";
+
 
 const Register = () => {
   const [combinations, setCombinations] = useState([]);
