@@ -77,8 +77,8 @@ const Register = () => {
         <MobileNav />
       </div>
      
-      <div className="table-container">
-        <div className="dropdown-container">
+
+ <div className="dropdown-container">
           <select
             id="section-dropdown"
             onChange={(e) => setSelectedCombination(e.target.value)}
@@ -95,6 +95,10 @@ const Register = () => {
             ))}
           </select>
         </div>
+
+
+      <div className="table-container">
+       
 
         <table>
           <thead>
