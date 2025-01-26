@@ -325,7 +325,7 @@ const Register = () => {
                   <td className="no-attendance-data" colSpan={attendanceRecords.length + 4}>
                     No attendance records found
                   </td>
-                </</tr>
+                </tr>
               ) : (
                 percentageData.map((student, index) => (
                   <tr
