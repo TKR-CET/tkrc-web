@@ -103,49 +103,67 @@ const Register = () => {
               </th>
             </tr>
             <tr>
-              <th>Roll No.</th>
+              <th className="th">Roll No.</th>
               {attendanceRecords.map((record, index) => (
-                <th key={index} colSpan={record.periods.length}>{record.date}</th>
+                <th key={index} className="th" colSpan={record.periods.length}>
+                  {record.date}
+                </th>
               ))}
-              <th>Total</th>
-              <th>Attend</th>
-              <th>%</th>
+              <th className="th">Total</th>
+              <th className="th">Attend</th>
+              <th className="th">%</th>
             </tr>
             <tr>
-              <th></th>
+              <th className="th"></th>
               {attendanceRecords.map((record) =>
                 record.periods.map((period, idx) => (
-                  <th key={idx}>{period}</th>
+                  <th key={idx} className="th">
+                    {period}
+                  </th>
                 ))
               )}
-              <th></th>
-              <th></th>
-              <th></th>
+              <th className="th"></th>
+              <th className="th"></th>
+              <th className="th"></th>
             </tr>
           </thead>
           <tbody>
             {percentageData.length === 0 ? (
               <tr>
-                <td className="no-data" colSpan={attendanceRecords.length + 4}>
-                  No attendance records found
+                <td className="th-td" colSpan={attendanceRecords.length + 4}>
+                  <div className="no-data">No attendance records found</div>
                 </td>
               </tr>
             ) : (
               percentageData.map((student, index) => (
-                <tr key={index} className={index % 2 === 0 ? "row-even" : "row-odd"}>
-                  <td>{student.rollNumber}</td>
+                <tr
+                  key={index}
+                  className={index % 2 === 0 ? "even-row" : "odd-row"}
+                >
+                  <td className="th-td">{student.rollNumber}</td>
                   {attendanceRecords.map((record) =>
                     record.students[student.rollNumber]
                       ? record.students[student.rollNumber].map((status, idx) => (
-                          <td key={idx} className={status === "A" ? "absent" : "present"}>
+                          <td
+                            key={idx}
+                            className={status === "A" ? "absent" : "present"}
+                          >
                             {status}
                           </td>
                         ))
-                      : record.periods.map((_, idx) => <td key={idx}>-</td>)
+                      : record.periods.map((_, idx) => (
+                          <td key={idx} className="th-td">
+                            -
+                          </td>
+                        ))
                   )}
-                  <td>{student.total}</td>
-                  <td>{student.attended}</td>
-                  <td className={student.percentage < 75 ? "low-attendance" : ""}>
+                  <td className="th-td">{student.total}</td>
+                  <td className="th-td">{student.attended}</td>
+                  <td
+                    className={`th-td ${
+                      student.percentage < 75 ? "low-attendance" : ""
+                    }`}
+                  >
                     {student.percentage}
                   </td>
                 </tr>
@@ -154,75 +172,6 @@ const Register = () => {
           </tbody>
         </table>
       </div>
-      <style>
-        {`
-          .table-container {
-            width: 100%;
-            overflow-x: auto;
-            margin: 30px auto;
-            padding: 0 10px;
-            background-color: #fafafa;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-          }
-          .table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: center;
-            margin-bottom: 20px;
-          }
-          .table th, .table td {
-            border: 1px solid #000;
-            padding: 12px 15px;
-            font-size: 14px;
-          }
-          .header-title {
-            background-color: #f5f5f5;
-            color: #000;
-            font-weight: bold;
-            text-transform: uppercase;
-            padding: 15px 0;
-            border-radius: 8px;
-            margin-bottom: 20px;
-          }
-          .present {
-            color: #4caf50;
-            font-weight: bold;
-          }
-          .absent {
-            color: #f44336;
-            font-weight: bold;
-          }
-          .low-attendance {
-            background-color: #ffebee;
-            font-weight: bold;
-          }
-          .dropdown-container {
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-          }
-          .dropdown {
-            padding: 10px;
-            font-size: 16px;
-            width: 250px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            background-color: #fff;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-          }
-          .no-data {
-            text-align: center;
-            font-size: 18px;
-            color: #757575;
-            padding: 20px 0;
-          }
-          .row-even {
-            background-color: #f9f9f9;
-          }
-        `}
-      </style>
     </>
   );
 };
