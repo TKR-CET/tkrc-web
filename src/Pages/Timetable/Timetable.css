@@ -45,10 +45,12 @@
   font-weight: bold;
   margin-bottom: 10px;
 }
+.m4{
+background-color:#87CEEB;
+}
 .m4 th{
   color:black !important;
   font-weight: bold !important;
-background-color: sky-blue !important;
 }
 .timetable table {
   width: 100%;
