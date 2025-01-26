@@ -67,6 +67,81 @@ const Register = () => {
     fetchAttendanceRecords();
   }, [selectedCombination]);
 
+  // **CSS Styles (Internal)**
+  const styles = {
+    tableContainer: {
+      width: "100%",
+      overflowX: "auto",
+      margin: "30px auto",
+      padding: "0 10px",
+      backgroundColor: "#fafafa",
+      borderRadius: "8px",
+      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+    },
+    table: {
+      width: "100%",
+      borderCollapse: "collapse",
+      textAlign: "center",
+      marginBottom: "20px",
+    },
+    thTd: {
+      border: "1px solid #000", // Black borders for all cells
+      padding: "12px 15px",
+      fontSize: "14px",
+    },
+    th: {
+      backgroundColor: "#f5f5f5", // Changed header background to neutral
+      color: "#000",
+      fontWeight: "bold",
+      textTransform: "uppercase",
+    },
+    headerTitle: {
+      backgroundColor: "#f5f5f5", // Neutral background for header
+      color: "#000",
+      fontSize: "20px",
+      fontWeight: "bold",
+      textAlign: "center",
+      padding: "15px 0",
+      borderRadius: "8px",
+      marginBottom: "20px",
+    },
+    present: {
+      color: "#4caf50",
+      fontWeight: "bold",
+      border: "1px solid #000", // Added black border for present cells
+    },
+    absent: {
+      color: "#f44336",
+      fontWeight: "bold",
+      border: "1px solid #000", // Added black border for absent cells
+    },
+    lowAttendance: {
+      backgroundColor: "#ffebee",
+      fontWeight: "bold",
+    },
+    dropdownContainer: {
+      marginBottom: "20px",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    dropdown: {
+      padding: "10px",
+      fontSize: "16px",
+      width: "250px",
+      border: "1px solid #ddd",
+      borderRadius: "4px",
+      backgroundColor: "#fff",
+      boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
+    },
+    noData: {
+      textAlign: "center",
+      fontSize: "18px",
+      color: "#757575",
+      padding: "20px 0",
+    },
+  };
+
   return (
     <>
       <Header />
@@ -76,12 +151,12 @@ const Register = () => {
       <div className="mob-nav">
         <MobileNav />
       </div>
-      <div className="table-container">
-        <div className="dropdown-container">
+      <div style={styles.tableContainer}>
+        <div style={styles.dropdownContainer}>
           <select
             id="section-dropdown"
             onChange={(e) => setSelectedCombination(e.target.value)}
-            className="dropdown"
+            style={styles.dropdown}
           >
             <option value="">Select Section</option>
             {combinations.map((combo, index) => (
@@ -95,74 +170,61 @@ const Register = () => {
           </select>
         </div>
 
-        <table className="table">
+        <table style={styles.table}>
           <thead>
             <tr>
-              <th className="header-title" colSpan={attendanceRecords.length + 4}>
+              <th style={styles.headerTitle} colSpan={attendanceRecords.length + 4}>
                 Attendance Register ({selectedCombination}) - {new Date().getFullYear()}
               </th>
             </tr>
             <tr>
-              <th className="th">Roll No.</th>
+              <th style={styles.th}>Roll No.</th>
               {attendanceRecords.map((record, index) => (
-                <th key={index} className="th" colSpan={record.periods.length}>
-                  {record.date}
-                </th>
+                <th key={index} style={styles.th} colSpan={record.periods.length}>{record.date}</th>
               ))}
-              <th className="th">Total</th>
-              <th className="th">Attend</th>
-              <th className="th">%</th>
+              <th style={styles.th}>Total</th>
+              <th style={styles.th}>Attend</th>
+              <th style={styles.th}>%</th>
             </tr>
             <tr>
-              <th className="th"></th>
+              <th style={styles.th}></th>
               {attendanceRecords.map((record) =>
                 record.periods.map((period, idx) => (
-                  <th key={idx} className="th">
-                    {period}
-                  </th>
+                  <th key={idx} style={styles.th}>{period}</th>
                 ))
               )}
-              <th className="th"></th>
-              <th className="th"></th>
-              <th className="th"></th>
+              <th style={styles.th}></th>
+              <th style={styles.th}></th>
+              <th style={styles.th}></th>
             </tr>
           </thead>
           <tbody>
             {percentageData.length === 0 ? (
               <tr>
-                <td className="th-td" colSpan={attendanceRecords.length + 4}>
-                  <div className="no-data">No attendance records found</div>
+                <td style={styles.thTd} colSpan={attendanceRecords.length + 4}>
+                  <div style={styles.noData}>No attendance records found</div>
                 </td>
               </tr>
             ) : (
               percentageData.map((student, index) => (
-                <tr
-                  key={index}
-                  className={index % 2 === 0 ? "even-row" : "odd-row"}
-                >
-                  <td className="th-td">{student.rollNumber}</td>
+                <tr key={index} style={index % 2 === 0 ? { backgroundColor: "#f9f9f9" } : {}}>
+                  <td style={styles.thTd}>{student.rollNumber}</td>
                   {attendanceRecords.map((record) =>
                     record.students[student.rollNumber]
                       ? record.students[student.rollNumber].map((status, idx) => (
-                          <td
-                            key={idx}
-                            className={status === "A" ? "absent" : "present"}
-                          >
+                          <td key={idx} style={status === "A" ? styles.absent : styles.present}>
                             {status}
                           </td>
                         ))
-                      : record.periods.map((_, idx) => (
-                          <td key={idx} className="th-td">
-                            -
-                          </td>
-                        ))
+                      : record.periods.map((_, idx) => <td key={idx} style={styles.thTd}>-</td>)
                   )}
-                  <td className="th-td">{student.total}</td>
-                  <td className="th-td">{student.attended}</td>
+                  <td style={styles.thTd}>{student.total}</td>
+                  <td style={styles.thTd}>{student.attended}</td>
                   <td
-                    className={`th-td ${
-                      student.percentage < 75 ? "low-attendance" : ""
-                    }`}
+                    style={{
+                      ...styles.thTd,
+                      ...(student.percentage < 75 ? styles.lowAttendance : {}),
+                    }}
                   >
                     {student.percentage}
                   </td>
@@ -177,3 +239,4 @@ const Register = () => {
 };
 
 export default Register;
+
