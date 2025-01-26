@@ -58,20 +58,20 @@ const Marking = () => {
   };
 
   const fetchMarkedSubjects = async () => {
-    try {
-      const response = await fetch(
-        `https://tkrcet-backend-g3zu.onrender.com/Attendance/marked-subjects?date=${date}&year=${programYear}&department=${department}&section=${section}`
-      );
-      const result = await response.json();
-      if (result.periods && Array.isArray(result.periods)) {
-        setMarkedPeriods(result.periods); // Store marked periods and subjects
-      } else {
-        throw new Error("Failed to fetch marked subjects.");
-      }
-    } catch (error) {
-      console.log(error);
+  try {
+    const response = await fetch(
+      `https://tkrcet-backend-g3zu.onrender.com/Attendance/marked-subjects?date=${date}&year=${programYear}&department=${department}&section=${section}`
+    );
+    const result = await response.json();
+    if (result.data && Array.isArray(result.data)) {
+      setMarkedPeriods(result.data); // Set marked periods using the "data" key
+    } else {
+      throw new Error("Invalid API response format.");
     }
-  };
+  } catch (error) {
+    console.log(error);
+  }
+};
 
   const fetchAttendanceRecord = async () => {
     try {
