@@ -230,7 +230,7 @@ const Marking = () => {
   }
 
   #btn-submit {
-    background-color: #FF5733;
+    background-color:#6495ED ;
     color: white;
     padding: 10px 20px;
     border: none;
