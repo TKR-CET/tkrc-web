@@ -131,6 +131,21 @@ const Register = () => {
           border-color: #004d99;
           outline: none;
         }
+.table-header-title-container {
+  text-align: center;
+  margin-bottom: 10px;
+  background-color: #e6f2ff;
+  padding: 15px;
+  border-bottom: 2px solid #004d99;
+}
+
+.table-header-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #004d99;
+  text-transform: uppercase;
+  margin: 0;
+}
 
         /* Table Section */
         .attendance-table-section {
@@ -287,77 +302,77 @@ const Register = () => {
       </div>
 
       {/* Table Section */}
-      <div className="attendance-table-section">
-        <div className="attendance-table-wrapper">
-          <table className="attendance-table">
-            <thead>
-              <tr>
-                <th className="table-header-title" colSpan={attendanceRecords.length + 4}>
-                  Attendance Register ({selectedCombination || "None"}) - {new Date().getFullYear()}
-                </th>
-              </tr>
-              <tr>
-                <th>Roll No.</th>
-                {attendanceRecords.map((record, index) => (
-                  <th key={index} colSpan={record.periods.length}>
-                    {record.date}
-                  </th>
-                ))}
-                <th>Total</th>
-                <th>Attend</th>
-                <th>%</th>
-              </tr>
-              <tr>
-                <th></th>
-                {attendanceRecords.map((record) =>
-                  record.periods.map((period, idx) => (
-                    <th key={idx}>{period}</th>
-                  ))
-                )}
-                <th></th>
-                <th></th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {percentageData.length === 0 ? (
-                <tr>
-                  <td className="no-attendance-data" colSpan={attendanceRecords.length + 4}>
-                    No attendance records found
-                  </td>
-                </tr>
-              ) : (
-                percentageData.map((student, index) => (
-                  <tr
-                    key={index}
-                    className={index % 2 === 0 ? "even-row" : "odd-row"}
-                  >
-                    <td>{student.rollNumber}</td>
-                    {attendanceRecords.map((record) =>
-                      record.students[student.rollNumber]
-                        ? record.students[student.rollNumber].map((status, idx) => (
-                            <td key={idx} className={status === "A" ? "absent-cell" : "present-cell"}>
-                              {status}
-                            </td>
-                          ))
-                        : record.periods.map((_, idx) => <td key={idx}>-</td>)
-                    )}
-                    <td>{student.total}</td>
-                    <td>{student.attended}</td>
-                    <td
-                      className={
-                        student.percentage < 75 ? "low-attendance-percentage" : "high-attendance-percentage"
-                      }
-                    >
-                      {student.percentage}
-                    </td>
-                  </tr>
-                ))
+     <div className="attendance-table-section">
+  {/* Header Title Section */}
+  <div className="table-header-title-container">
+    <h3 className="table-header-title">
+      Attendance Register ({selectedCombination || "None"}) - {new Date().getFullYear()}
+    </h3>
+  </div>
+
+  {/* Table Section */}
+  <div className="attendance-table-wrapper">
+    <table className="attendance-table">
+      <thead>
+        <tr>
+          <th>Roll No.</th>
+          {attendanceRecords.map((record, index) => (
+            <th key={index} colSpan={record.periods.length}>
+              {record.date}
+            </th>
+          ))}
+          <th>Total</th>
+          <th>Attend</th>
+          <th>%</th>
+        </tr>
+        <tr>
+          <th></th>
+          {attendanceRecords.map((record) =>
+            record.periods.map((period, idx) => (
+              <th key={idx}>{period}</th>
+            ))
+          )}
+          <th></th>
+          <th></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {percentageData.length === 0 ? (
+          <tr>
+            <td className="no-attendance-data" colSpan={attendanceRecords.length + 4}>
+              No attendance records found
+            </td>
+          </tr>
+        ) : (
+          percentageData.map((student, index) => (
+            <tr key={index} className={index % 2 === 0 ? "even-row" : "odd-row"}>
+              <td>{student.rollNumber}</td>
+              {attendanceRecords.map((record) =>
+                record.students[student.rollNumber]
+                  ? record.students[student.rollNumber].map((status, idx) => (
+                      <td key={idx} className={status === "A" ? "absent-cell" : "present-cell"}>
+                        {status}
+                      </td>
+                    ))
+                  : record.periods.map((_, idx) => <td key={idx}>-</td>)
               )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+              <td>{student.total}</td>
+              <td>{student.attended}</td>
+              <td
+                className={
+                  student.percentage < 75 ? "low-attendance-percentage" : "high-attendance-percentage"
+                }
+              >
+                {student.percentage}
+              </td>
+            </tr>
+          ))
+        )}
+      </tbody>
+    </table>
+  </div>
+</div>
     </>
   );
 };
