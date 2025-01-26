@@ -10,18 +10,7 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background-color: #f7f8fc;
-  color: #333;
-}
-
-/* Header Styles */
-header {
-  background-color: #6495ED; /* Cornflower Blue */
-  color: #fff;
-  padding: 1rem;
-  text-align: center;
-  font-size: 1.5rem;
-  font-weight: bold;
+  background-color: #f0f4f8;
 }
 
 /* Activity Container */
@@ -35,49 +24,35 @@ header {
 /* Sidebar */
 .activity-sidebar {
   width: 250px;
-  background-color: #fff;
+  background-color: #f7f9fa;
   padding: 1rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-right: 2px solid #ddd;
 }
 
 #section-dropdown {
   width: 100%;
-  padding: 0.6rem;
+  padding: 0.5rem;
   font-size: 1rem;
   margin-bottom: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  background-color: #f9f9f9;
 }
 
 #lab-link-btn {
-  display: inline-block;
-  color: #007BFF;
+  color: red;
   font-weight: bold;
   text-decoration: none;
-  margin-top: 1rem;
-  transition: color 0.3s ease;
-}
-
-#lab-link-btn:hover {
-  color: #0056b3;
 }
 
 /* Main Content */
 .activity-content {
   flex: 1;
-  background-color: #fff;
-  padding: 1.5rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
 }
 
 #activity-title {
-  background-color: #6495ED;
-  color: #fff;
+  background-color: #e6adad;
+  color: #4b0082;
   text-align: center;
-  padding: 0.75rem;
+  padding: 0.5rem;
   font-size: 1.2rem;
   margin-bottom: 1rem;
   font-weight: bold;
@@ -85,27 +60,31 @@ header {
 }
 
 /* Table Styles */
+#activity-table-container {
+  width: 100%;
+  overflow-x: auto; /* Enable horizontal scrolling */
+}
+
 #activity-table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 1rem;
-  background-color: #fff;
-  border: 1px solid #ddd;
+  background-color: #ffffff;
+  border: 1px solid black;
 }
 
 #activity-table th,
 #activity-table td {
-  padding: 1rem;
+  padding: 0.75rem;
   text-align: left;
-  border: 1px solid #ddd;
+  border: 1px solid black;
   font-size: 0.95rem;
 }
 
 #activity-table th {
-  background-color: #f1f5f9;
-  color: #333;
+  background-color: #fad9d9;
+  color: #4b0082;
   font-weight: bold;
-  text-align: center;
 }
 
 #activity-table tr:nth-child(even) {
@@ -136,7 +115,7 @@ header {
   #activity-table th,
   #activity-table td {
     font-size: 0.85rem;
-    padding: 0.75rem;
+    padding: 0.5rem;
   }
 }
 
@@ -145,10 +124,14 @@ header {
     font-size: 0.9rem;
   }
 
+  #activity-table-container {
+    overflow-x: scroll; /* Ensure full table is visible */
+  }
+
   #activity-table th,
   #activity-table td {
-    font-size: 0.75rem;
-    padding: 0.5rem;
+    font-size: 10px;
+    padding: 0.4rem;
   }
 
   #section-dropdown {
