@@ -67,81 +67,6 @@ const Register = () => {
     fetchAttendanceRecords();
   }, [selectedCombination]);
 
-  // **CSS Styles (Internal)**
-  const styles = {
-    tableContainer: {
-      width: "100%",
-      overflowX: "auto",
-      margin: "30px auto",
-      padding: "0 10px",
-      backgroundColor: "#fafafa",
-      borderRadius: "8px",
-      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-    },
-    table: {
-      width: "100%",
-      borderCollapse: "collapse",
-      textAlign: "center",
-      marginBottom: "20px",
-    },
-    thTd: {
-      border: "1px solid #000", // Black borders for all cells
-      padding: "12px 15px",
-      fontSize: "14px",
-    },
-    th: {
-      backgroundColor: "#f5f5f5", // Changed header background to neutral
-      color: "#000",
-      fontWeight: "bold",
-      textTransform: "uppercase",
-    },
-    headerTitle: {
-      backgroundColor: "#f5f5f5", // Neutral background for header
-      color: "#000",
-      fontSize: "20px",
-      fontWeight: "bold",
-      textAlign: "center",
-      padding: "15px 0",
-      borderRadius: "8px",
-      marginBottom: "20px",
-    },
-    present: {
-      color: "#4caf50",
-      fontWeight: "bold",
-      border: "1px solid #000", // Added black border for present cells
-    },
-    absent: {
-      color: "#f44336",
-      fontWeight: "bold",
-      border: "1px solid #000", // Added black border for absent cells
-    },
-    lowAttendance: {
-      backgroundColor: "#ffebee",
-      fontWeight: "bold",
-    },
-    dropdownContainer: {
-      marginBottom: "20px",
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-    },
-    dropdown: {
-      padding: "10px",
-      fontSize: "16px",
-      width: "250px",
-      border: "1px solid #ddd",
-      borderRadius: "4px",
-      backgroundColor: "#fff",
-      boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
-    },
-    noData: {
-      textAlign: "center",
-      fontSize: "18px",
-      color: "#757575",
-      padding: "20px 0",
-    },
-  };
-
   return (
     <>
       <Header />
@@ -151,12 +76,12 @@ const Register = () => {
       <div className="mob-nav">
         <MobileNav />
       </div>
-      <div style={styles.tableContainer}>
-        <div style={styles.dropdownContainer}>
+      <div className="table-container">
+        <div className="dropdown-container">
           <select
             id="section-dropdown"
             onChange={(e) => setSelectedCombination(e.target.value)}
-            style={styles.dropdown}
+            className="dropdown"
           >
             <option value="">Select Section</option>
             {combinations.map((combo, index) => (
@@ -170,62 +95,57 @@ const Register = () => {
           </select>
         </div>
 
-        <table style={styles.table}>
+        <table className="table">
           <thead>
             <tr>
-              <th style={styles.headerTitle} colSpan={attendanceRecords.length + 4}>
+              <th className="header-title" colSpan={attendanceRecords.length + 4}>
                 Attendance Register ({selectedCombination}) - {new Date().getFullYear()}
               </th>
             </tr>
             <tr>
-              <th style={styles.th}>Roll No.</th>
+              <th>Roll No.</th>
               {attendanceRecords.map((record, index) => (
-                <th key={index} style={styles.th} colSpan={record.periods.length}>{record.date}</th>
+                <th key={index} colSpan={record.periods.length}>{record.date}</th>
               ))}
-              <th style={styles.th}>Total</th>
-              <th style={styles.th}>Attend</th>
-              <th style={styles.th}>%</th>
+              <th>Total</th>
+              <th>Attend</th>
+              <th>%</th>
             </tr>
             <tr>
-              <th style={styles.th}></th>
+              <th></th>
               {attendanceRecords.map((record) =>
                 record.periods.map((period, idx) => (
-                  <th key={idx} style={styles.th}>{period}</th>
+                  <th key={idx}>{period}</th>
                 ))
               )}
-              <th style={styles.th}></th>
-              <th style={styles.th}></th>
-              <th style={styles.th}></th>
+              <th></th>
+              <th></th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
             {percentageData.length === 0 ? (
               <tr>
-                <td style={styles.thTd} colSpan={attendanceRecords.length + 4}>
-                  <div style={styles.noData}>No attendance records found</div>
+                <td className="no-data" colSpan={attendanceRecords.length + 4}>
+                  No attendance records found
                 </td>
               </tr>
             ) : (
               percentageData.map((student, index) => (
-                <tr key={index} style={index % 2 === 0 ? { backgroundColor: "#f9f9f9" } : {}}>
-                  <td style={styles.thTd}>{student.rollNumber}</td>
+                <tr key={index} className={index % 2 === 0 ? "row-even" : "row-odd"}>
+                  <td>{student.rollNumber}</td>
                   {attendanceRecords.map((record) =>
                     record.students[student.rollNumber]
                       ? record.students[student.rollNumber].map((status, idx) => (
-                          <td key={idx} style={status === "A" ? styles.absent : styles.present}>
+                          <td key={idx} className={status === "A" ? "absent" : "present"}>
                             {status}
                           </td>
                         ))
-                      : record.periods.map((_, idx) => <td key={idx} style={styles.thTd}>-</td>)
+                      : record.periods.map((_, idx) => <td key={idx}>-</td>)
                   )}
-                  <td style={styles.thTd}>{student.total}</td>
-                  <td style={styles.thTd}>{student.attended}</td>
-                  <td
-                    style={{
-                      ...styles.thTd,
-                      ...(student.percentage < 75 ? styles.lowAttendance : {}),
-                    }}
-                  >
+                  <td>{student.total}</td>
+                  <td>{student.attended}</td>
+                  <td className={student.percentage < 75 ? "low-attendance" : ""}>
                     {student.percentage}
                   </td>
                 </tr>
@@ -234,6 +154,75 @@ const Register = () => {
           </tbody>
         </table>
       </div>
+      <style>
+        {`
+          .table-container {
+            width: 100%;
+            overflow-x: auto;
+            margin: 30px auto;
+            padding: 0 10px;
+            background-color: #fafafa;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+          }
+          .table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+            margin-bottom: 20px;
+          }
+          .table th, .table td {
+            border: 1px solid #000;
+            padding: 12px 15px;
+            font-size: 14px;
+          }
+          .header-title {
+            background-color: #f5f5f5;
+            color: #000;
+            font-weight: bold;
+            text-transform: uppercase;
+            padding: 15px 0;
+            border-radius: 8px;
+            margin-bottom: 20px;
+          }
+          .present {
+            color: #4caf50;
+            font-weight: bold;
+          }
+          .absent {
+            color: #f44336;
+            font-weight: bold;
+          }
+          .low-attendance {
+            background-color: #ffebee;
+            font-weight: bold;
+          }
+          .dropdown-container {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+          }
+          .dropdown {
+            padding: 10px;
+            font-size: 16px;
+            width: 250px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+          }
+          .no-data {
+            text-align: center;
+            font-size: 18px;
+            color: #757575;
+            padding: 20px 0;
+          }
+          .row-even {
+            background-color: #f9f9f9;
+          }
+        `}
+      </style>
     </>
   );
 };
