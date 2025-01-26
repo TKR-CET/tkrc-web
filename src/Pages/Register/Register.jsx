@@ -164,7 +164,7 @@ const Register = () => {
         }
 
         .attendance-table th {
-          background-color: #2c3e50;
+          background-color:#87CEEB ;
           color: white;
           font-weight: bold;
         }
