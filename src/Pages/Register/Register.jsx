@@ -74,6 +74,7 @@ const Register = () => {
     <>
       <style>{`
         /* General Styles */
+        /* General Styles */
         body {
           font-family: 'Arial', sans-serif;
           margin: 0;
@@ -164,7 +165,7 @@ const Register = () => {
         }
 
         .attendance-table th {
-          background-color: #87CEEB; /* New professional heading color */
+          background-color: #2c3e50; /* Darker heading color */
           color: white;
           font-weight: bold;
         }
@@ -172,7 +173,7 @@ const Register = () => {
         .table-header-title {
           font-size: 18px;
           font-weight: bold;
-          color: #004d99;
+          color: #2c3e50; /* Dark heading color */
           text-transform: uppercase;
           background-color: #e6f2ff;
           text-align: center;
