@@ -72,11 +72,198 @@ const Register = () => {
 
   return (
     <>
+<style>{`/* General Styles */
+body {
+  font-family: 'Arial', sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  background-color: #f5f5f5;
+}
+
+/* Navbar Styling */
+.navbar-container,
+.mobile-navbar-container {
+  background-color: #004d99;
+  color: white;
+  padding: 10px;
+  text-align: center;
+}
+
+.navbar-container {
+  display: block;
+}
+
+.mobile-navbar-container {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .navbar-container {
+    display: none;
+  }
+  .mobile-navbar-container {
+    display: block;
+  }
+}
+
+/* Dropdown Section */
+.dropdown-section {
+  margin: 20px auto;
+  text-align: center;
+  padding: 0 20px;
+}
+
+.dropdown-menu {
+  width: 100%;
+  max-width: 300px;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  transition: border-color 0.3s;
+}
+
+.dropdown-menu:focus {
+  border-color: #004d99;
+  outline: none;
+}
+
+/* Table Section */
+.attendance-table-section {
+  margin: 20px auto;
+  width: 100%;
+  max-width: 1200px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  overflow-x: auto;
+}
+
+.attendance-table {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.attendance-table th,
+.attendance-table td {
+  padding: 10px;
+  text-align: center;
+  border: 1px solid #ddd;
+}
+
+.attendance-table th {
+  background-color: #004d99;
+  color: white;
+  font-weight: bold;
+}
+
+.table-header-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #004d99;
+  text-transform: uppercase;
+  background-color: #e6f2ff;
+}
+
+.even-row {
+  background-color: #f9f9f9;
+}
+
+.odd-row {
+  background-color: #fff;
+}
+
+.absent-cell {
+  color: #ff4d4d;
+  font-weight: bold;
+}
+
+.present-cell {
+  color: #4caf50;
+  font-weight: bold;
+}
+
+.low-attendance-percentage {
+  background-color: #ffe6e6;
+  color: #ff4d4d;
+  font-weight: bold;
+}
+
+.high-attendance-percentage {
+  background-color: #e6ffe6;
+  color: #4caf50;
+  font-weight: bold;
+}
+
+.no-attendance-data {
+  color: #666;
+  font-style: italic;
+  background-color: #f5f5f5;
+  text-align: center;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .dropdown-menu {
+    font-size: 14px;
+    padding: 8px;
+  }
+
+  .attendance-table th,
+  .attendance-table td {
+    font-size: 14px;
+    padding: 8px;
+  }
+}
+
+@media (max-width: 768px) {
+  .attendance-table-section {
+    margin: 20px 10px;
+  }
+
+  .attendance-table th,
+  .attendance-table td {
+    font-size: 12px;
+    padding: 6px;
+  }
+
+  .table-header-title {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dropdown-section {
+    padding: 0 10px;
+  }
+
+  .dropdown-menu {
+    font-size: 14px;
+    padding: 6px;
+  }
+
+  .attendance-table th,
+  .attendance-table td {
+    font-size: 10px;
+    padding: 5px;
+  }
+
+  .table-header-title {
+    font-size: 14px;
+  }
+}
+`}
+</style>
       <Header />
-      <div className="navbar-container">
+      <div className="nav">
         <NavBar />
       </div>
-      <div className="mobile-navbar-container">
+      <div className="mob-nav">
         <MobileNav />
       </div>
 
