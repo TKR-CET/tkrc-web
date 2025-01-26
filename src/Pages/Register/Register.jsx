@@ -133,21 +133,24 @@ const Register = () => {
         }
 .table-header-title-container {
   text-align: center;
-  margin-bottom: 10px;
-  background-color: #e6f2ff;
-  padding: 15px;
-  border-bottom: 2px solid #004d99;
+  margin-bottom: 20px;
+  background-color: #ffffff; /* Clean white background */
+  padding: 20px 30px; /* Spacious padding for a modern look */
+  border-radius: 8px; /* Rounded corners for a softer design */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  border: 1px solid #d9d9d9; /* Light border for a polished look */
 }
 
 .table-header-title {
-  font-size: 20px;
-  font-weight: bold;
-  color: #004d99;
+  font-size: 22px; /* Slightly larger font size for emphasis */
+  font-weight: 600; /* Semi-bold for readability */
+  color: #2c3e50; /* A professional dark blue-gray color */
   text-transform: uppercase;
   margin: 0;
+  letter-spacing: 1px; /* Slight letter spacing for a sleek effect */
 }
 
-        /* Table Section */
+  /* Table Section */
         .attendance-table-section {
           margin: 20px auto;
           width: 100%;
