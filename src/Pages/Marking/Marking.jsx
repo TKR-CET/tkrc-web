@@ -173,35 +173,35 @@ const Marking = () => {
         <div className="periodSelection">
           <label>Periods:</label>
           {[1, 2, 3, 4, 5, 6].map((period) => {
-            const markedPeriodData = markedPeriods.find((p) => p.period === period);
-            return (
-              <label key={period} style={{ display: "block", marginBottom: "5px" }}>
-                <input
-                  type="checkbox"
-                  value={period}
-                  checked={periods.includes(period)}
-                  disabled={
-                    editPeriod
-                      ? period !== parseInt(editPeriod)
-                      : markedPeriodData
-                  }
-                  onChange={() =>
-                    setPeriods((prev) =>
-                      prev.includes(period)
-                        ? prev.filter((p) => p !== period)
-                        : [...prev, period]
-                    )
-                  }
-                />
-                {period}
-                {markedPeriodData && (
-                  <span style={{ color: "red", marginLeft: "10px" }}>
-                    ({markedPeriodData.subject})
-                  </span>
-                )}
-              </label>
-            );
-          })}
+  const markedPeriodData = markedPeriods.find((p) => p.period === period);
+  return (
+    <label key={period} style={{ display: "block", marginBottom: "5px" }}>
+      <input
+        type="checkbox"
+        value={period}
+        checked={periods.includes(period)}
+        disabled={
+          editPeriod
+            ? period !== parseInt(editPeriod)
+            : markedPeriodData
+        }
+        onChange={() =>
+          setPeriods((prev) =>
+            prev.includes(period)
+              ? prev.filter((p) => p !== period)
+              : [...prev, period]
+          )
+        }
+      />
+      {period}
+      {markedPeriodData && (
+        <span style={{ color: "red", marginLeft: "10px" }}>
+          ({markedPeriodData.subject})
+        </span>
+      )}
+    </label>
+  );
+})}
         </div>
         <div className="subjectTopicEntry">
           <label>Topic:</label>
