@@ -73,6 +73,7 @@ const Register = () => {
   return (
     <>
 <style>{`/* General Styles */
+/* General Styles */
 body {
   font-family: 'Arial', sans-serif;
   margin: 0;
@@ -139,7 +140,11 @@ body {
   background-color: #fff;
   border-radius: 8px;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-  overflow-x: auto;
+  overflow-x: auto; /* Ensures horizontal scrolling */
+}
+
+.attendance-table-wrapper {
+  overflow-x: auto; /* Scrolls horizontally for smaller screens */
 }
 
 .attendance-table {
@@ -147,6 +152,7 @@ body {
   border-collapse: collapse;
   border-radius: 8px;
   overflow: hidden;
+  min-width: 800px; /* Ensures a baseline table width */
 }
 
 .attendance-table th,
@@ -157,7 +163,7 @@ body {
 }
 
 .attendance-table th {
-  background-color: #004d99;
+  background-color: #87CEEB; /* New professional heading color */
   color: white;
   font-weight: bold;
 }
@@ -168,6 +174,8 @@ body {
   color: #004d99;
   text-transform: uppercase;
   background-color: #e6f2ff;
+  text-align: center;
+  padding: 10px;
 }
 
 .even-row {
@@ -226,6 +234,10 @@ body {
     margin: 20px 10px;
   }
 
+  .attendance-table-wrapper {
+    overflow-x: scroll; /* Ensures horizontal scroll for mobile devices */
+  }
+
   .attendance-table th,
   .attendance-table td {
     font-size: 12px;
@@ -245,6 +257,10 @@ body {
   .dropdown-menu {
     font-size: 14px;
     padding: 6px;
+  }
+
+  .attendance-table-wrapper {
+    overflow-x: auto; /* Horizontal scroll on mobile devices */
   }
 
   .attendance-table th,
