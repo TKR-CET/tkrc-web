@@ -74,7 +74,6 @@ const Register = () => {
     <>
       <style>{`
         /* General Styles */
-        /* General Styles */
         body {
           font-family: 'Arial', sans-serif;
           margin: 0;
@@ -141,12 +140,12 @@ const Register = () => {
           background-color: #fff;
           border-radius: 8px;
           box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-          overflow-x: auto; /* Ensures horizontal scrolling */
+          overflow-x: auto;
         }
 
         .attendance-table-wrapper {
-          overflow-x: auto; /* Scrolls horizontally for smaller screens */
-          padding: 0 5px; /* Add some padding for better spacing */
+          overflow-x: auto;
+          padding: 0 5px;
         }
 
         .attendance-table {
@@ -154,7 +153,7 @@ const Register = () => {
           border-collapse: collapse;
           border-radius: 8px;
           overflow: hidden;
-          min-width: 800px; /* Ensures a baseline table width */
+          min-width: 800px;
         }
 
         .attendance-table th,
@@ -165,7 +164,7 @@ const Register = () => {
         }
 
         .attendance-table th {
-          background-color: #2c3e50; /* Darker heading color */
+          background-color: #2c3e50;
           color: white;
           font-weight: bold;
         }
@@ -173,7 +172,7 @@ const Register = () => {
         .table-header-title {
           font-size: 18px;
           font-weight: bold;
-          color: #2c3e50; /* Dark heading color */
+          color: #2c3e50;
           text-transform: uppercase;
           background-color: #e6f2ff;
           text-align: center;
@@ -235,12 +234,25 @@ const Register = () => {
 
           .attendance-table th,
           .attendance-table td {
-            font-size: 10px;
+            font-size: 12px;
             padding: 5px;
           }
 
           .table-header-title {
+            font-size: 14px;
+          }
+
+          .attendance-table th {
+            padding: 8px;
+          }
+
+          .attendance-table td {
+            padding: 5px;
+          }
+
+          .no-attendance-data {
             font-size: 12px;
+            padding: 5px;
           }
         }
       `}</style>
