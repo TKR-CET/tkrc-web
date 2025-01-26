@@ -24,6 +24,7 @@ const Marking = () => {
   const [markedPeriods, setMarkedPeriods] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+ const [facultyId, setFacultyId] = useState(null);
 
 
    const mongoDbFacultyId = localStorage.getItem("facultyId");
