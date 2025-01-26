@@ -26,7 +26,24 @@ const Marking = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
 
-  const mongoDbFacultyId = localStorage.getItem("facultyId"); // Retrieve MongoDB _id from local storage
+   const mongoDbFacultyId = localStorage.getItem("facultyId");
+
+  useEffect(() => {
+    if (!mongoDbFacultyId) return;
+
+    const fetchFacultyId = async () => {
+      try {
+        const response = await axios.get(
+          `https://tkrcet-backend-g3zu.onrender.com/faculty/${mongoDbFacultyId}`
+        );
+        setFacultyId(response.data.facultyId);
+      } catch (error) {
+        console.error("Error fetching faculty data:", error);
+      }
+    };
+
+    fetchFacultyId();
+  }, [mongoDbFacultyId]);
 
 
   useEffect(() => {
