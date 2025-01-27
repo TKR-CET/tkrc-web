@@ -1,480 +1,289 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import Header from "../../Components/Header/Header";
-import NavBar from "../../Components/NavBar/NavBar";
-import MobileNav from "../../Components/MobileNav/MobileNav";
-import { useLocation, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react"; import Header from "../../Components/Header/Header"; import NavBar from "../../Components/NavBar/NavBar"; import MobileNav from "../../Components/MobileNav/MobileNav"; import { useLocation, useNavigate } from "react-router-dom";
 
-const Marking = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const query = new URLSearchParams(location.search);
+const Marking = () => { const navigate = useNavigate(); const location = useLocation(); const query = new URLSearchParams(location.search);
 
-  const date = query.get("date") || new Date().toISOString().split("T")[0];
-  const programYear = query.get("programYear");
-  const department = query.get("department");
-  const section = query.get("section");
-  const subject = query.get("subject");
-  const editPeriod = query.get("editPeriod");
+const date = query.get("date") || new Date().toISOString().split("T")[0]; const programYear = query.get("programYear"); const department = query.get("department"); const section = query.get("section"); const subject = query.get("subject"); const editPeriod = query.get("editPeriod");
 
-  const [studentsData, setStudentsData] = useState([]);
-  const [topic, setTopic] = useState("");
-  const [remarks, setRemarks] = useState("");
-  const [attendance, setAttendance] = useState({});
-  const [markedSubjects, setMarkedSubjects] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [facultyId, setFacultyId] = useState(null);
+const [studentsData, setStudentsData] = useState([]); const [topic, setTopic] = useState(""); const [remarks, setRemarks] = useState(""); const [attendance, setAttendance] = useState({}); const [periods, setPeriods] = useState([]); const [markedSubjects, setMarkedSubjects] = useState([]); const [isLoading, setIsLoading] = useState(true); const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const mongoDbFacultyId = localStorage.getItem("facultyId");
+useEffect(() => { fetchStudents(); fetchMarkedSubjects(); if (editPeriod) { fetchAttendanceRecord(); } }, []);
 
-  // Fetch facultyId from MongoDB ID
-  useEffect(() => {
-    if (!mongoDbFacultyId) return;
+const fetchStudents = async () => { try { const response = await fetch( https://tkrcet-backend-g3zu.onrender.com/Section/${programYear}/${department}/${section}/students ); const result = await response.json(); if (result.students && Array.isArray(result.students)) { setStudentsData(result.students); setAttendance( result.students.reduce((acc, student) => { acc[student.rollNumber] = "present"; // Default to "present" return acc; }, {}) ); } else { throw new Error("Failed to fetch students."); } } catch (error) { alert(Error: ${error.message}); } finally { setIsLoading(false); } };
 
-    const fetchFacultyId = async () => {
-      try {
-        const response = await axios.get(
-          `https://tkrcet-backend-g3zu.onrender.com/faculty/${mongoDbFacultyId}`
-        );
-        setFacultyId(response.data.facultyId);
-      } catch (error) {
-        console.error("Error fetching faculty data:", error);
-      }
-    };
+const fetchMarkedSubjects = async () => { try { const response = await fetch( https://tkrcet-backend-g3zu.onrender.com/Attendance/marked-subjects?date=${date}&year=${programYear}&department=${department}&section=${section} ); const result = await response.json(); if (result.data && Array.isArray(result.data)) { setMarkedSubjects(result.data); // Store marked subjects with periods } else { throw new Error("Failed to fetch marked subjects."); } } catch (error) { console.log(error.message); } };
 
-    fetchFacultyId();
-  }, [mongoDbFacultyId]);
+const fetchAttendanceRecord = async () => { try { const response = await fetch( https://tkrcet-backend-g3zu.onrender.com/Attendance/check?date=${date}&year=${programYear}&department=${department}&section=${section}&period=${editPeriod} ); const result = await response.json();
 
-  useEffect(() => {
-    fetchStudents();
-    fetchMarkedSubjects();
-    if (editPeriod) {
-      fetchAttendanceRecord();
+if (result && result.records && result.records.length > 0) {
+    const record = result.records[0];
+    setTopic(record.topic || "");
+    setRemarks(record.remarks || "");
+    setAttendance(
+      record.attendance.reduce((acc, student) => {
+        acc[student.rollNumber] = student.status;
+        return acc;
+      }, {})
+    );
+    setPeriods([parseInt(editPeriod)]);
+  } else {
+    throw new Error("No attendance record found for the selected period.");
+  }
+} catch (error) {
+  alert(`Error: ${error.message}`);
+}
+
+};
+
+const handleAttendanceChange = (rollNumber, status) => { setAttendance((prev) => ({ ...prev, [rollNumber]: status, })); };
+
+const handleSubmit = async () => { if (!subject.trim() || !topic.trim() || periods.length === 0) { alert("Please fill in all mandatory fields (Periods, Subject, Topic)."); return; }
+
+const attendanceData = {
+  date,
+  year: programYear,
+  department,
+  section,
+  subject,
+  topic,
+  remarks,
+  periods,
+  attendance: studentsData.map((student) => ({
+    rollNumber: student.rollNumber,
+    name: student.name,
+    status: attendance[student.rollNumber],
+  })),
+  editing: !!editPeriod, // Add editing flag
+};
+
+setIsSubmitting(true);
+
+try {
+  const response = await fetch(
+    "https://tkrcet-backend-g3zu.onrender.com/Attendance/mark-attendance",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(attendanceData),
     }
-  }, []);
+  );
 
-  const fetchStudents = async () => {
-    try {
-      const response = await fetch(
-        `https://tkrcet-backend-g3zu.onrender.com/Section/${programYear}/${department}/${section}/students`
-      );
-      const result = await response.json();
-      if (result.students && Array.isArray(result.students)) {
-        setStudentsData(result.students);
-        setAttendance(
-          result.students.reduce((acc, student) => {
-            acc[student.rollNumber] = "present"; // Default to "present"
-            return acc;
-          }, {})
-        );
-      } else {
-        throw new Error("Failed to fetch students.");
-      }
-    } catch (error) {
-      alert(`Error: ${error.message}`);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const result = await response.json();
 
-  const fetchMarkedSubjects = async () => {
-    try {
-      const response = await fetch(
-        `https://tkrcet-backend-g3zu.onrender.com/Attendance/marked-subjects?date=${date}&year=${programYear}&department=${department}&section=${section}`
-      );
-      const result = await response.json();
-      if (result.data && Array.isArray(result.data)) {
-        setMarkedSubjects(result.data); // Store marked subjects with periods
-      } else {
-        throw new Error("Failed to fetch marked subjects.");
-      }
-    } catch (error) {
-      console.log(error.message);
-    }
-  };
-
-  const fetchAttendanceRecord = async () => {
-    try {
-      const response = await fetch(
-        `https://tkrcet-backend-g3zu.onrender.com/Attendance/check?date=${date}&year=${programYear}&department=${department}&section=${section}&period=${editPeriod}`
-      );
-      const result = await response.json();
-
-      if (result && result.records && result.records.length > 0) {
-        const record = result.records[0];
-        setTopic(record.topic || "");
-        setRemarks(record.remarks || "");
-        setAttendance(
-          record.attendance.reduce((acc, student) => {
-            acc[student.rollNumber] = student.status;
-            return acc;
-          }, {})
-        );
-      } else {
-        throw new Error("No attendance record found for the selected period.");
-      }
-    } catch (error) {
-      alert(`Error: ${error.message}`);
-    }
-  };
-
-  const handleAttendanceChange = (rollNumber, status) => {
-    setAttendance((prev) => ({
-      ...prev,
-      [rollNumber]: status,
-    }));
-  };
-
-  const handleSubmit = async () => {
-    if (!subject.trim() || !topic.trim()) {
-      alert("Please fill in all mandatory fields (Subject, Topic).");
-      return;
-    }
-
-    const attendanceData = {
-      date,
-      year: programYear,
-      department,
-      section,
-      subject,
-      topic,
-      remarks,
-      attendance: studentsData.map((student) => ({
-        rollNumber: student.rollNumber,
-        name: student.name,
-        status: attendance[student.rollNumber],
-      })),
-      editing: !!editPeriod, // Add editing flag
-    };
-
-    setIsSubmitting(true);
-
-    try {
-      const response = await fetch(
-        "https://tkrcet-backend-g3zu.onrender.com/Attendance/mark-attendance",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(attendanceData),
-        }
-      );
-
-      const result = await response.json();
-
-      if (response.ok) {
-        alert(result.message || "Attendance submitted successfully!");
-        navigate("/attendance");
-      } else {
-        throw new Error(result.message || "Failed to submit attendance.");
-      }
-    } catch (error) {
-      alert(`Error: ${error.message}`);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const getMarkedSubject = (period) => {
-    const marked = markedSubjects.find((item) => item.period === period);
-    return marked ? marked.subject : null;
-  };
-
-  return (
-    <>
-      <style>{`
-    .attendanceMain {
-    padding: 20px;
-    background-color: #fff;
-    margin: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  if (response.ok) {
+    alert(result.message || "Attendance submitted successfully!");
+    navigate("/attendance");
+  } else {
+    throw new Error(result.message || "Failed to submit attendance.");
   }
+} catch (error) {
+  alert(`Error: ${error.message}`);
+} finally {
+  setIsSubmitting(false);
+}
 
-  .compulsoryText {
-    color: red;
-    font-weight: bold;
-  }
+};
 
-  .attendanceHeading {
-    font-size: 19px;
-    font-weight: bold;
-    padding-top:5px;
-    margin-top:4px;
-    margin-bottom: 15px;
-    text-align: center;
-  }
+const getMarkedSubject = (period) => { const marked = markedSubjects.find((item) => item.period === period); return marked ? marked.subject : null; };
 
-  .attendanceDetails {
-    margin-bottom: 20px;
-  }
+return ( <> <style>{` .attendanceMain { padding: 20px; background-color: #fff; margin: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); }
 
-  .periodSelection {
-    margin-bottom: 15px;
-  }
+.compulsoryText { color: red; font-weight: bold; }
 
-  .periodSelection label {
-    font-size: 14px;
-    margin-right: 10px;
-  }
+.attendanceHeading { font-size: 19px; font-weight: bold; padding-top:5px; margin-top:4px; margin-bottom: 15px; text-align: center; }
 
-  .periodSelection input[type="checkbox"] {
-    margin-right: 6px;
-    width: 18px;
-    height: 18px;
-    cursor: pointer;
-    display: inline-block;
-  }
+.attendanceDetails { margin-bottom: 20px; }
 
-  .subjectTopicEntry label {
-    font-size: 14px;
-    margin-top: 8px;
-    display: block;
-  }
+.periodSelection { margin-bottom: 15px; }
 
-  .subjectTopicEntry input,
-  .subjectTopicEntry textarea {
-    font-size: 14px;
-    padding: 8px;
-    margin-top: 6px;
-    margin-bottom: 12px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    width: 100%;
-  }
+.periodSelection label { font-size: 14px; margin-right: 10px; }
 
-  .subjectTopicEntry textarea {
-    height: 80px;
-    resize: vertical;
-  }
+.periodSelection input[type="checkbox"] { margin-right: 6px; width: 18px; height: 18px; cursor: pointer; display: inline-block; }
 
-  #btn-submit {
-    background-color: #FF5733;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    position: relative;
-    top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    text-align: center;
-  }
+.subjectTopicEntry label { font-size: 14px; margin-top: 8px; display: block; }
 
-  #btn-submit:hover {
-    background-color: #ff704d;
-  }
+.subjectTopicEntry input, .subjectTopicEntry textarea { font-size: 14px; padding: 8px; margin-top: 6px; margin-bottom: 12px; border-radius: 4px; border: 1px solid #ccc; width: 100%; }
 
-  button:disabled {
-    background-color: #dcdcdc;
-    cursor: not-allowed;
-  }
+.subjectTopicEntry textarea { height: 80px; resize: vertical; }
 
-  .attendanceList {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-  }
+#btn-submit { background-color: #FF5733; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; position: relative; top: 10px; left: 50%; transform: translateX(-50%); text-align: center; }
 
-  .attendanceList th,
-  .attendanceList td {
-    text-align: center;
-    padding: 10px;
-    border: 1.5px solid #ddd;
-  }
+#btn-submit:hover { background-color: #ff704d; }
 
-  .attendanceList th {
-    background-color: #f7f7f7;
-    font-weight: bold;
-  }
+button:disabled { background-color: #dcdcdc; cursor: not-allowed; }
 
-  .attendanceList td {
-    background-color: #fff;
-  }
+.attendanceList { width: 100%; border-collapse: collapse; margin-top: 20px; }
+
+.attendanceList th, .attendanceList td { text-align: center; padding: 10px; border: 1.5px solid #ddd; }
+
+.attendanceList th { background-color: #f7f7f7; font-weight: bold; }
+
+.attendanceList td { background-color: #fff; }
+
+.attendanceList input[type="radio"] { appearance: none; -webkit-appearance: none; /* Safari */ width: 20px; height: 20px; border: 2px solid #aaa; border-radius: 50%; cursor: pointer; background-color: white; }
+
+.attendanceList input[type="radio"]:checked { background-color: #2ecc71; /* Green for Present */ border-color: #2ecc71; }
+
+.attendanceList input[type="radio"].absentStatus:checked { background-color: #e74c3c; /* Red for Absent */ border-color: #e74c3c; }
+
+@media (max-width: 768px) { .attendanceMain { margin: 15px; padding: 20px; } .periodSelection label{ margin-right:4px;
+
+.periodSelection input[type="checkbox"] {
+  margin-right: 0px !important;
+}
+
+.attendanceList th,
+.attendanceList td {
+  font-size: 12px;
+  padding: 8px;
+}
+
+.subjectTopicEntry textarea {
+  height: 70px;
+}
+
+.subjectTopicEntry input,
+.subjectTopicEntry textarea {
+  font-size: 12px;
+}
+
+#btn-submit {
+  font-size: 14px;
+  position:relative;
+  padding-top:5px !important;
+}
+    .attendanceList input[type="radio"] {
+  width: 25px !important;
+  height: 25px !important;
+}
+
+}
+
+@media (max-width: 480px) { .attendanceList th, .attendanceList td { font-size: 11px; padding: 6px; }
 
 .attendanceList input[type="radio"] {
-  appearance: none;
-  -webkit-appearance: none; /* Safari */
   width: 20px;
   height: 20px;
-  border: 2px solid #aaa;
-  border-radius: 50%;
-  cursor: pointer;
-  background-color: white;
 }
 
-.attendanceList input[type="radio"]:checked {
-  background-color: #2ecc71; /* Green for Present */
-  border-color: #2ecc71;
+.subjectTopicEntry textarea {
+  height: 60px;
 }
 
-.attendanceList input[type="radio"].absentStatus:checked {
-  background-color: #e74c3c; /* Red for Absent */
-  border-color: #e74c3c;
+#btn-submit {
+  font-size: 14px;
+  padding: 8px;
+  width: 100%;
+  left: 0;
+  transform: none;
+  top: 0;
 }
 
-  @media (max-width: 768px) {
-    .attendanceMain {
-      margin: 15px;
-      padding: 20px;
-    }
-        .periodSelection label{
-        margin-right:4px;
+} `}</style>
 
-    .periodSelection input[type="checkbox"] {
-      margin-right: 0px !important;
-    }
-
-    .attendanceList th,
-    .attendanceList td {
-      font-size: 12px;
-      padding: 8px;
-    }
-
-    .subjectTopicEntry textarea {
-      height: 70px;
-    }
-
-    .subjectTopicEntry input,
-    .subjectTopicEntry textarea {
-      font-size: 12px;
-    }
-
-    #btn-submit {
-      font-size: 14px;
-      position:relative;
-      padding-top:5px !important;
-    }
-        .attendanceList input[type="radio"] {
-      width: 25px !important;
-      height: 25px !important;
-    }
-  }
-
-  @media (max-width: 480px) {
-    .attendanceList th,
-    .attendanceList td {
-      font-size: 11px;
-      padding: 6px;
-    }
-
-    .attendanceList input[type="radio"] {
-      width: 20px;
-      height: 20px;
-    }
-
-    .subjectTopicEntry textarea {
-      height: 60px;
-    }
-
-    #btn-submit {
-      font-size: 14px;
-      padding: 8px;
-      width: 100%;
-      left: 0;
-      transform: none;
-      top: 0;
-    }
-  }
-      `}</style>
-      <Header />
-      <div className="nav">
-        <NavBar />
-      </div>
-      <div className="mob-nav">
-        <MobileNav />
-      </div>
-      <div className="attendanceMain">
-        <h2>{editPeriod ? `Editing Attendance for Period ${editPeriod}` : "Mark Attendance"}</h2>
-        <p>
-          Year: {programYear} | Department: {department} | Section: {section} |
-          Subject: {subject}
-        </p>
-        <div className="periodSelection">
-          <label>Periods:</label>
-          {[1, 2, 3, 4, 5, 6].map((period) => (
-            <label key={period} style={{ marginRight: "10px" }}>
-              <input
-                type="checkbox"
-                value={period}
-                checked={false} // No automatic checking logic here
-                onChange={() =>
-                  setPeriods((prev) =>
-                    prev.includes(period)
-                      ? prev.filter((p) => p !== period)
-                      : [...prev, period]
-                  )
-                }
-              />
-              {period}
-            </label>
+<Header />
+  <div className="nav">
+    <NavBar />
+  </div>
+  <div className="mob-nav">
+    <MobileNav />
+  </div>
+  <div className="attendanceMain">
+    <h2>{editPeriod ? `Editing Attendance for Period ${editPeriod}` : "Mark Attendance"}</h2>
+    <p>
+      Year: {programYear} | Department: {department} | Section: {section} |
+      Subject: {subject}
+    </p>
+    <div className="periodSelection">
+      <label>Periods:</label>
+      {[1, 2, 3, 4, 5, 6].map((period) => (
+        <label key={period} style={{ marginRight: "10px" }}>
+          <input
+            type="checkbox"
+            value={period}
+            checked={periods.includes(period)}
+            disabled={
+              editPeriod
+                ? period !== parseInt(editPeriod)
+                : !!getMarkedSubject(period)
+            }
+            onChange={() =>
+              setPeriods((prev) =>
+                prev.includes(period)
+                  ? prev.filter((p) => p !== period)
+                  : [...prev, period]
+              )
+            }
+          />
+          {period}
+          {getMarkedSubject(period) && (
+            <span style={{ color: "red", marginLeft: "5px" }}>
+              ({getMarkedSubject(period)})
+            </span>
+          )}
+        </label>
+      ))}
+    </div>
+    <div className="subjectTopicEntry">
+      <label>Topic:</label>
+      <textarea
+        value={topic}
+        onChange={(e) => setTopic(e.target.value)}
+        placeholder="Enter topic"
+      />
+      <label>Remarks:</label>
+      <textarea
+        value={remarks}
+        onChange={(e) => setRemarks(e.target.value)}
+        placeholder="Enter remarks"
+      />
+    </div>
+    {isLoading ? (
+      <p>Loading students...</p>
+    ) : (
+      <table className="attendanceList">
+        <thead>
+          <tr>
+            <th>Roll Number</th>
+            <th>Name</th>
+            <th>Present</th>
+            <th>Absent</th>
+          </tr>
+        </thead>
+        <tbody>
+          {studentsData.map((student) => (
+            <tr key={student.rollNumber}>
+              <td>{student.rollNumber}</td>
+              <td>{student.name}</td>
+              <td>
+                <input
+                  type="radio"
+                  checked={attendance[student.rollNumber] === "present"}
+                  onChange={() =>
+                    handleAttendanceChange(student.rollNumber, "present")
+                  }
+                />
+              </td>
+              <td>
+                <input
+                  type="radio"
+                  className="absentStatus"
+                  checked={attendance[student.rollNumber] === "absent"}
+                  onChange={() =>
+                    handleAttendanceChange(student.rollNumber, "absent")
+                  }
+                />
+              </td>
+            </tr>
           ))}
-        </div>
-        <div className="subjectTopicEntry">
-          <label>Topic:</label>
-          <textarea
-            value={topic}
-            onChange={(e) => setTopic(e.target.value)}
-            placeholder="Enter topic"
-          />
-          <label>Remarks:</label>
-          <textarea
-            value={remarks}
-            onChange={(e) => setRemarks(e.target.value)}
-            placeholder="Enter remarks"
-          />
-        </div>
-        {isLoading ? (
-          <p>Loading students...</p>
-        ) : (
-          <table className="attendanceList">
-            <thead>
-              <tr>
-                <th>Roll Number</th>
-                <th>Name</th>
-                <th>Present</th>
-                <th>Absent</th>
-              </tr>
-            </thead>
-            <tbody>
-              {studentsData.map((student) => (
-                <tr key={student.rollNumber}>
-                  <td>{student.rollNumber}</td>
-                  <td>{student.name}</td>
-                  <td>
-                    <input
-                      type="radio"
-                      checked={attendance[student.rollNumber] === "present"}
-                      onChange={() =>
-                        handleAttendanceChange(student.rollNumber, "present")
-                      }
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="radio"
-                      className="absentStatus"
-                      checked={attendance[student.rollNumber] === "absent"}
-                      onChange={() =>
-                        handleAttendanceChange(student.rollNumber, "absent")
-                      }
-                    />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-        <div className="submitSection">
-          <button onClick={handleSubmit} disabled={isSubmitting}>
-            {isSubmitting ? "Submitting..." : editPeriod ? "Update Attendance" : "Submit Attendance"}
-          </button>
-        </div>
-      </div>
-    </>
-  );
-};
+        </tbody>
+      </table>
+    )}
+    <button id="btn-submit" onClick={handleSubmit} disabled={isSubmitting}>
+      {isSubmitting ? "Submitting..." : "Submit"}
+    </button>
+  </div>
+</>
+
+); };
 
 export default Marking;
