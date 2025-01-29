@@ -73,32 +73,36 @@ const Homepage = () => {
     
     
     
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
-    const navigate = useNavigate();
-
-    
+    const [role, setRole] = useState('faculty'); // Default is faculty
+const [username, setUsername] = useState('');
+const [password, setPassword] = useState('');
+const [error, setError] = useState('');
+const navigate = useNavigate();
     
 
     const handleLogin = async () => {
     try {
-        const response = await axios.post('https://tkrcet-backend-g3zu.onrender.com/faculty/login', {
-            username,
-            password,
-        });
+        let endpoint = role === 'faculty' 
+            ? 'https://tkrcet-backend-g3zu.onrender.com/faculty/login' 
+            : 'https://tkrcet-backend-g3zu.onrender.com/Section/login';
+
+        let data = role === 'faculty' 
+            ? { username, password } 
+            : { rollNumber: username, password };
+
+        const response = await axios.post(endpoint, data);
 
         if (response.data.success) {
-            const { faculty } = response.data;
+            const user = response.data.faculty || response.data.student;
 
-            // Store the faculty ID in localStorage
-            localStorage.setItem("facultyId", faculty.id);
+            // Store user ID in localStorage
+            localStorage.setItem(`${role}Id`, user._id);
 
-            // Show success alert with faculty data
-            alert(`Login successful!\nName: ${faculty.name}\nRole: ${faculty.role}\nDepartment: ${faculty.department}`);
+            // Show success message
+            alert(`Login successful!\nName: ${user.name}\nRole: ${user.role}`);
 
-            // Redirect to timetable page
-            navigate('/index');
+            // Redirect to appropriate dashboard
+            navigate(role === 'faculty' ? '/faculty-dashboard' : '/student-dashboard');
         } else {
             setError(response.data.message);
         }
@@ -106,7 +110,6 @@ const Homepage = () => {
         setError("Login failed. Please try again.");
     }
 };
-    
 
     return (
         <div>
@@ -184,22 +187,30 @@ const Homepage = () => {
                     </div>
 
                  <div className="login">
-                <h3>Login</h3>
-                <input
-                    type="text"
-                    placeholder="Username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                />
-                <input
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                />
-                {error && <p style={{ color: "red" }}>{error}</p>}
-                <button id="menu" onClick={handleLogin}>Login</button>
-            </div>
+    <h3>Login</h3>
+
+    <select value={role} onChange={(e) => setRole(e.target.value)}>
+        <option value="faculty">Faculty</option>
+        <option value="student">Student</option>
+    </select>
+
+    <input
+        type="text"
+        placeholder={role === 'faculty' ? "Username" : "Roll Number"}
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+    />
+    <input
+        type="password"
+        placeholder="Password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+    />
+
+    {error && <p style={{ color: "red" }}>{error}</p>}
+
+    <button id="menu" onClick={handleLogin}>Login</button>
+</div>
                 </div>
                   </div>
             
