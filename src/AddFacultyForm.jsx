@@ -7,6 +7,8 @@ const AddFacultyForm = () => {
     facultyId: "",
     role: "",
     department: "",
+    subject: "", // Added subject field
+    designation: "", // Added designation field
     password: "",
     timetable: "", // Store timetable as a raw JSON string
   });
@@ -42,6 +44,8 @@ const AddFacultyForm = () => {
       data.append("facultyId", formData.facultyId);
       data.append("role", formData.role);
       data.append("department", formData.department);
+      data.append("subject", formData.subject); // Added subject field
+      data.append("designation", formData.designation); // Added designation field
       data.append("password", formData.password);
       data.append("timetable", formData.timetable); // Send raw JSON string
       if (image) data.append("image", image);
@@ -79,6 +83,14 @@ const AddFacultyForm = () => {
         <div>
           <label>Department:</label>
           <input type="text" name="department" value={formData.department} onChange={handleChange} required />
+        </div>
+        <div>
+          <label>Subject:</label>
+          <input type="text" name="subject" value={formData.subject} onChange={handleChange} required />
+        </div>
+        <div>
+          <label>Designation:</label>
+          <input type="text" name="designation" value={formData.designation} onChange={handleChange} required />
         </div>
         <div>
           <label>Password:</label>
