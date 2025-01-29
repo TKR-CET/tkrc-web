@@ -7,7 +7,7 @@ const AddStudentForm = () => {
     name: "",
     fatherName: "",
     password: "",
-    role: "student", // Default role
+    role: "student",
     year: "B.Tech I",
     department: "CSD",
     section: "A",
