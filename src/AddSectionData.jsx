@@ -25,34 +25,42 @@ const AddStudentForm = () => {
     setImage(e.target.files[0]);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  
 
-    try {
-      const data = new FormData();
-      const studentData = {
-        rollNumber: formData.rollNumber,
-        name: formData.name,
-        fatherName: formData.fatherName,
-        password: formData.password,
-        role: formData.role,
-      };
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-      // Append students array as JSON
-      data.append("students", JSON.stringify([studentData]));
-      if (image) data.append("image", image);
+  try {
+    const data = new FormData();
 
-      const apiUrl = `https://tkrcet-backend-g3zu.onrender.com/Section/${formData.year}/${formData.department}/${formData.section}/students`;
+    const studentData = {
+      rollNumber: formData.rollNumber,
+      name: formData.name,
+      fatherName: formData.fatherName,
+      password: formData.password,
+      role: formData.role,
+    };
 
-      const response = await axios.post(apiUrl, data, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+    // ✅ Ensure students is sent as a JSON string
+    const studentsArray = [studentData];
+    data.append("students", JSON.stringify(studentsArray));
 
-      setResponseMessage(response.data.message);
-    } catch (error) {
-      setResponseMessage(error.response?.data?.message || "Failed to add student");
-    }
-  };
+    if (image) data.append("image", image);
+
+    const apiUrl = `https://tkrcet-backend-g3zu.onrender.com/Section/${formData.year}/${formData.department}/${formData.section}/students`;
+
+    alert("Sending data: " + JSON.stringify(studentsArray)); // Debug alert
+
+    const response = await axios.post(apiUrl, data, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+
+    alert("Success: " + response.data.message); // Show success message
+  } catch (error) {
+    alert("Error: " + (error.response?.data?.message || "Failed to add student")); // Show error message
+  }
+};
+
 
   return (
     <div>
