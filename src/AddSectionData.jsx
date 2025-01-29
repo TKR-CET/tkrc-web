@@ -41,23 +41,24 @@ const handleSubmit = async (e) => {
       role: formData.role,
     };
 
-    // ✅ Ensure students is sent as a JSON string
     const studentsArray = [studentData];
+
+    // ✅ Send as a JSON string
     data.append("students", JSON.stringify(studentsArray));
 
     if (image) data.append("image", image);
 
     const apiUrl = `https://tkrcet-backend-g3zu.onrender.com/Section/${formData.year}/${formData.department}/${formData.section}/students`;
 
-    alert("Sending data: " + JSON.stringify(studentsArray)); // Debug alert
+    alert("Sending data: " + JSON.stringify(studentsArray)); // Debugging alert
 
     const response = await axios.post(apiUrl, data, {
       headers: { "Content-Type": "multipart/form-data" },
     });
 
-    alert("Success: " + response.data.message); // Show success message
+    alert("Success: " + response.data.message);
   } catch (error) {
-    alert("Error: " + (error.response?.data?.message || "Failed to add student")); // Show error message
+    alert("Error: " + (error.response?.data?.message || "Failed to add student"));
   }
 };
 
