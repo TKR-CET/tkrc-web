@@ -92,7 +92,7 @@ const navigate = useNavigate();
             const faculty = facultyResponse.data.faculty;
             localStorage.setItem("facultyId", faculty._id);
             alert(`Login successful!\nName: ${faculty.name}\nRole: ${faculty.role}\nDepartment: ${faculty.department}`);
-            navigate('/faculty-dashboard');
+            navigate('/index');
             return; // Exit function if login is successful
         }
     } catch (err) {
