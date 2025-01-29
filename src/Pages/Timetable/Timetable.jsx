@@ -9,7 +9,7 @@ const Timetable = () => {
     const [timetable, setTimetable] = useState([]);
     const [facultyDetails, setFacultyDetails] = useState({});
     const facultyId = localStorage.getItem("facultyId"); // Using MongoDB _id from localStorage
-
+   alert(facultyId)
     // Fetch timetable
     useEffect(() => {
         const fetchTimetable = async () => {
