@@ -91,7 +91,7 @@ const navigate = useNavigate();
         if (facultyResponse.data.success) {
             const faculty = facultyResponse.data.faculty;
            const id= localStorage.setItem("facultyId", faculty.id);
-            alert(id);
+            
             alert(`Login successful!\nName: ${faculty.name}\nRole: ${faculty.role}\nDepartment: ${faculty.department}`);
             navigate('/index');
             return; // Exit function if login is successful
@@ -108,9 +108,9 @@ const navigate = useNavigate();
 
         if (studentResponse.data.success) {
             const student = studentResponse.data.student;
-            localStorage.setItem("studentId", student._id);
+            localStorage.setItem("studentId", student.id);
             alert(`Login successful!\nName: ${student.name}\nRole: ${student.role}`);
-            navigate('/student-dashboard');
+            navigate('/index');
             return; // Exit function if login is successful
         }
     } catch (err) {
