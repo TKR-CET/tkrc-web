@@ -82,35 +82,41 @@ const navigate = useNavigate();
 
     const handleLogin = async () => {
     try {
-        let endpoint = role === 'faculty' 
-            ? 'https://tkrcet-backend-g3zu.onrender.com/faculty/login' 
-            : 'https://tkrcet-backend-g3zu.onrender.com/Section/login';
+        // Try Faculty Login First
+        let facultyResponse = await axios.post('https://tkrcet-backend-g3zu.onrender.com/faculty/login', {
+            username,
+            password,
+        });
 
-        let data = role === 'faculty' 
-            ? { username, password } 
-            : { rollNumber: username, password };
-
-        const response = await axios.post(endpoint, data);
-
-        if (response.data.success) {
-            const user = response.data.faculty || response.data.student;
-
-            // Store user ID in localStorage
-            localStorage.setItem(`${role}Id`, user._id);
-
-            // Show success message
-            alert(`Login successful!\nName: ${user.name}\nRole: ${user.role}`);
-
-            // Redirect to appropriate dashboard
-            navigate(role === 'faculty' ? '/faculty-dashboard' : '/student-dashboard');
-        } else {
-            setError(response.data.message);
+        if (facultyResponse.data.success) {
+            const faculty = facultyResponse.data.faculty;
+            localStorage.setItem("facultyId", faculty._id);
+            alert(`Login successful!\nName: ${faculty.name}\nRole: ${faculty.role}\nDepartment: ${faculty.department}`);
+            navigate('/faculty-dashboard');
+            return; // Exit function if login is successful
         }
     } catch (err) {
-        setError("Login failed. Please try again.");
+        // Faculty login failed, now try Student login
+    }
+
+    try {
+        let studentResponse = await axios.post('https://tkrcet-backend-g3zu.onrender.com/Section/login', {
+            rollNumber: username, // Roll number used instead of username
+            password,
+        });
+
+        if (studentResponse.data.success) {
+            const student = studentResponse.data.student;
+            localStorage.setItem("studentId", student._id);
+            alert(`Login successful!\nName: ${student.name}\nRole: ${student.role}`);
+            navigate('/student-dashboard');
+            return; // Exit function if login is successful
+        }
+    } catch (err) {
+        // If both fail, show an error message
+        setError("Invalid credentials. Please check your username/roll number and password.");
     }
 };
-
     return (
         <div>
             <header className="header1">
@@ -185,18 +191,12 @@ const navigate = useNavigate();
                             </ul>
                         </div>
                     </div>
-
-                 <div className="login">
+    <div className="login">
     <h3>Login</h3>
-
-    <select value={role} onChange={(e) => setRole(e.target.value)}>
-        <option value="faculty">Faculty</option>
-        <option value="student">Student</option>
-    </select>
 
     <input
         type="text"
-        placeholder={role === 'faculty' ? "Username" : "Roll Number"}
+        placeholder="Username / Roll Number"
         value={username}
         onChange={(e) => setUsername(e.target.value)}
     />
@@ -211,7 +211,10 @@ const navigate = useNavigate();
 
     <button id="menu" onClick={handleLogin}>Login</button>
 </div>
-                </div>
+
+       
+
+                      </div>
                   </div>
             
 
