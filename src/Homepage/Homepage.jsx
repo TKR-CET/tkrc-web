@@ -91,7 +91,7 @@ const navigate = useNavigate();
         if (facultyResponse.data.success) {
             const faculty = facultyResponse.data.faculty;
            const id= localStorage.setItem("facultyId", faculty._id);
-            alert("id");
+            alert(id);
             alert(`Login successful!\nName: ${faculty.name}\nRole: ${faculty.role}\nDepartment: ${faculty.department}`);
             navigate('/index');
             return; // Exit function if login is successful
