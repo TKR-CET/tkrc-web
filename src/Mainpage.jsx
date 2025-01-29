@@ -8,6 +8,7 @@ import Activitydiary from './Pages/Activitydiary/Activitydiary';
 import Homepage from "./Homepage/Homepage";
 import Marking from "./Pages/Marking/Marking.jsx";
 import AddFacultyForm from "./AddFacultyForm";
+import AddSectionData from "./AddSectionData";
 import Register from "./Pages/Register/Register.jsx";
 
 
@@ -15,7 +16,7 @@ function Mainpage() {
   const location = useLocation();
 
   // List of routes where the other components should be hidden
-  const hideComponentsPaths = ['/timetable', '/index','/attendance','/activity','/home','/mark','/register']; // Add more paths here
+  const hideComponentsPaths = ['/timetable', '/index','/attendance','/activity','/home','/mark','/register','/add']; // Add more paths here
 
   return (
     <div className="maindiv">
@@ -30,6 +31,7 @@ function Mainpage() {
      
       <Routes>
         <Route path="/register"  element={<Register/>}/>
+ <Route path="/add" element={<AddSectionData/>}/>
         <Route path="/timetable" element={<Timetable />} />
         
         <Route path="/index" element={<Landingpage/>}/>
