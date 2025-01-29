@@ -31,6 +31,13 @@ const AddSectionData = () => {
     setTimetableJson(e.target.value);
   };
 
+  /** Handle Image File Input */
+  const handleImageChange = (index, e) => {
+    const updatedStudents = [...students];
+    updatedStudents[index].image = e.target.files[0];
+    setStudents(updatedStudents);
+  };
+
   /** Add New Student */
   const addStudent = () => {
     setStudents([...students, { 
@@ -46,10 +53,23 @@ const AddSectionData = () => {
   /** Submit Student Data */
   const submitStudents = async () => {
     try {
+      const formData = new FormData();
+      
+      students.forEach((student, index) => {
+        formData.append(`students[${index}].rollNumber`, student.rollNumber);
+        formData.append(`students[${index}].name`, student.name);
+        formData.append(`students[${index}].fatherName`, student.fatherName);
+        formData.append(`students[${index}].password`, student.password);
+        formData.append(`students[${index}].role`, student.role);
+        formData.append(`students[${index}].image`, student.image);
+      });
+
       const response = await axios.post(
         `https://tkrcet-backend-g3zu.onrender.com/Section/${year}/${department}/${section}/students`,
-        { students }
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } }
       );
+
       alert("Students added successfully!");
       console.log(response.data);
     } catch (error) {
@@ -94,7 +114,13 @@ const AddSectionData = () => {
             <option value="admin">Admin</option>
             <option value="teacher">Teacher</option>
           </select>
-          <input type="text" placeholder="Image URL (optional)" value={student.image} onChange={(e) => handleStudentChange(index, "image", e.target.value)} />
+
+          {/* Image File Input */}
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => handleImageChange(index, e)}
+          />
         </div>
       ))}
       <button type="button" onClick={addStudent}>+ Add Student</button>
