@@ -30,11 +30,16 @@ const AddStudentForm = () => {
 
     try {
       const data = new FormData();
-      data.append("rollNumber", formData.rollNumber);
-      data.append("name", formData.name);
-      data.append("fatherName", formData.fatherName);
-      data.append("password", formData.password);
-      data.append("role", formData.role);
+      const studentData = {
+        rollNumber: formData.rollNumber,
+        name: formData.name,
+        fatherName: formData.fatherName,
+        password: formData.password,
+        role: formData.role,
+      };
+
+      // Append students array as JSON
+      data.append("students", JSON.stringify([studentData]));
       if (image) data.append("image", image);
 
       const apiUrl = `https://tkrcet-backend-g3zu.onrender.com/Section/${formData.year}/${formData.department}/${formData.section}/students`;
