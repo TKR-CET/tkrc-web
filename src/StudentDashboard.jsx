@@ -134,7 +134,8 @@ const StudentDashboard = () => {
         }
         `}
       </style>
-
+   
+              <Header />
            <div className="nav">
         <NavBar />
       </div>
