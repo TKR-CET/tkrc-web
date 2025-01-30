@@ -106,10 +106,14 @@ const navigate = useNavigate();
             password,
         });
 
-        if (studentResponse.data.success) {
-            const student = studentResponse.data.student;
- const studentID=  localStorage.setItem("studentId", student.id);
-alert(studentID);
+        
+if (studentResponse.data.success && student.id) {
+    localStorage.setItem("studentId", student.id);
+    console.log("Stored Student ID:", localStorage.getItem("studentId"));
+} else {
+    console.error("Student ID not found in response.");
+}
+
             alert(`Login successful!\nName: ${student.name}\nRole: ${student.designation}`);
             navigate('/index');
             return; // Exit function if login is successful
