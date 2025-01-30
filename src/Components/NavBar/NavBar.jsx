@@ -78,10 +78,10 @@ function NavBar() {
     navigate("/"); // Redirect to login page
   };
 
-  // Handle Attendance click
+  // Handle Attendance click (Student Redirects Only on Click)
   const handleAttendanceClick = () => {
     if (userData?.role === "student") {
-      navigate("/student"); // Redirect student to student page
+      navigate("/student"); // Redirect student to student page **ONLY on click**
     } else {
       setAttendanceMenuVisible(!attendanceMenuVisible); // Show faculty dropdown
     }
@@ -103,8 +103,6 @@ function NavBar() {
   useEffect(() => {
     if (userData?.role === "faculty") {
       fetchClassOptions();
-    } else if (userData?.role === "student") {
-      navigate("/student"); // If it's a student, navigate immediately
     }
   }, [userData]);
 
@@ -115,11 +113,12 @@ function NavBar() {
           <Link to="/index">
             <li>Home</li>
           </Link>
-          {userData?.role === "faculty" && (
-            <Link to="/timetable">
-              <li>Timetable</li>
-            </Link>
-          )}
+
+          {/* Show Timetable for Faculty & Students */}
+          <Link to="/timetable">
+            <li>Timetable</li>
+          </Link>
+
           <li>
             <div className="menu-dropdown">
               <a onClick={handleAttendanceClick} id="attendance">
