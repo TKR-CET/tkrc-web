@@ -109,7 +109,7 @@ const navigate = useNavigate();
         if (studentResponse.data.success) {
             const student = studentResponse.data.student;
             localStorage.setItem("studentId", student.id);
-            alert(`Login successful!\nName: ${student.name}\nRole: ${student.rollNumber}`);
+            alert(`Login successful!\nName: ${student.name}\nRole: ${student.designation}`);
             navigate('/index');
             return; // Exit function if login is successful
         }
