@@ -10,7 +10,7 @@ import Marking from "./Pages/Marking/Marking.jsx";
 import AddFacultyForm from "./AddFacultyForm";
 import AddSectionData from "./AddSectionData";
 import Register from "./Pages/Register/Register.jsx";
-import StudentDashboard from "./Pages/Student/Studentdashboard.jsx";
+import StudentDashboard from "./Studentdashboard";
 
 function Mainpage() {
   const location = useLocation();
