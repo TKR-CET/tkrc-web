@@ -9,68 +9,44 @@ function NavBar() {
   const [loading, setLoading] = useState(false);
   const [accountMenuVisible, setAccountMenuVisible] = useState(false);
   const [showDynamicClasses, setShowDynamicClasses] = useState(false);
-  const [providedFacultyId, setProvidedFacultyId] = useState(null);
-  const [role, setRole] = useState(localStorage.getItem("role") || "faculty"); // Default to faculty
+  const [userDetails, setUserDetails] = useState(null);
 
   const navRef = useRef(null);
   const navigate = useNavigate();
-  const mongoDbFacultyId = localStorage.getItem("facultyId");
 
-  // Toggle Attendance Dropdown Menu
-  const toggleAttendanceMenu = () => {
-    if (role === "student") {
-      navigate("/student");
-    } else {
-      setAttendanceMenuVisible(!attendanceMenuVisible);
+  // Fetch user details from localStorage
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUserDetails(JSON.parse(storedUser));
     }
-  };
+  }, []);
 
-  // Toggle Account Dropdown Menu
-  const toggleAccountMenu = () => {
-    setAccountMenuVisible(!accountMenuVisible);
-  };
-
-  // Fetch faculty details using MongoDB _id
-  const fetchProvidedFacultyId = async () => {
-    try {
-      const response = await axios.get(
-        `https://tkrcet-backend-g3zu.onrender.com/faculty/${mongoDbFacultyId}`
-      );
-      setProvidedFacultyId(response.data); // Store full faculty object
-    } catch (error) {
-      console.error("Error fetching faculty-provided ID:", error);
-    }
-  };
-
-  // Fetch today's timetable dynamically
+  // Fetch faculty timetable if the user is a faculty member
   const fetchClassOptions = async () => {
-    if (!providedFacultyId) return;
+    if (!userDetails || userDetails.role !== "faculty") return;
 
     setLoading(true);
     try {
       const response = await axios.get(
-        `https://tkrcet-backend-g3zu.onrender.com/faculty/${providedFacultyId.facultyId}/timetable-today`
+        `https://tkrcet-backend-g3zu.onrender.com/faculty/${userDetails.facultyId}/timetable-today`
       );
-      console.log("API Response:", response.data); // Debugging
 
       let classes = response.data.classes || [];
-
-      // Filter out empty periods and avoid skipping valid ones
       const uniqueClasses = classes
-        .filter((period) => period.subject && period.subject.trim() !== "") // Ignore empty periods
+        .filter((period) => period.subject && period.subject.trim() !== "")
         .filter((period, index, self) => {
           return (
             self.findIndex(
               (item) =>
                 item.subject === period.subject &&
-                item.programYear === period.programYear &&
+                item.year === period.year &&
                 item.department === period.department &&
                 item.section === period.section
             ) === index
           );
         });
 
-      console.log("Filtered Classes:", uniqueClasses); // Debugging
       setClassOptions(uniqueClasses);
     } catch (error) {
       console.error("Error fetching class options:", error);
@@ -80,54 +56,33 @@ function NavBar() {
     }
   };
 
-  // Logout function
+  useEffect(() => {
+    if (userDetails && userDetails.role === "faculty") {
+      fetchClassOptions();
+    }
+  }, [userDetails]);
+
   const handleLogout = () => {
-    localStorage.removeItem("facultyId");
-    localStorage.removeItem("role");
-    navigate("/"); // Redirect to login page
+    localStorage.removeItem("user");
+    navigate("/");
   };
 
-  // Handle Class click: Show dynamic class dropdown, hide other items
+  const handleAttendanceClick = () => {
+    if (userDetails?.role === "student") {
+      navigate("/student");
+    } else {
+      setAttendanceMenuVisible(!attendanceMenuVisible);
+    }
+  };
+
   const handleClassClick = () => {
     setShowDynamicClasses(true);
   };
 
-  // Handle redirection to the attendance page with selected class details
   const handleClassSelect = (option) => {
-    const { programYear, department, section, subject } = option;
-    const route = `/attendance?programYear=${programYear}&department=${department}&section=${section}&subject=${subject}`;
-    navigate(route);
+    const { year, department, section, subject } = option;
+    navigate(`/attendance?year=${year}&department=${department}&section=${section}&subject=${subject}`);
   };
-
-  // Close menus on outside click
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (navRef.current && !navRef.current.contains(event.target)) {
-        setAttendanceMenuVisible(false);
-        setAccountMenuVisible(false);
-        setShowDynamicClasses(false);
-      }
-    };
-
-    document.addEventListener("click", handleClickOutside);
-    return () => {
-      document.removeEventListener("click", handleClickOutside);
-    };
-  }, []);
-
-  // Fetch faculty ID on component mount
-  useEffect(() => {
-    if (mongoDbFacultyId) {
-      fetchProvidedFacultyId();
-    }
-  }, [mongoDbFacultyId]);
-
-  // Fetch timetable once faculty ID is available
-  useEffect(() => {
-    if (providedFacultyId && providedFacultyId.facultyId) {
-      fetchClassOptions();
-    }
-  }, [providedFacultyId]);
 
   return (
     <nav ref={navRef}>
@@ -141,10 +96,10 @@ function NavBar() {
           </Link>
           <li>
             <div className="menu-dropdown">
-              <a onClick={toggleAttendanceMenu} id="attendance">
+              <a onClick={handleAttendanceClick} id="attendance">
                 Attendance
               </a>
-              {attendanceMenuVisible && role === "faculty" && (
+              {userDetails?.role === "faculty" && attendanceMenuVisible && (
                 <div
                   className="menu-drop-container"
                   onClick={(e) => e.stopPropagation()}
@@ -162,7 +117,7 @@ function NavBar() {
                               key={index}
                               onClick={() => handleClassSelect(option)}
                             >
-                              {`${option.programYear} ${option.department}-${option.section} - ${option.subject}`}
+                              {`${option.year} ${option.department}-${option.section} - ${option.subject}`}
                             </li>
                           ))
                         )
@@ -192,10 +147,10 @@ function NavBar() {
       </div>
       <div className="nav-user-profile">
         <span>
-          Welcome, {providedFacultyId?.name || "User"}
+          Welcome, {userDetails?.name || "User"}
         </span>
         <div className="account-menu">
-          <button className="account-menu-button" onClick={toggleAccountMenu}>
+          <button className="account-menu-button" onClick={() => setAccountMenuVisible(!accountMenuVisible)}>
             Account
           </button>
           {accountMenuVisible && (
