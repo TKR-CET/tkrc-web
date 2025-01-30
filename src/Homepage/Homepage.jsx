@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import './Homepage.css';
 import { Link, useNavigate } from "react-router-dom";
 import axios from 'axios';
+import './Homepage.css';
 
 const Homepage = () => {
     const navigate = useNavigate();
@@ -33,11 +33,10 @@ const Homepage = () => {
             description: "Dr. D. V. Ravi Shankar, Principal, TKR College of Engineering & Technology..."
         }
     };
-
     const delegateKeys = Object.keys(delegateInfo);
     const [currentDelegateIndex, setCurrentDelegateIndex] = useState(0);
 
-    // Carousel Effect for Images
+    // Auto Image Carousel Effect
     useEffect(() => {
         const imageInterval = setInterval(() => {
             setCurrentImageIndex((prevIndex) => (prevIndex + 1) % imagesLoader.length);
@@ -45,7 +44,7 @@ const Homepage = () => {
         return () => clearInterval(imageInterval);
     }, []);
 
-    // Carousel Effect for Delegates
+    // Auto Delegate Carousel Effect
     useEffect(() => {
         const delegateInterval = setInterval(() => {
             setCurrentDelegateIndex((prevIndex) => (prevIndex + 1) % delegateKeys.length);
@@ -83,28 +82,22 @@ const Homepage = () => {
         }
 
         try {
+            console.log("Attempting Student Login...");
             let studentResponse = await axios.post('https://tkrcet-backend-g3zu.onrender.com/Section/login', {
                 rollNumber: username,
                 password,
             });
 
-            console.log("Student Response:", studentResponse.data);
-
             if (studentResponse.data.success) {
                 const student = studentResponse.data.student;
-                
+
                 if (student && student.id) {
-                    try {
-                        localStorage.setItem("studentId", JSON.stringify(student.id));
-                        alert("Stored Student ID:", localStorage.getItem("studentId"));
-                    } catch (error) {
-                        console.error("Error storing Student ID:", error);
-                    }
+                    localStorage.setItem("studentId", student.id);
+                    alert(`Login successful!\nName: ${student.name}\nStored Student ID: ${localStorage.getItem("studentId")}`);
                 } else {
                     console.error("Student ID is undefined.");
                 }
 
-                alert(`Login successful!\nName: ${student.name}`);
                 navigate('/index');
                 return;
             }
@@ -116,6 +109,7 @@ const Homepage = () => {
 
     return (
         <div>
+            {/* Header */}
             <header className="header1">
                 <div className="marquee-container">
                     <img id="logo" src="./images/logo.png" alt="TKRCET Logo" />
@@ -123,7 +117,9 @@ const Homepage = () => {
                 </div>
             </header>
 
+            {/* Main Content */}
             <div className="main-content">
+                {/* Left Section */}
                 <div className="left-section">
                     <div className="campus-image">
                         <img src={currentImage} alt={`Campus ${currentImageIndex + 1}`} />
@@ -134,7 +130,9 @@ const Homepage = () => {
                     </div>
                 </div>
 
+                {/* Right Section */}
                 <div className="right-section">
+                    {/* Delegates Section */}
                     <div className="delegates">
                         <h3 className="typing">Our Magnificent Delegates</h3>
                         <img src={currentDelegate.photo} alt={currentDelegate.name} />
@@ -155,6 +153,7 @@ const Homepage = () => {
                         </div>
                     </div>
 
+                    {/* Vision & Mission */}
                     <div className="vision-mission">
                         <div className="vision">
                             <h4 className="typing">Institution Vision</h4>
@@ -169,6 +168,7 @@ const Homepage = () => {
                         </div>
                     </div>
 
+                    {/* Login Section */}
                     <div className="login">
                         <h3>Login</h3>
                         <input
@@ -189,6 +189,7 @@ const Homepage = () => {
                 </div>
             </div>
 
+            {/* Footer */}
             <footer className="footer">
                 <p>Copyright © 2024 TKR College of Engineering & Technology. All Rights Reserved.</p>
                 <p>Designer, Developer & Maintenance - Mr. Md. Shakeel (TKRES)</p>
