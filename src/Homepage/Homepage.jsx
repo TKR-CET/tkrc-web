@@ -110,7 +110,7 @@ const navigate = useNavigate();
             const student = studentResponse.data.student;
             localStorage.setItem("studentId", student.id);
             alert(`Login successful!\nName: ${student.name}\nRole: ${student.role}`);
-            navigate('/student');
+            navigate('/index');
             return; // Exit function if login is successful
         }
     } catch (err) {
