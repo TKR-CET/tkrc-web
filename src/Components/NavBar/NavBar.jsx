@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -11,14 +10,24 @@ function NavBar() {
   const [accountMenuVisible, setAccountMenuVisible] = useState(false);
   const [showDynamicClasses, setShowDynamicClasses] = useState(false);
   const [providedFacultyId, setProvidedFacultyId] = useState(null);
+  const [role, setRole] = useState(null);
 
   const navRef = useRef(null);
   const navigate = useNavigate();
   const mongoDbFacultyId = localStorage.getItem("facultyId");
+  const storedRole = localStorage.getItem("role");
+
+  useEffect(() => {
+    setRole(storedRole);
+  }, [storedRole]);
 
   // Toggle Attendance Dropdown Menu
   const toggleAttendanceMenu = () => {
-    setAttendanceMenuVisible(!attendanceMenuVisible);
+    if (role === "student") {
+      navigate("/student");
+    } else {
+      setAttendanceMenuVisible(!attendanceMenuVisible);
+    }
   };
 
   // Toggle Account Dropdown Menu
@@ -32,7 +41,7 @@ function NavBar() {
       const response = await axios.get(
         `https://tkrcet-backend-g3zu.onrender.com/faculty/${mongoDbFacultyId}`
       );
-      setProvidedFacultyId(response.data); // Store full faculty object
+      setProvidedFacultyId(response.data);
     } catch (error) {
       console.error("Error fetching faculty-provided ID:", error);
     }
@@ -47,13 +56,10 @@ function NavBar() {
       const response = await axios.get(
         `https://tkrcet-backend-g3zu.onrender.com/faculty/${providedFacultyId.facultyId}/timetable-today`
       );
-      console.log("API Response:", response.data); // Debugging
-
       let classes = response.data.classes || [];
 
-      // Filter out empty periods and avoid skipping valid ones
       const uniqueClasses = classes
-        .filter((period) => period.subject && period.subject.trim() !== "") // Ignore empty periods
+        .filter((period) => period.subject && period.subject.trim() !== "")
         .filter((period, index, self) => {
           return (
             self.findIndex(
@@ -66,7 +72,6 @@ function NavBar() {
           );
         });
 
-      console.log("Filtered Classes:", uniqueClasses); // Debugging
       setClassOptions(uniqueClasses);
     } catch (error) {
       console.error("Error fetching class options:", error);
@@ -79,15 +84,17 @@ function NavBar() {
   // Logout function
   const handleLogout = () => {
     localStorage.removeItem("facultyId");
-    navigate("/"); // Redirect to login page
+    localStorage.removeItem("studentId");
+    localStorage.removeItem("role");
+    navigate("/");
   };
 
-  // Handle Class click: Show dynamic class dropdown, hide other items
+  // Handle Class click
   const handleClassClick = () => {
     setShowDynamicClasses(true);
   };
 
-  // Handle redirection to the attendance page with selected class details
+  // Redirect to attendance page with selected class details
   const handleClassSelect = (option) => {
     const { programYear, department, section, subject } = option;
     const route = `/attendance?programYear=${programYear}&department=${department}&section=${section}&subject=${subject}`;
@@ -110,7 +117,7 @@ function NavBar() {
     };
   }, []);
 
-  // Fetch faculty ID on component mount
+  // Fetch faculty ID on mount
   useEffect(() => {
     if (mongoDbFacultyId) {
       fetchProvidedFacultyId();
@@ -131,15 +138,17 @@ function NavBar() {
           <Link to="/index">
             <li>Home</li>
           </Link>
-          <Link to="/timetable">
-            <li>Timetable</li>
-          </Link>
+          {role === "faculty" && (
+            <Link to="/timetable">
+              <li>Timetable</li>
+            </Link>
+          )}
           <li>
             <div className="menu-dropdown">
               <a onClick={toggleAttendanceMenu} id="attendance">
                 Attendance
               </a>
-              {attendanceMenuVisible && (
+              {role === "faculty" && attendanceMenuVisible && (
                 <div
                   className="menu-drop-container"
                   onClick={(e) => e.stopPropagation()}
@@ -186,9 +195,7 @@ function NavBar() {
         </ul>
       </div>
       <div className="nav-user-profile">
-        <span>
-          Welcome, {providedFacultyId?.name || "User"}
-        </span>
+        <span>Welcome, {providedFacultyId?.name || "User"}</span>
         <div className="account-menu">
           <button className="account-menu-button" onClick={toggleAccountMenu}>
             Account
