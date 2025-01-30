@@ -33,7 +33,9 @@ function Mainpage() {
         <Route path="/register"  element={<Register/>}/>
  <Route path="/add" element={<AddSectionData/>}/>
         <Route path="/timetable" element={<Timetable />} />
-        <Route path="/student" element={<Studentdashboard/>}/></Route>
+
+
+        <Route path="/student" element={<Studentdashboard/>}/>
         <Route path="/index" element={<Landingpage/>}/>
                 <Route path="/attendance" element={<Attendance/>}/>
                   <Route path="/activity" element={<Activitydiary/>}/>
