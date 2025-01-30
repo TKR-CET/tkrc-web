@@ -134,7 +134,13 @@ const StudentDashboard = () => {
         `}
       </style>
 
-     
+           <div className="nav">
+        <NavBar />
+      </div>
+      <div className="mob-nav">
+        <MobileNav />
+      </div>
+
 
       {/* Student Details */}
       <div className="student-details">
