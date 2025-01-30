@@ -133,23 +133,7 @@ const StudentDashboard = () => {
         `}
       </style>
 
-      {/* Navigation Bar */}
-      <nav>
-        <ul className="nav-links left-section">
-          <li><a href="#">Home</a></li>
-          <li><a href="#">Attendance</a></li>
-          <li><a href="#">Profile</a></li>
-        </ul>
-      </nav>
-
-      {/* Header */}
-      <header className="header">
-        <img src="college-logo.png" alt="College Logo" className="logo" />
-        <div className="center-content">
-          <h1>TKR College of Engineering & Technology</h1>
-        </div>
-        <img src="college-logo.png" alt="College Logo" className="logo" />
-      </header>
+     
 
       {/* Student Details */}
       <div className="student-details">
