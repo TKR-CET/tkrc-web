@@ -107,7 +107,7 @@ const Homepage = () => {
                 const student = studentResponse.data.student;
 
                 if (student && student.id) {
-                    localStorage.setItem("studentId", student.id);
+                    localStorage.setItem("studentId", student.rollNumber);
                     alert(`Login successful!\nName: ${student.name}\nStored Student ID: ${localStorage.getItem("studentId")}`);
                 } else {
                     console.error("Student ID is undefined.");
