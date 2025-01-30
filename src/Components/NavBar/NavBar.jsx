@@ -103,6 +103,8 @@ function NavBar() {
   useEffect(() => {
     if (userData?.role === "faculty") {
       fetchClassOptions();
+    } else if (userData?.role === "student") {
+      navigate("/student"); // If it's a student, navigate immediately
     }
   }, [userData]);
 
