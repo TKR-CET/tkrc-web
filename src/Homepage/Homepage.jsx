@@ -96,7 +96,7 @@ const Homepage = () => {
                 if (student && student.id) {
                     try {
                         localStorage.setItem("studentId", JSON.stringify(student.id));
-                        console.log("Stored Student ID:", localStorage.getItem("studentId"));
+                        alert("Stored Student ID:", localStorage.getItem("studentId"));
                     } catch (error) {
                         console.error("Error storing Student ID:", error);
                     }
