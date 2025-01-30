@@ -1,6 +1,7 @@
 import React from "react";
 import NavBar from "./Components/NavBar/NavBar";
 import MobileNav from "./Components/MobileNav/MobileNav";
+import Header from "./Components/Header/Header";
 const StudentDashboard = () => {
   return (
     <div>
