@@ -10,6 +10,7 @@ function NavBar() {
   const [accountMenuVisible, setAccountMenuVisible] = useState(false);
   const [showDynamicClasses, setShowDynamicClasses] = useState(false);
   const [providedFacultyId, setProvidedFacultyId] = useState(null);
+  const [role, setRole] = useState(localStorage.getItem("role") || "faculty"); // Default to faculty
 
   const navRef = useRef(null);
   const navigate = useNavigate();
@@ -17,7 +18,11 @@ function NavBar() {
 
   // Toggle Attendance Dropdown Menu
   const toggleAttendanceMenu = () => {
-    setAttendanceMenuVisible(!attendanceMenuVisible);
+    if (role === "student") {
+      navigate("/student");
+    } else {
+      setAttendanceMenuVisible(!attendanceMenuVisible);
+    }
   };
 
   // Toggle Account Dropdown Menu
@@ -78,6 +83,7 @@ function NavBar() {
   // Logout function
   const handleLogout = () => {
     localStorage.removeItem("facultyId");
+    localStorage.removeItem("role");
     navigate("/"); // Redirect to login page
   };
 
@@ -138,7 +144,7 @@ function NavBar() {
               <a onClick={toggleAttendanceMenu} id="attendance">
                 Attendance
               </a>
-              {attendanceMenuVisible && (
+              {attendanceMenuVisible && role === "faculty" && (
                 <div
                   className="menu-drop-container"
                   onClick={(e) => e.stopPropagation()}
