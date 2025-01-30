@@ -92,7 +92,7 @@ const navigate = useNavigate();
             const faculty = facultyResponse.data.faculty;
            const id= localStorage.setItem("facultyId", faculty.id);
             
-            alert(`Login successful!\nName: ${faculty.name}\nRole: ${faculty.role}\nDepartment: ${faculty.department}`);
+            alert(`Login successful!\nName: ${faculty.name}\nRole: ${faculty.designation}\nDepartment: ${faculty.department}`);
             navigate('/index');
             return; // Exit function if login is successful
         }
@@ -109,7 +109,7 @@ const navigate = useNavigate();
         if (studentResponse.data.success) {
             const student = studentResponse.data.student;
             localStorage.setItem("studentId", student.id);
-            alert(`Login successful!\nName: ${student.name}\nRole: ${student.role}`);
+            alert(`Login successful!\nName: ${student.name}\nRole: ${student.rollNumber}`);
             navigate('/index');
             return; // Exit function if login is successful
         }
