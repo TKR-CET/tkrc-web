@@ -23,12 +23,12 @@ function NavBar() {
         const response = await axios.get(
           `https://tkrcet-backend-g3zu.onrender.com/faculty/${facultyId}`
         );
-        setUserData(response.data);
+        setUserData(response.data); // Faculty data is directly available
       } else if (studentId) {
         const response = await axios.get(
           `https://tkrcet-backend-g3zu.onrender.com/Section/${studentId}`
         );
-        setUserData(response.data);
+        setUserData(response.data.student); // Extract 'student' object
       }
     } catch (error) {
       console.error("Error fetching user data:", error);
@@ -42,7 +42,7 @@ function NavBar() {
     setLoading(true);
     try {
       const response = await axios.get(
-        `https://tkrcet-backend-g3zu.onrender.com/faculty/${userData.facultyId}/timetable-today`
+        `https://tkrcet-backend-g3zu.onrender.com/faculty/${userData.id}/timetable-today`
       );
 
       let classes = response.data.classes || [];
