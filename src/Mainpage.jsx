@@ -10,7 +10,7 @@ import Marking from "./Pages/Marking/Marking.jsx";
 import AddFacultyForm from "./AddFacultyForm";
 import AddSectionData from "./AddSectionData";
 import Register from "./Pages/Register/Register.jsx";
-
+import StudentDashboard from "./Student/Studentdashboard.jsx";
 
 function Mainpage() {
   const location = useLocation();
@@ -33,7 +33,7 @@ function Mainpage() {
         <Route path="/register"  element={<Register/>}/>
  <Route path="/add" element={<AddSectionData/>}/>
         <Route path="/timetable" element={<Timetable />} />
-        
+        <Route path="/student" element={<Studentdashboard/>}/></Route>
         <Route path="/index" element={<Landingpage/>}/>
                 <Route path="/attendance" element={<Attendance/>}/>
                   <Route path="/activity" element={<Activitydiary/>}/>
