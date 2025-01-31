@@ -46,7 +46,9 @@ const StudentDashboard = () => {
         window.alert(`Student details - Roll: ${rollNumber}, Year: ${year}, Department: ${department}, Section: ${section}`);
 
         // Construct API URL with encoded parameters
-        const attendanceURL = `https://tkrcet-backend-g3zu.onrender.com/Attendance/student-record?rollNumber=CS2025001&year=B.Tech I&department=CSD&section=A`;
+        const attendanceURL = `https://tkrcet-backend-g3zu.onrender.com/Attendance/student-record?rollNumber=${encodeURIComponent(rollNumber)}&year=${encodeURIComponent(year)}&department=${encodeURIComponent(department)}&section=${encodeURIComponent(section)}`;
+
+console.log("Fetching attendance from:", attendanceURL); // Debugging
 
         window.alert("Fetching attendance details...");
         console.log("Fetching attendance from:", attendanceURL);
