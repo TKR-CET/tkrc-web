@@ -46,26 +46,19 @@ const StudentDashboard = () => {
           .then((attendanceData) => {
             console.log("Attendance API Response:", attendanceData); // Debugging log
 
+            // Check if the attendance data has both 'subjectSummary' and 'dailySummary'
             if (
               !attendanceData ||
-              !attendanceData.subjectSummary ||
-              !attendanceData.dailySummary
+              !Array.isArray(attendanceData.subjectSummary) ||
+              typeof attendanceData.dailySummary !== 'object'
             ) {
-              console.error("Attendance data is missing:", attendanceData);
+              console.error("Attendance data is missing or malformed:", attendanceData);
               setError("Failed to fetch attendance data.");
               setLoading(false);
               return;
             }
 
-            // Check if subjectSummary and dailySummary are in the expected structure
-            const { subjectSummary, dailySummary } = attendanceData;
-
-            if (Array.isArray(subjectSummary) && Object.keys(dailySummary).length > 0) {
-              setAttendance(attendanceData); // Set the attendance data if valid
-            } else {
-              setError("Invalid attendance data format.");
-            }
-
+            setAttendance(attendanceData); // Set the attendance data if valid
             setLoading(false);
           })
           .catch((err) => {
