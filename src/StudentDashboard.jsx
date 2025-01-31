@@ -42,17 +42,18 @@ const StudentDashboard = () => {
           throw new Error("Student details are incomplete.");
         }
 
-        // Alert student details before fetching attendance
-        window.alert(`Student details - Roll: ${rollNumber}, Year: ${year}, Department: ${department}, Section: ${section}`);
+        // Properly encode the parameters for URL
+        const formattedYear = encodeURIComponent(`${year.trim()}`);
+        const formattedDepartment = encodeURIComponent(department.trim());
+        const formattedSection = encodeURIComponent(section.trim());
 
-        // Construct API URL with encoded parameters
-        const attendanceURL = `https://tkrcet-backend-g3zu.onrender.com/Attendance/student-record?rollNumber=${encodeURIComponent(rollNumber)}&year=${encodeURIComponent(year)}&department=${encodeURIComponent(department)}&section=${encodeURIComponent(section)}`;
+        // Construct the attendance API URL
+        const attendanceURL = `https://tkrcet-backend-g3zu.onrender.com/Attendance/student-record?rollNumber=${encodeURIComponent(rollNumber)}&year=${formattedYear}&department=${formattedDepartment}&section=${formattedSection}`;
 
-console.log("Fetching attendance from:", attendanceURL); // Debugging
+        console.log("Fetching attendance from:", attendanceURL); // Debugging
 
         window.alert("Fetching attendance details...");
-        console.log("Fetching attendance from:", attendanceURL);
-
+        
         return fetch(attendanceURL);
       })
       .then((res) => {
