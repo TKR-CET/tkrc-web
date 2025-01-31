@@ -42,20 +42,18 @@ const StudentDashboard = () => {
           throw new Error("Student details are incomplete.");
         }
 
-        // Alert the student details before fetching attendance
+        // Alert student details before fetching attendance
         window.alert(`Student details - Roll: ${rollNumber}, Year: ${year}, Department: ${department}, Section: ${section}`);
 
-        // Fetch Attendance
-        const attendanceURL = `https://tkrcet-backend-g3zu.onrender.com/Attendance/student-record?rollNumber=${rollNumber}&year=${year}&department=${department}&section=${section}`;
+        // Construct API URL with encoded parameters
+        const attendanceURL = `https://tkrcet-backend-g3zu.onrender.com/Attendance/student-record?rollNumber=${encodeURIComponent(rollNumber)}&year=${encodeURIComponent(year)}&department=${encodeURIComponent(department)}&section=${encodeURIComponent(section)}`;
 
         window.alert("Fetching attendance details...");
-
         console.log("Fetching attendance from:", attendanceURL);
 
         return fetch(attendanceURL);
       })
       .then((res) => {
-        console.log("Attendance Response:", res);
         if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
         return res.json();
       })
@@ -92,78 +90,94 @@ const StudentDashboard = () => {
       </div>
 
       {/* Student Details */}
-      <div className="student-details">
-        <h2>Student Details</h2>
-        <table>
-          <tbody>
-            <tr>
-              <th>Roll No.</th>
-              <td>{student.rollNumber}</td>
-              <td rowSpan="4">
-                <img src={student.image} alt="Student" />
-              </td>
-            </tr>
-            <tr>
-              <th>Student Name</th>
-              <td>{student.name}</td>
-            </tr>
-            <tr>
-              <th>Father's Name</th>
-              <td>{student.fatherName}</td>
-            </tr>
-            <tr>
-              <th>Department</th>
-              <td>{`${student.year} ${student.department} ${student.section}`}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      {student ? (
+        <div className="student-details">
+          <h2>Student Details</h2>
+          <table>
+            <tbody>
+              <tr>
+                <th>Roll No.</th>
+                <td>{student.rollNumber}</td>
+                <td rowSpan="4">
+                  <img src={student.image} alt="Student" />
+                </td>
+              </tr>
+              <tr>
+                <th>Student Name</th>
+                <td>{student.name}</td>
+              </tr>
+              <tr>
+                <th>Father's Name</th>
+                <td>{student.fatherName}</td>
+              </tr>
+              <tr>
+                <th>Department</th>
+                <td>{`${student.year} ${student.department} ${student.section}`}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <h2>Student data not available</h2>
+      )}
 
       {/* Attendance Table */}
-      <h2 style={{ textAlign: "center" }}>Attendance Details</h2>
-      <table className="attendance-table">
-        <thead>
-          <tr>
-            <th>Subject</th>
-            <th>Classes Conducted</th>
-            <th>Classes Attended</th>
-            <th>%</th>
-          </tr>
-        </thead>
-        <tbody>
-          {attendance.subjectSummary.map((subject, index) => (
-            <tr key={index}>
-              <td>{subject.subject}</td>
-              <td>{subject.classesConducted}</td>
-              <td>{subject.classesAttended}</td>
-              <td>{subject.percentage}%</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      {attendance && attendance.subjectSummary ? (
+        <>
+          <h2 style={{ textAlign: "center" }}>Attendance Details</h2>
+          <table className="attendance-table">
+            <thead>
+              <tr>
+                <th>Subject</th>
+                <th>Classes Conducted</th>
+                <th>Classes Attended</th>
+                <th>%</th>
+              </tr>
+            </thead>
+            <tbody>
+              {attendance.subjectSummary.map((subject, index) => (
+                <tr key={index}>
+                  <td>{subject.subject}</td>
+                  <td>{subject.classesConducted}</td>
+                  <td>{subject.classesAttended}</td>
+                  <td>{subject.percentage}%</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
+      ) : (
+        <h2>Loading Attendance...</h2>
+      )}
 
       {/* Daily Attendance */}
-      <h2 style={{ textAlign: "center" }}>Daily Attendance</h2>
-      <table className="daily-attendance">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>1</th>
-            <th>Total</th>
-            <th>Attend</th>
-          </tr>
-        </thead>
-        <tbody>
-          {Object.entries(attendance.dailySummary).map(([date, record], index) => (
-            <tr key={index}>
-              <td>{date}</td>
-              <td className={record.periods["1"]}>{record.periods["1"]}</td>
-              <td>{record.total}</td>
-              <td>{record.attended}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      {attendance && attendance.dailySummary ? (
+        <>
+          <h2 style={{ textAlign: "center" }}>Daily Attendance</h2>
+          <table className="daily-attendance">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>1</th>
+                <th>Total</th>
+                <th>Attend</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Object.entries(attendance.dailySummary).map(([date, record], index) => (
+                <tr key={index}>
+                  <td>{date}</td>
+                  <td>{record.periods["1"]}</td>
+                  <td>{record.total}</td>
+                  <td>{record.attended}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
+      ) : (
+        <h2>Loading Daily Attendance...</h2>
+      )}
     </div>
   );
 };
