@@ -6,34 +6,62 @@ import Header from "./Components/Header/Header";
 const StudentDashboard = () => {
   const [student, setStudent] = useState(null);
   const [attendance, setAttendance] = useState(null);
+  const [error, setError] = useState(""); // Error state
   const studentId = localStorage.getItem("studentId"); // Get student ID from local storage
 
   useEffect(() => {
-    if (!studentId) return;
+    if (!studentId) {
+      setError("Student ID not found in local storage.");
+      return;
+    }
 
-    // Fetch student details
+    alert("Fetching student data...");
+
+    console.log("Fetching student data for:", studentId);
+
     fetch(`https://tkrcet-backend-g3zu.onrender.com/Section/${studentId}`)
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+        return res.json();
+      })
       .then((data) => {
+        console.log("Student Data:", data);
+
+        if (!data.student) {
+          throw new Error("No student data received.");
+        }
+
         setStudent(data.student);
 
-        // Once student data is fetched, use it to fetch attendance details
-        fetch(
-          `https://tkrcet-backend-g3zu.onrender.com/Attendance/student-record?rollNumber=${data.student.rollNumber}&year=${encodeURIComponent(
-            data.student.year
-          )}&department=${encodeURIComponent(
-            data.student.department
-          )}&section=${data.student.section}`
-        )
-          .then((res) => res.json())
-          .then((attendanceData) => setAttendance(attendanceData))
-          .catch((err) => console.error("Error fetching attendance:", err));
+        alert("Fetching attendance data...");
+        const attendanceURL = `https://tkrcet-backend-g3zu.onrender.com/Attendance/student-record?rollNumber=${data.student.rollNumber}&year=${encodeURIComponent(
+          data.student.year
+        )}&department=${encodeURIComponent(data.student.department)}&section=${data.student.section}`;
+
+        console.log("Fetching attendance data from:", attendanceURL);
+
+        return fetch(attendanceURL);
       })
-      .catch((err) => console.error("Error fetching student details:", err));
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+        return res.json();
+      })
+      .then((attendanceData) => {
+        console.log("Attendance Data:", attendanceData);
+        setAttendance(attendanceData);
+      })
+      .catch((err) => {
+        console.error("Error fetching data:", err);
+        setError(err.message);
+      });
   }, [studentId]);
 
-  if (!student || !attendance) {
-    return <h2>Loading...</h2>;
+  if (error) {
+    return <h2 style={{ textAlign: "center", color: "red" }}>Error: {error}</h2>;
+  }
+
+  if (!student || !attendance || !attendance.subjectSummary || !attendance.dailySummary) {
+    return <h2 style={{ textAlign: "center" }}>Loading...</h2>;
   }
 
   return (
