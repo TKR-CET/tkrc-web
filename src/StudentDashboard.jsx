@@ -6,78 +6,34 @@ import Header from "./Components/Header/Header";
 const StudentDashboard = () => {
   const [student, setStudent] = useState(null);
   const [attendance, setAttendance] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const studentId = localStorage.getItem("studentId");
+  const studentId = localStorage.getItem("studentId"); // Get student ID from local storage
 
   useEffect(() => {
-    if (!studentId) {
-      setError("Student ID not found in local storage.");
-      setLoading(false);
-      return;
-    }
+    if (!studentId) return;
 
-    console.log("Student ID from Local Storage:", studentId);
-
-    const fetchStudentData = async () => {
-      try {
-        const res = await fetch(`https://tkrcet-backend-g3zu.onrender.com/Section/${studentId}`);
-        const data = await res.json();
-
-        if (!data || !data.student) {
-          setError("Failed to fetch student data.");
-          setLoading(false);
-          return;
-        }
-
+    // Fetch student details
+    fetch(`https://tkrcet-backend-g3zu.onrender.com/Section/${studentId}`)
+      .then((res) => res.json())
+      .then((data) => {
         setStudent(data.student);
-      } catch (err) {
-        console.error("Error fetching student details:", err);
-        setError("Error fetching student details.");
-        setLoading(false);
-      }
-    };
 
-    fetchStudentData();
+        // Once student data is fetched, use it to fetch attendance details
+        fetch(
+          `https://tkrcet-backend-g3zu.onrender.com/Attendance/student-record?rollNumber=${data.student.rollNumber}&year=${encodeURIComponent(
+            data.student.year
+          )}&department=${encodeURIComponent(
+            data.student.department
+          )}&section=${data.student.section}`
+        )
+          .then((res) => res.json())
+          .then((attendanceData) => setAttendance(attendanceData))
+          .catch((err) => console.error("Error fetching attendance:", err));
+      })
+      .catch((err) => console.error("Error fetching student details:", err));
   }, [studentId]);
 
-  useEffect(() => {
-    if (!student) return; // Wait for student data to load
-
-    const { rollNumber, year, department, section } = student;
-    const encodedURL = `https://tkrcet-backend-g3zu.onrender.com/Attendance/student-record?rollNumber=${encodeURIComponent(
-      rollNumber
-    )}&year=${encodeURIComponent(year)}&department=${encodeURIComponent(department)}&section=${encodeURIComponent(section)}`;
-
-    console.log("Fetching attendance from:", encodedURL);
-
-    const fetchAttendanceData = async () => {
-      try {
-        const res = await fetch(encodedURL);
-        if (!res.ok) throw new Error("Failed to fetch attendance data");
-        const data = await res.json();
-        setAttendance(data);
-      } catch (err) {
-        console.error("Error fetching attendance data:", err);
-        setError("Failed to fetch attendance data.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAttendanceData();
-  }, [student]);
-
-  if (loading) {
-    return <h2 className="loading-text">Loading...</h2>;
-  }
-
-  if (error) {
-    return <h2 className="loading-text">{error}</h2>;
-  }
-
-  if (!student) {
-    return <h2 className="loading-text">Error loading student data. Please try again.</h2>;
+  if (!student || !attendance) {
+    return <h2>Loading...</h2>;
   }
 
   return (
@@ -92,14 +48,13 @@ const StudentDashboard = () => {
 
       {/* Student Details */}
       <div className="student-details">
-        <h2>Student Details</h2>
         <table>
           <tbody>
             <tr>
               <th>Roll No.</th>
               <td>{student.rollNumber}</td>
               <td rowSpan="4">
-                <img src={student.image} alt="Student" className="student-image" />
+                <img src={student.image} alt="Student" />
               </td>
             </tr>
             <tr>
@@ -118,91 +73,51 @@ const StudentDashboard = () => {
         </table>
       </div>
 
-      {/* Attendance Details */}
-      {attendance && (
-        <div className="attendance-details">
-          <h2>Attendance Summary</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Subject</th>
-                <th>Classes Conducted</th>
-                <th>Classes Attended</th>
-                <th>Percentage</th>
-              </tr>
-            </thead>
-            <tbody>
-              {attendance.subjectSummary.map((subject, index) => (
-                <tr key={index}>
-                  <td>{subject.subject}</td>
-                  <td>{subject.classesConducted}</td>
-                  <td>{subject.classesAttended}</td>
-                  <td>{subject.percentage}%</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      {/* Attendance Table */}
+      <h2 style={{ textAlign: "center" }}>Attendance Details</h2>
+      <table className="attendance-table">
+        <thead>
+          <tr>
+            <th>Subject</th>
+            <th>Classes Conducted</th>
+            <th>Classes Attended</th>
+            <th>%</th>
+          </tr>
+        </thead>
+        <tbody>
+          {attendance.subjectSummary.map((subject, index) => (
+            <tr key={index}>
+              <td>{subject.subject}</td>
+              <td>{subject.classesConducted}</td>
+              <td>{subject.classesAttended}</td>
+              <td>{subject.percentage}%</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
 
-      <style>
-        {`
-          .loading-text {
-            text-align: center;
-            font-size: 20px;
-            margin-top: 20px;
-          }
-
-          .student-details, .attendance-details {
-            margin-top: 20px;
-            padding: 20px;
-            background-color: #f9f9f9;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-          }
-
-          .student-details h2, .attendance-details h2 {
-            text-align: center;
-            color: #333;
-          }
-
-          table {
-            width: 100%;
-            margin: 20px 0;
-            border-collapse: collapse;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-          }
-
-          th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-          }
-
-          th {
-            background-color: #f2f2f2;
-            color: #333;
-          }
-
-          td {
-            color: #555;
-          }
-
-          img.student-image {
-            width: 100px;
-            height: 100px;
-            object-fit: cover;
-            border-radius: 50%;
-            margin-left: 20px;
-          }
-
-          .nav, .mob-nav {
-            margin-top: 20px;
-          }
-        `}
-      </style>
+      {/* Daily Attendance */}
+      <h2 style={{ textAlign: "center" }}>Daily Attendance</h2>
+      <table className="daily-attendance">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>1</th>
+            <th>Total</th>
+            <th>Attend</th>
+          </tr>
+        </thead>
+        <tbody>
+          {Object.entries(attendance.dailySummary).map(([date, record], index) => (
+            <tr key={index}>
+              <td>{date}</td>
+              <td className={record.periods["1"]}>{record.periods["1"]}</td>
+              <td>{record.total}</td>
+              <td>{record.attended}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };
