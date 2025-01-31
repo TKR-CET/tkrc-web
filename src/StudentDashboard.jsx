@@ -17,7 +17,7 @@ const StudentDashboard = () => {
       .then((data) => {
         setStudent(data.student);
 
-        // Once student data is fetched, use it to fetch attendance details
+        // Fetch attendance details using student details
         fetch(
           `https://tkrcet-backend-g3zu.onrender.com/Attendance/student-record?rollNumber=${data.student.rollNumber}&year=${encodeURIComponent(
             data.student.year
@@ -38,6 +38,116 @@ const StudentDashboard = () => {
 
   return (
     <div>
+      <style>
+        {`
+        body {
+          font-family: 'Arial', sans-serif;
+          background-color: #f4f4f9;
+          color: #333;
+          margin: 0;
+          padding: 0;
+        }
+
+        .container {
+          width: 90%;
+          margin: auto;
+          max-width: 1200px;
+          padding: 20px;
+        }
+
+        /* Navigation Styling */
+        .nav, .mob-nav {
+          margin-bottom: 20px;
+        }
+
+        /* Student Details Styling */
+        .student-details {
+          background: #fff;
+          padding: 20px;
+          border-radius: 8px;
+          box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+          margin-bottom: 20px;
+          text-align: center;
+        }
+
+        .student-details table {
+          width: 100%;
+          border-collapse: collapse;
+        }
+
+        .student-details th, .student-details td {
+          padding: 10px;
+          border-bottom: 1px solid #ddd;
+          text-align: left;
+        }
+
+        .student-details img {
+          width: 120px;
+          height: auto;
+          border-radius: 10px;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Attendance Table Styling */
+        .attendance-table, .daily-attendance {
+          width: 100%;
+          border-collapse: collapse;
+          background: #fff;
+          border-radius: 8px;
+          overflow: hidden;
+          box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+          margin-bottom: 20px;
+        }
+
+        th, td {
+          padding: 12px;
+          text-align: center;
+          border-bottom: 1px solid #ddd;
+        }
+
+        th {
+          background-color: #4CAF50;
+          color: white;
+        }
+
+        td {
+          background-color: #fff;
+        }
+
+        /* Highlighting attendance */
+        .daily-attendance td.P {
+          background-color: #c8e6c9;
+          font-weight: bold;
+          color: #2e7d32;
+        }
+
+        .daily-attendance td.A {
+          background-color: #ffcccb;
+          font-weight: bold;
+          color: #c62828;
+        }
+
+        /* Table Footer Styling */
+        tfoot th {
+          background-color: #ff9800;
+          color: white;
+        }
+
+        /* Responsive Styling */
+        @media (max-width: 768px) {
+          .student-details, .attendance-table, .daily-attendance {
+            width: 100%;
+            overflow-x: auto;
+            display: block;
+          }
+
+          .student-details img {
+            width: 100px;
+          }
+        }
+        `}
+      </style>
+
       <Header />
       <div className="nav">
         <NavBar />
@@ -46,78 +156,81 @@ const StudentDashboard = () => {
         <MobileNav />
       </div>
 
-      {/* Student Details */}
-      <div className="student-details">
-        <table>
+      <div className="container">
+        {/* Student Details */}
+        <div className="student-details">
+          <h2>Student Details</h2>
+          <table>
+            <tbody>
+              <tr>
+                <th>Roll No.</th>
+                <td>{student.rollNumber}</td>
+                <td rowSpan="4">
+                  <img src={student.image} alt="Student" />
+                </td>
+              </tr>
+              <tr>
+                <th>Student Name</th>
+                <td>{student.name}</td>
+              </tr>
+              <tr>
+                <th>Father's Name</th>
+                <td>{student.fatherName}</td>
+              </tr>
+              <tr>
+                <th>Department</th>
+                <td>{`${student.year} ${student.department} ${student.section}`}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        {/* Attendance Table */}
+        <h2 style={{ textAlign: "center" }}>Attendance Details</h2>
+        <table className="attendance-table">
+          <thead>
+            <tr>
+              <th>Subject</th>
+              <th>Classes Conducted</th>
+              <th>Classes Attended</th>
+              <th>%</th>
+            </tr>
+          </thead>
           <tbody>
+            {attendance.subjectSummary.map((subject, index) => (
+              <tr key={index}>
+                <td>{subject.subject}</td>
+                <td>{subject.classesConducted}</td>
+                <td>{subject.classesAttended}</td>
+                <td>{subject.percentage}%</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        {/* Daily Attendance */}
+        <h2 style={{ textAlign: "center" }}>Daily Attendance</h2>
+        <table className="daily-attendance">
+          <thead>
             <tr>
-              <th>Roll No.</th>
-              <td>{student.rollNumber}</td>
-              <td rowSpan="4">
-                <img src={student.image} alt="Student" />
-              </td>
+              <th>Date</th>
+              <th>1</th>
+              <th>Total</th>
+              <th>Attend</th>
             </tr>
-            <tr>
-              <th>Student Name</th>
-              <td>{student.name}</td>
-            </tr>
-            <tr>
-              <th>Father's Name</th>
-              <td>{student.fatherName}</td>
-            </tr>
-            <tr>
-              <th>Department</th>
-              <td>{`${student.year} ${student.department} ${student.section}`}</td>
-            </tr>
+          </thead>
+          <tbody>
+            {Object.entries(attendance.dailySummary).map(([date, record], index) => (
+              <tr key={index}>
+                <td>{date}</td>
+                <td className={record.periods["1"]}>{record.periods["1"]}</td>
+                <td>{record.total}</td>
+                <td>{record.attended}</td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
-
-      {/* Attendance Table */}
-      <h2 style={{ textAlign: "center" }}>Attendance Details</h2>
-      <table className="attendance-table">
-        <thead>
-          <tr>
-            <th>Subject</th>
-            <th>Classes Conducted</th>
-            <th>Classes Attended</th>
-            <th>%</th>
-          </tr>
-        </thead>
-        <tbody>
-          {attendance.subjectSummary.map((subject, index) => (
-            <tr key={index}>
-              <td>{subject.subject}</td>
-              <td>{subject.classesConducted}</td>
-              <td>{subject.classesAttended}</td>
-              <td>{subject.percentage}%</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
-      {/* Daily Attendance */}
-      <h2 style={{ textAlign: "center" }}>Daily Attendance</h2>
-      <table className="daily-attendance">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>1</th>
-            <th>Total</th>
-            <th>Attend</th>
-          </tr>
-        </thead>
-        <tbody>
-          {Object.entries(attendance.dailySummary).map(([date, record], index) => (
-            <tr key={index}>
-              <td>{date}</td>
-              <td className={record.periods["1"]}>{record.periods["1"]}</td>
-              <td>{record.total}</td>
-              <td>{record.attended}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
     </div>
   );
 };
