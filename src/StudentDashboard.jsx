@@ -33,7 +33,7 @@ const StudentDashboard = () => {
   }, [studentId]);
 
   if (!student || !attendance) {
-    return <h2>Loading...</h2>;
+    return <h2 className="loading-text">Loading...</h2>;
   }
 
   return (
@@ -41,11 +41,11 @@ const StudentDashboard = () => {
       <style>
         {`
         body {
-          font-family: 'Arial', sans-serif;
-          background-color: #f4f4f9;
-          color: #333;
+          font-family: 'Poppins', sans-serif;
+          background-color: #f4f6f8;
           margin: 0;
           padding: 0;
+          color: #333;
         }
 
         .container {
@@ -55,17 +55,26 @@ const StudentDashboard = () => {
           padding: 20px;
         }
 
-        /* Navigation Styling */
+        /* Navigation */
         .nav, .mob-nav {
           margin-bottom: 20px;
         }
 
-        /* Student Details Styling */
+        /* Loading Text */
+        .loading-text {
+          text-align: center;
+          font-size: 1.5rem;
+          font-weight: bold;
+          color: #555;
+          margin-top: 50px;
+        }
+
+        /* Student Details */
         .student-details {
           background: #fff;
           padding: 20px;
           border-radius: 8px;
-          box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
           margin-bottom: 20px;
           text-align: center;
         }
@@ -73,12 +82,12 @@ const StudentDashboard = () => {
         .student-details table {
           width: 100%;
           border-collapse: collapse;
+          text-align: left;
         }
 
         .student-details th, .student-details td {
-          padding: 10px;
+          padding: 12px;
           border-bottom: 1px solid #ddd;
-          text-align: left;
         }
 
         .student-details img {
@@ -88,25 +97,25 @@ const StudentDashboard = () => {
           box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
-        /* Attendance Table Styling */
+        /* Attendance Table */
         .attendance-table, .daily-attendance {
           width: 100%;
           border-collapse: collapse;
           background: #fff;
           border-radius: 8px;
           overflow: hidden;
-          box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
           margin-bottom: 20px;
         }
 
         th, td {
-          padding: 12px;
+          padding: 14px;
           text-align: center;
           border-bottom: 1px solid #ddd;
         }
 
         th {
-          background-color: #4CAF50;
+          background-color: #007bff;
           color: white;
         }
 
@@ -114,7 +123,7 @@ const StudentDashboard = () => {
           background-color: #fff;
         }
 
-        /* Highlighting attendance */
+        /* Attendance Colors */
         .daily-attendance td.P {
           background-color: #c8e6c9;
           font-weight: bold;
@@ -125,12 +134,6 @@ const StudentDashboard = () => {
           background-color: #ffcccb;
           font-weight: bold;
           color: #c62828;
-        }
-
-        /* Table Footer Styling */
-        tfoot th {
-          background-color: #ff9800;
-          color: white;
         }
 
         /* Responsive Styling */
