@@ -35,7 +35,7 @@ const StudentDashboard = () => {
 
         setStudent(data.student);
         window.alert("Student details fetched successfully!");
-
+  alert(student);
         // Fetch Attendance
         const attendanceURL = `https://tkrcet-backend-g3zu.onrender.com/Attendance/student-record?rollNumber=CS2025001&year=${student.year}&department=CSD&section=A`;
 
