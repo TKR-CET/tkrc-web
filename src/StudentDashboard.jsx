@@ -46,13 +46,26 @@ const StudentDashboard = () => {
           .then((attendanceData) => {
             console.log("Attendance API Response:", attendanceData); // Debugging log
 
-            if (!attendanceData || !attendanceData.subjectSummary) {
+            if (
+              !attendanceData ||
+              !attendanceData.subjectSummary ||
+              !attendanceData.dailySummary
+            ) {
               console.error("Attendance data is missing:", attendanceData);
               setError("Failed to fetch attendance data.");
               setLoading(false);
               return;
             }
-            setAttendance(attendanceData);
+
+            // Check if subjectSummary and dailySummary are in the expected structure
+            const { subjectSummary, dailySummary } = attendanceData;
+
+            if (Array.isArray(subjectSummary) && Object.keys(dailySummary).length > 0) {
+              setAttendance(attendanceData); // Set the attendance data if valid
+            } else {
+              setError("Invalid attendance data format.");
+            }
+
             setLoading(false);
           })
           .catch((err) => {
