@@ -5,9 +5,10 @@ import Header from "./Components/Header/Header";
 
 const StudentDashboard = () => {
   const [student, setStudent] = useState(null);
-  const [loading, setLoading] = useState(true);  // Added loading state
-  const [error, setError] = useState(""); // Added error state
-  const studentId = localStorage.getItem("studentId"); // Get student ID from local storage
+  const [attendance, setAttendance] = useState(null);  // New state for attendance
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const studentId = localStorage.getItem("studentId");
 
   useEffect(() => {
     if (!studentId) {
@@ -16,14 +17,13 @@ const StudentDashboard = () => {
       return;
     }
 
-    // Log the studentId to verify
     console.log("Student ID from Local Storage:", studentId);
 
     // Fetch student details
     fetch(`https://tkrcet-backend-g3zu.onrender.com/Section/${studentId}`)
       .then((res) => res.json())
       .then((data) => {
-        console.log("Student API Response:", data); // Debugging log
+        console.log("Student API Response:", data);
 
         if (!data || !data.student) {
           console.error("Student data is missing:", data);
@@ -31,22 +31,38 @@ const StudentDashboard = () => {
           setLoading(false);
           return;
         }
+
         setStudent(data.student);
+
+        // Fetch attendance data after student details are loaded
+        const { rollNumber, year, department, section } = data.student;
+        return fetch(`https://tkrcet-backend-g3zu.onrender.com/Attendance/student-record?rollNumber=${rollNumber}&year=${year}&department=${department}&section=${section}`);
+      })
+      .then((res) => res.json())
+      .then((attendanceData) => {
+        console.log("Attendance API Response:", attendanceData);
+
+        if (!attendanceData || !attendanceData.subjectSummary) {
+          console.error("Attendance data is missing:", attendanceData);
+          setError("Failed to fetch attendance data.");
+          setLoading(false);
+          return;
+        }
+
+        setAttendance(attendanceData);
         setLoading(false);
       })
       .catch((err) => {
-        console.error("Error fetching student details:", err);
-        setError("Error fetching student details.");
+        console.error("Error fetching data:", err);
+        setError("Error fetching data.");
         setLoading(false);
       });
   }, [studentId]);
 
-  // Loading state before data is fetched
   if (loading) {
     return <h2 className="loading-text">Loading...</h2>;
   }
 
-  // Error handling if no student data is available
   if (error) {
     return <h2 className="loading-text">{error}</h2>;
   }
@@ -93,7 +109,33 @@ const StudentDashboard = () => {
         </table>
       </div>
 
-      {/* Internal CSS */}
+      {/* Attendance Details */}
+      {attendance && (
+        <div className="attendance-details">
+          <h2>Attendance Summary</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Subject</th>
+                <th>Classes Conducted</th>
+                <th>Classes Attended</th>
+                <th>Percentage</th>
+              </tr>
+            </thead>
+            <tbody>
+              {attendance.subjectSummary.map((subject, index) => (
+                <tr key={index}>
+                  <td>{subject.subject}</td>
+                  <td>{subject.classesConducted}</td>
+                  <td>{subject.classesAttended}</td>
+                  <td>{subject.percentage}%</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
       <style>
         {`
           .loading-text {
@@ -102,7 +144,7 @@ const StudentDashboard = () => {
             margin-top: 20px;
           }
 
-          .student-details {
+          .student-details, .attendance-details {
             margin-top: 20px;
             padding: 20px;
             background-color: #f9f9f9;
@@ -110,7 +152,7 @@ const StudentDashboard = () => {
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
           }
 
-          .student-details h2 {
+          .student-details h2, .attendance-details h2 {
             text-align: center;
             color: #333;
           }
