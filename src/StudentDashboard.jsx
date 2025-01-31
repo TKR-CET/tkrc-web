@@ -74,7 +74,7 @@ const StudentDashboard = () => {
               <th>Roll No.</th>
               <td>{student.rollNumber}</td>
               <td rowSpan="4">
-                <img src={student.image} alt="Student" />
+                <img src={student.image} alt="Student" className="student-image" />
               </td>
             </tr>
             <tr>
@@ -92,6 +92,66 @@ const StudentDashboard = () => {
           </tbody>
         </table>
       </div>
+
+      {/* Internal CSS */}
+      <style>
+        {`
+          .loading-text {
+            text-align: center;
+            font-size: 20px;
+            margin-top: 20px;
+          }
+
+          .student-details {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+          }
+
+          .student-details h2 {
+            text-align: center;
+            color: #333;
+          }
+
+          table {
+            width: 100%;
+            margin: 20px 0;
+            border-collapse: collapse;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+          }
+
+          th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+          }
+
+          th {
+            background-color: #f2f2f2;
+            color: #333;
+          }
+
+          td {
+            color: #555;
+          }
+
+          img.student-image {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin-left: 20px;
+          }
+
+          .nav, .mob-nav {
+            margin-top: 20px;
+          }
+        `}
+      </style>
     </div>
   );
 };
