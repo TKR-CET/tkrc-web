@@ -12,66 +12,74 @@ const StudentDashboard = () => {
   const studentId = localStorage.getItem("studentId"); // Get student ID from local storage
 
   useEffect(() => {
-  if (!studentId) {
-    window.alert("Student ID not found in local storage.");
-    setError("Student ID not found.");
-    setLoading(false);
-    return;
+    if (!studentId) {
+      window.alert("Student ID not found in local storage.");
+      setError("Student ID not found.");
+      setLoading(false);
+      return;
+    }
+
+    window.alert("Fetching student details...");
+
+    // Fetch student details
+    fetch(`https://tkrcet-backend-g3zu.onrender.com/Section/${studentId}`)
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+        return res.json();
+      })
+      .then((data) => {
+        console.log("Student API Response:", data);
+        if (!data || !data.student) {
+          throw new Error("Invalid student data received.");
+        }
+
+        setStudent(data.student);
+        window.alert("Student details fetched successfully!");
+
+        // Ensure student details are populated correctly
+        const { rollNumber, year, department, section } = data.student;
+        if (!rollNumber || !year || !department || !section) {
+          throw new Error("Student details are incomplete.");
+        }
+
+        // Alert the student details before fetching attendance
+        window.alert(`Student details - Roll: ${rollNumber}, Year: ${year}, Department: ${department}, Section: ${section}`);
+
+        // Fetch Attendance
+        const attendanceURL = `https://tkrcet-backend-g3zu.onrender.com/Attendance/student-record?rollNumber=${rollNumber}&year=${year}&department=${department}&section=${section}`;
+
+        window.alert("Fetching attendance details...");
+
+        console.log("Fetching attendance from:", attendanceURL);
+
+        return fetch(attendanceURL);
+      })
+      .then((res) => {
+        console.log("Attendance Response:", res);
+        if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+        return res.json();
+      })
+      .then((attendanceData) => {
+        console.log("Attendance Data:", attendanceData);
+        setAttendance(attendanceData);
+        window.alert("Attendance details fetched successfully!");
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Error fetching data:", err);
+        window.alert(`Error: ${err.message}`);
+        setError(err.message);
+        setLoading(false);
+      });
+  }, [studentId]);
+
+  if (loading) {
+    return <h2>Loading...</h2>;
   }
 
-  window.alert("Fetching student details...");
-
-  // Fetch student details
-  fetch(`https://tkrcet-backend-g3zu.onrender.com/Section/${studentId}`)
-    .then((res) => {
-      if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
-      return res.json();
-    })
-    .then((data) => {
-      console.log("Student API Response:", data);
-      if (!data || !data.student) {
-        throw new Error("Invalid student data received.");
-      }
-
-      setStudent(data.student);
-      window.alert("Student details fetched successfully!");
-
-      // Ensure student details are populated correctly
-      const { rollNumber, year, department, section } = data.student;
-      if (!rollNumber || !year || !department || !section) {
-        throw new Error("Student details are incomplete.");
-      }
-
-      // Alert the student details before fetching attendance
-      window.alert(`Student details - Roll: ${rollNumber}, Year: ${year}, Department: ${department}, Section: ${section}`);
-
-      // Fetch Attendance
-      const attendanceURL = `https://tkrcet-backend-g3zu.onrender.com/Attendance/student-record?rollNumber=${rollNumber}&year=${year}&department=${department}&section=${section}`;
-      
-      window.alert("Fetching attendance details...");
-
-      console.log("Fetching attendance from:", attendanceURL);
-
-      return fetch(attendanceURL);
-    })
-    .then((res) => {
-      console.log("Attendance Response:", res);
-      if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
-      return res.json();
-    })
-    .then((attendanceData) => {
-      console.log("Attendance Data:", attendanceData);
-      setAttendance(attendanceData);
-      window.alert("Attendance details fetched successfully!");
-      setLoading(false);
-    })
-    .catch((err) => {
-      console.error("Error fetching data:", err);
-      window.alert(`Error: ${err.message}`);
-      setError(err.message);
-      setLoading(false);
-    });
-}, [studentId]);
+  if (error) {
+    return <h2 style={{ color: "red", textAlign: "center" }}>{error}</h2>;
+  }
 
   return (
     <div>
@@ -123,7 +131,7 @@ const StudentDashboard = () => {
           </tr>
         </thead>
         <tbody>
-          {attendance?.subjectSummary?.map((subject, index) => (
+          {attendance.subjectSummary.map((subject, index) => (
             <tr key={index}>
               <td>{subject.subject}</td>
               <td>{subject.classesConducted}</td>
@@ -146,15 +154,14 @@ const StudentDashboard = () => {
           </tr>
         </thead>
         <tbody>
-          {attendance?.dailySummary &&
-            Object.entries(attendance.dailySummary).map(([date, record], index) => (
-              <tr key={index}>
-                <td>{date}</td>
-                <td className={record.periods["1"]}>{record.periods["1"]}</td>
-                <td>{record.total}</td>
-                <td>{record.attended}</td>
-              </tr>
-            ))}
+          {Object.entries(attendance.dailySummary).map(([date, record], index) => (
+            <tr key={index}>
+              <td>{date}</td>
+              <td className={record.periods["1"]}>{record.periods["1"]}</td>
+              <td>{record.total}</td>
+              <td>{record.attended}</td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>
