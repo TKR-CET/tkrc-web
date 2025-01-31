@@ -6,18 +6,29 @@ import Header from "./Components/Header/Header";
 const StudentDashboard = () => {
   const [student, setStudent] = useState(null);
   const [attendance, setAttendance] = useState(null);
+  const [loading, setLoading] = useState(true);  // Added loading state
   const studentId = localStorage.getItem("studentId"); // Get student ID from local storage
 
   useEffect(() => {
     if (!studentId) return;
 
+    // Log the studentId to verify
+    console.log("Student ID from Local Storage:", studentId);
+
     // Fetch student details
     fetch(`https://tkrcet-backend-g3zu.onrender.com/Section/${studentId}`)
       .then((res) => res.json())
       .then((data) => {
+        console.log("Student API Response:", data); // Debugging log
+
+        if (!data || !data.student) {
+          console.error("Student data is missing:", data);
+          setLoading(false);
+          return;
+        }
         setStudent(data.student);
 
-        // Once student data is fetched, use it to fetch attendance details
+        // Fetch attendance details using student details
         fetch(
           `https://tkrcet-backend-g3zu.onrender.com/Attendance/student-record?rollNumber=${data.student.rollNumber}&year=${encodeURIComponent(
             data.student.year
@@ -26,14 +37,35 @@ const StudentDashboard = () => {
           )}&section=${data.student.section}`
         )
           .then((res) => res.json())
-          .then((attendanceData) => setAttendance(attendanceData))
-          .catch((err) => console.error("Error fetching attendance:", err));
+          .then((attendanceData) => {
+            console.log("Attendance API Response:", attendanceData); // Debugging log
+
+            if (!attendanceData || !attendanceData.subjectSummary) {
+              console.error("Attendance data is missing:", attendanceData);
+              setLoading(false);
+              return;
+            }
+            setAttendance(attendanceData);
+            setLoading(false);
+          })
+          .catch((err) => {
+            console.error("Error fetching attendance:", err);
+            setLoading(false);
+          });
       })
-      .catch((err) => console.error("Error fetching student details:", err));
+      .catch((err) => {
+        console.error("Error fetching student details:", err);
+        setLoading(false);
+      });
   }, [studentId]);
 
+  // Loading state before data is fetched
+  if (loading) {
+    return <h2 className="loading-text">Loading...</h2>;
+  }
+
   if (!student || !attendance) {
-    return <h2>Loading...</h2>;
+    return <h2 className="loading-text">Error loading student data. Please try again.</h2>;
   }
 
   return (
@@ -48,6 +80,7 @@ const StudentDashboard = () => {
 
       {/* Student Details */}
       <div className="student-details">
+        <h2>Student Details</h2>
         <table>
           <tbody>
             <tr>
@@ -85,14 +118,20 @@ const StudentDashboard = () => {
           </tr>
         </thead>
         <tbody>
-          {attendance.subjectSummary.map((subject, index) => (
-            <tr key={index}>
-              <td>{subject.subject}</td>
-              <td>{subject.classesConducted}</td>
-              <td>{subject.classesAttended}</td>
-              <td>{subject.percentage}%</td>
+          {attendance.subjectSummary && attendance.subjectSummary.length > 0 ? (
+            attendance.subjectSummary.map((subject, index) => (
+              <tr key={index}>
+                <td>{subject.subject}</td>
+                <td>{subject.classesConducted}</td>
+                <td>{subject.classesAttended}</td>
+                <td>{subject.percentage}%</td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="4">No attendance data available.</td>
             </tr>
-          ))}
+          )}
         </tbody>
       </table>
 
@@ -108,14 +147,20 @@ const StudentDashboard = () => {
           </tr>
         </thead>
         <tbody>
-          {Object.entries(attendance.dailySummary).map(([date, record], index) => (
-            <tr key={index}>
-              <td>{date}</td>
-              <td className={record.periods["1"]}>{record.periods["1"]}</td>
-              <td>{record.total}</td>
-              <td>{record.attended}</td>
+          {Object.entries(attendance.dailySummary || {}).length > 0 ? (
+            Object.entries(attendance.dailySummary).map(([date, record], index) => (
+              <tr key={index}>
+                <td>{date}</td>
+                <td className={record.periods["1"]}>{record.periods["1"]}</td>
+                <td>{record.total}</td>
+                <td>{record.attended}</td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="4">No daily attendance data available.</td>
             </tr>
-          ))}
+          )}
         </tbody>
       </table>
     </div>
