@@ -8,75 +8,57 @@ const StudentDashboard = () => {
   const [attendance, setAttendance] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
-  const studentId = localStorage.getItem("studentId"); // Get student ID from local storage
+  const studentId = localStorage.getItem("studentId");
 
   useEffect(() => {
     if (!studentId) {
-      window.alert("Student ID not found in local storage.");
-      setError("Student ID not found.");
+      setError("Student ID not found in local storage.");
       setLoading(false);
       return;
     }
 
-    window.alert("Fetching student details...");
-
-    // Fetch student details
+    // Fetch Student Details
     fetch(`https://tkrcet-backend-g3zu.onrender.com/Section/${studentId}`)
-      .then((res) => {
-        if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
-        return res.json();
-      })
+      .then((res) => res.json())
       .then((data) => {
-        console.log("Student API Response:", data);
         if (!data || !data.student) {
-          throw new Error("Invalid student data received.");
+          setError("Failed to fetch student data.");
+          setLoading(false);
+          return;
         }
-
         setStudent(data.student);
-        window.alert("Student details fetched successfully!");
-
-        // Extract student details
-        const { rollNumber, year, department, section } = data.student;
-        if (!rollNumber || !year || !department || !section) {
-          throw new Error("Student details are incomplete.");
-        }
-
-        window.alert(`Student details: Roll: ${rollNumber}, Year: ${year}, Department: ${department}, Section: ${section}`);
-
-        // Fetch Attendance
-        const attendanceURL = `https://tkrcet-backend-g3zu.onrender.com/Attendance/student-record?rollNumber=${rollNumber}&year=${year}&department=${department}&section=${section}`;
-
-        window.alert("Fetching attendance details...");
-        console.log("Fetching attendance from:", attendanceURL);
-
-        return fetch(attendanceURL);
-      })
-      .then((res) => {
-        console.log("Attendance Response:", res);
-        if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
-        return res.json();
-      })
-      .then((attendanceData) => {
-        console.log("Attendance Data:", attendanceData);
-        setAttendance(attendanceData);
-        window.alert("Attendance details fetched successfully!");
         setLoading(false);
       })
       .catch((err) => {
-        console.error("Error fetching data:", err);
-        window.alert(`Error: ${err.message}`);
-        setError(err.message);
+        setError("Error fetching student details.");
         setLoading(false);
+      });
+
+    // Fetch Attendance Details
+    fetch(`https://tkrcet-backend-g3zu.onrender.com/Attendance/student-record?rollNumber=${studentId}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (!data || !data.subjectSummary) {
+          setError("Failed to fetch attendance data.");
+          return;
+        }
+        setAttendance(data);
+      })
+      .catch((err) => {
+        setError("Error fetching attendance data.");
       });
   }, [studentId]);
 
   if (loading) {
-    return <h2>Loading...</h2>;
+    return <h2 className="loading-text">Loading...</h2>;
   }
 
   if (error) {
-    return <h2 style={{ color: "red", textAlign: "center" }}>{error}</h2>;
+    return <h2 className="loading-text">{error}</h2>;
+  }
+
+  if (!student || !attendance) {
+    return <h2 className="loading-text">Error loading data. Please try again.</h2>;
   }
 
   return (
@@ -98,7 +80,7 @@ const StudentDashboard = () => {
               <th>Roll No.</th>
               <td>{student.rollNumber}</td>
               <td rowSpan="4">
-                <img src={student.image} alt="Student" />
+                <img src={student.image} alt="Student" className="student-image" />
               </td>
             </tr>
             <tr>
@@ -117,58 +99,115 @@ const StudentDashboard = () => {
         </table>
       </div>
 
-      {/* Attendance Table */}
-      <h2 style={{ textAlign: "center" }}>Attendance Details</h2>
-      <table className="attendance-table">
-        <thead>
-          <tr>
-            <th>Subject</th>
-            <th>Classes Conducted</th>
-            <th>Classes Attended</th>
-            <th>Attendance %</th>
-          </tr>
-        </thead>
-        <tbody>
-          {attendance.subjectSummary?.map((subject, index) => (
-            <tr key={index}>
-              <td>{subject.subject}</td>
-              <td>{subject.classesConducted}</td>
-              <td>{subject.classesAttended}</td>
-              <td>{subject.percentage}%</td>
+      {/* Attendance Summary */}
+      <div className="attendance-summary">
+        <h2>Attendance Summary</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Subject</th>
+              <th>Classes Conducted</th>
+              <th>Classes Attended</th>
+              <th>Percentage</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-
-      {/* Daily Attendance */}
-      <h2 style={{ textAlign: "center" }}>Daily Attendance</h2>
-      <table className="daily-attendance">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Periods</th>
-            <th>Total</th>
-            <th>Attended</th>
-          </tr>
-        </thead>
-        <tbody>
-          {attendance.dailySummary &&
-            Object.entries(attendance.dailySummary).map(([date, record], index) => (
+          </thead>
+          <tbody>
+            {attendance.subjectSummary.map((subject, index) => (
               <tr key={index}>
-                <td>{date}</td>
-                <td>
-                  {Object.entries(record.periods).map(([period, status]) => (
-                    <span key={period}>
-                      {period}: {status} &nbsp;
-                    </span>
-                  ))}
-                </td>
-                <td>{record.total}</td>
-                <td>{record.attended}</td>
+                <td>{subject.subject}</td>
+                <td>{subject.classesConducted}</td>
+                <td>{subject.classesAttended}</td>
+                <td>{subject.percentage}%</td>
               </tr>
             ))}
-        </tbody>
-      </table>
+          </tbody>
+        </table>
+      </div>
+
+      {/* Daily Attendance Summary */}
+      <div className="daily-attendance">
+        <h2>Daily Attendance</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Periods</th>
+              <th>Total</th>
+              <th>Attended</th>
+            </tr>
+          </thead>
+          <tbody>
+            {Object.entries(attendance.dailySummary).map(([date, data], index) => (
+              <tr key={index}>
+                <td>{date}</td>
+                <td>{Object.values(data.periods).join(", ")}</td>
+                <td>{data.total}</td>
+                <td>{data.attended}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Internal CSS */}
+      <style>
+        {`
+          .loading-text {
+            text-align: center;
+            font-size: 20px;
+            margin-top: 20px;
+          }
+
+          .student-details, .attendance-summary, .daily-attendance {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+          }
+
+          h2 {
+            text-align: center;
+            color: #333;
+          }
+
+          table {
+            width: 100%;
+            margin: 20px 0;
+            border-collapse: collapse;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+          }
+
+          th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+          }
+
+          th {
+            background-color: #f2f2f2;
+            color: #333;
+          }
+
+          td {
+            color: #555;
+          }
+
+          img.student-image {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin-left: 20px;
+          }
+
+          .nav, .mob-nav {
+            margin-top: 20px;
+          }
+        `}
+      </style>
     </div>
   );
 };
