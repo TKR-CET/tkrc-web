@@ -7,10 +7,15 @@ const StudentDashboard = () => {
   const [student, setStudent] = useState(null);
   const [attendance, setAttendance] = useState(null);
   const [loading, setLoading] = useState(true);  // Added loading state
+  const [error, setError] = useState(""); // Added error state
   const studentId = localStorage.getItem("studentId"); // Get student ID from local storage
 
   useEffect(() => {
-    if (!studentId) return;
+    if (!studentId) {
+      setError("Student ID not found in local storage.");
+      setLoading(false);
+      return;
+    }
 
     // Log the studentId to verify
     console.log("Student ID from Local Storage:", studentId);
@@ -23,6 +28,7 @@ const StudentDashboard = () => {
 
         if (!data || !data.student) {
           console.error("Student data is missing:", data);
+          setError("Failed to fetch student data.");
           setLoading(false);
           return;
         }
@@ -42,6 +48,7 @@ const StudentDashboard = () => {
 
             if (!attendanceData || !attendanceData.subjectSummary) {
               console.error("Attendance data is missing:", attendanceData);
+              setError("Failed to fetch attendance data.");
               setLoading(false);
               return;
             }
@@ -50,11 +57,13 @@ const StudentDashboard = () => {
           })
           .catch((err) => {
             console.error("Error fetching attendance:", err);
+            setError("Error fetching attendance.");
             setLoading(false);
           });
       })
       .catch((err) => {
         console.error("Error fetching student details:", err);
+        setError("Error fetching student details.");
         setLoading(false);
       });
   }, [studentId]);
@@ -62,6 +71,11 @@ const StudentDashboard = () => {
   // Loading state before data is fetched
   if (loading) {
     return <h2 className="loading-text">Loading...</h2>;
+  }
+
+  // Error handling if no student or attendance data is available
+  if (error) {
+    return <h2 className="loading-text">{error}</h2>;
   }
 
   if (!student || !attendance) {
