@@ -11,6 +11,7 @@ const StudentDashboard = () => {
 
   const studentId = localStorage.getItem("studentId"); // Get student ID from local storage
 
+  // Fetch student details
   useEffect(() => {
     if (!studentId) {
       window.alert("Student ID not found in local storage.");
@@ -21,7 +22,6 @@ const StudentDashboard = () => {
 
     window.alert("Fetching student details...");
 
-    // Fetch student details
     fetch(`https://tkrcet-backend-g3zu.onrender.com/Section/${studentId}`)
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
@@ -35,34 +35,42 @@ const StudentDashboard = () => {
 
         setStudent(data.student);
         window.alert("Student details fetched successfully!");
-  alert(student);
-        // Fetch Attendance
-        const attendanceURL = `https://tkrcet-backend-g3zu.onrender.com/Attendance/student-record?rollNumber=CS2025001&year=${student.year}&department=CSD&section=A`;
-
-        window.alert("Fetching attendance details...");
-
-        console.log("Fetching attendance from:", attendanceURL);
-
-        return fetch(attendanceURL);
-      })
-      .then((res) => {
-        console.log("Attendance Response:", res);
-        if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
-        return res.json();
-      })
-      .then((attendanceData) => {
-        console.log("Attendance Data:", attendanceData);
-        setAttendance(attendanceData);
-        window.alert("Attendance details fetched successfully!");
-        setLoading(false);
       })
       .catch((err) => {
-        console.error("Error fetching data:", err);
+        console.error("Error fetching student data:", err);
         window.alert(`Error: ${err.message}`);
         setError(err.message);
         setLoading(false);
       });
   }, [studentId]);
+
+  // Fetch attendance after student data is available
+  useEffect(() => {
+    if (student) {
+      const attendanceURL = `https://tkrcet-backend-g3zu.onrender.com/Attendance/student-record?rollNumber=${student.rollNumber}&year=${student.year}&department=${student.department}&section=${student.section}`;
+
+      window.alert("Fetching attendance details...");
+      console.log("Fetching attendance from:", attendanceURL);
+
+      fetch(attendanceURL)
+        .then((res) => {
+          if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+          return res.json();
+        })
+        .then((attendanceData) => {
+          console.log("Attendance Data:", attendanceData);
+          setAttendance(attendanceData);
+          window.alert("Attendance details fetched successfully!");
+          setLoading(false);
+        })
+        .catch((err) => {
+          console.error("Error fetching attendance:", err);
+          window.alert(`Error: ${err.message}`);
+          setError(err.message);
+          setLoading(false);
+        });
+    }
+  }, [student]);
 
   if (loading) {
     return <h2>Loading...</h2>;
@@ -122,7 +130,7 @@ const StudentDashboard = () => {
           </tr>
         </thead>
         <tbody>
-          {attendance.subjectSummary.map((subject, index) => (
+          {attendance?.subjectSummary?.map((subject, index) => (
             <tr key={index}>
               <td>{subject.subject}</td>
               <td>{subject.classesConducted}</td>
@@ -145,14 +153,15 @@ const StudentDashboard = () => {
           </tr>
         </thead>
         <tbody>
-          {Object.entries(attendance.dailySummary).map(([date, record], index) => (
-            <tr key={index}>
-              <td>{date}</td>
-              <td className={record.periods["1"]}>{record.periods["1"]}</td>
-              <td>{record.total}</td>
-              <td>{record.attended}</td>
-            </tr>
-          ))}
+          {attendance?.dailySummary &&
+            Object.entries(attendance.dailySummary).map(([date, record], index) => (
+              <tr key={index}>
+                <td>{date}</td>
+                <td className={record.periods["1"]}>{record.periods["1"]}</td>
+                <td>{record.total}</td>
+                <td>{record.attended}</td>
+              </tr>
+            ))}
         </tbody>
       </table>
     </div>
