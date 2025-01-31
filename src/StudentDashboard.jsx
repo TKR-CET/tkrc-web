@@ -35,7 +35,7 @@ const StudentDashboard = () => {
       });
 
     // Fetch Attendance Details
-    fetch(`https://tkrcet-backend-g3zu.onrender.com/Attendance/student-record?rollNumber=A400`)
+    fetch(`https://tkrcet-backend-g3zu.onrender.com/Attendance/student-record?rollNumber=${studentId}`)
       .then((res) => res.json())
       .then((data) => {
         if (!data || !data.subjectSummary) {
