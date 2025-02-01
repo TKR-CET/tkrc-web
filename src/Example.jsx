@@ -54,23 +54,31 @@ const Example = () => {
         <p>Department: {student.department}</p>
         <p>Section: {student.section}</p>
       </div>
+
       <h1>Timetable</h1>
       <div style={styles.timetable}>
+        {/* Table Header */}
         <div style={styles.header}>
-          <div>Day</div>
-          <div>9:40-10:40</div>
-          <div>10:40-11:40</div>
-          <div>11:40-12:40</div>
-          <div>12:40-1:20</div>
-          <div>1:20-2:20</div>
-          <div>2:20-3:20</div>
-          <div>3:20-4:20</div>
+          <div style={styles.cell}>Day</div>
+          <div style={styles.cell}>9:40-10:40</div>
+          <div style={styles.cell}>10:40-11:40</div>
+          <div style={styles.cell}>11:40-12:40</div>
+          <div style={styles.cell}>12:40-1:20</div> {/* Fixed Lunch Period */}
+          <div style={styles.cell}>1:20-2:20</div>
+          <div style={styles.cell}>2:20-3:20</div>
+          <div style={styles.cell}>3:20-4:20</div>
         </div>
+
+        {/* Table Body */}
         {timetable.map((day) => (
           <div style={styles.row} key={day._id}>
-            <div>{day.day}</div>
-            {day.periods.map((period) => (
-              <div key={period._id}>{period.subject}</div>
+            <div style={styles.cell}>{day.day}</div>
+            {day.periods.slice(0, 3).map((period, index) => (
+              <div style={styles.cell} key={index}>{period.subject}</div>
+            ))}
+            <div style={{ ...styles.cell, backgroundColor: '#f4f4f4', fontWeight: 'bold' }}>LUNCH</div>
+            {day.periods.slice(3).map((period, index) => (
+              <div style={styles.cell} key={index}>{period.subject}</div>
             ))}
           </div>
         ))}
@@ -86,32 +94,26 @@ const styles = {
   },
   studentInfo: {
     marginBottom: '20px',
+    textAlign: 'center',
   },
   timetable: {
     display: 'grid',
     gridTemplateColumns: 'repeat(8, 1fr)',
-    gap: '1px',
-    backgroundColor: '#ddd',
+    border: '1px solid #ddd',
+    backgroundColor: '#fff',
   },
   header: {
     display: 'contents',
+    fontWeight: 'bold',
+    backgroundColor: '#f4f4f4',
   },
   row: {
     display: 'contents',
   },
-  headerDiv: {
+  cell: {
     padding: '10px',
-    backgroundColor: '#fff',
-    textAlign: 'center',
     border: '1px solid #ddd',
-    fontWeight: 'bold',
-    backgroundColor: '#f4f4f4',
-  },
-  rowDiv: {
-    padding: '10px',
-    backgroundColor: '#fff',
     textAlign: 'center',
-    border: '1px solid #ddd',
   },
 };
 
