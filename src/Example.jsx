@@ -39,35 +39,21 @@ const Example = () => {
 
   return (
     <div className="container">
-      {/* Student Details Section */}
+      {/* Student Details Section (FULL WIDTH) */}
       <div className="student-details">
         <h1 className="title">Student Details</h1>
-        <table className="student-table">
-          <tbody>
-            <tr>
-              <td rowSpan="4" className="image-cell">
-                <img src={student.image} alt="Student" className="student-image" />
-              </td>
-              <td><strong>Roll No.</strong></td>
-              <td>{student.rollNumber}</td>
-            </tr>
-            <tr>
-              <td><strong>Student Name</strong></td>
-              <td>{student.name}</td>
-            </tr>
-            <tr>
-              <td><strong>Father's Name</strong></td>
-              <td>{student.fatherName}</td>
-            </tr>
-            <tr>
-              <td><strong>Department</strong></td>
-              <td>{student.department} | {student.section}</td>
-            </tr>
-          </tbody>
-        </table>
+        <div className="student-card">
+          <img src={student.image} alt="Student" className="student-image" />
+          <div className="student-info">
+            <p><strong>Roll No:</strong> {student.rollNumber}</p>
+            <p><strong>Name:</strong> {student.name}</p>
+            <p><strong>Father's Name:</strong> {student.fatherName}</p>
+            <p><strong>Department:</strong> {student.department} | {student.section}</p>
+          </div>
+        </div>
       </div>
 
-      {/* Timetable Section */}
+      {/* Timetable Section (BELOW Student Details) */}
       <div className="timetable-section">
         <h1 className="title">Timetable</h1>
         <div className="table-container">
@@ -107,7 +93,7 @@ const Example = () => {
         {`
           .container {
             width: 90%;
-            max-width: 1200px;
+            max-width: 1000px;
             margin: 20px auto;
             background: #fff;
             padding: 20px;
@@ -128,28 +114,28 @@ const Example = () => {
           }
           .student-details {
             margin-bottom: 30px;
-          }
-          .student-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: #f9f9f9;
-            border-radius: 8px;
-            overflow: hidden;
-          }
-          .student-table td {
-            padding: 12px;
-            border: 1px solid #ddd;
-          }
-          .image-cell {
             text-align: center;
-            vertical-align: middle;
-            width: 150px;
+          }
+          .student-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
           }
           .student-image {
-            width: 100px;
-            height: 100px;
+            width: 120px;
+            height: 120px;
             border-radius: 50%;
             object-fit: cover;
+            margin-bottom: 10px;
+          }
+          .student-info p {
+            margin: 5px 0;
+            font-size: 18px;
+            color: #444;
           }
           .timetable-section {
             margin-top: 40px;
@@ -180,12 +166,15 @@ const Example = () => {
             color: #d9534f;
           }
           @media (max-width: 768px) {
-            .student-table td {
-              padding: 8px;
+            .student-card {
+              padding: 15px;
             }
             .student-image {
-              width: 80px;
-              height: 80px;
+              width: 100px;
+              height: 100px;
+            }
+            .student-info p {
+              font-size: 16px;
             }
             .timetable th, .timetable td {
               padding: 8px;
@@ -199,14 +188,15 @@ const Example = () => {
             .title {
               font-size: 20px;
             }
-            .student-table td {
-              display: block;
-              text-align: left;
-              border: none;
+            .student-card {
+              padding: 10px;
             }
             .student-image {
               width: 80px;
               height: 80px;
+            }
+            .student-info p {
+              font-size: 14px;
             }
             .timetable {
               font-size: 12px;
