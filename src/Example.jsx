@@ -6,19 +6,13 @@ const Example = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Get studentId from localStorage
     const studentId = localStorage.getItem('studentId');
     if (studentId) {
-      // Fetch student details based on studentId
       fetch(`https://tkrcet-backend-g3zu.onrender.com/Section/${studentId}`)
         .then((response) => response.json())
         .then((data) => {
           setStudent(data.student);
-
-          // Extract year, department, and section from the student details
           const { year, department, section } = data.student;
-
-          // Now fetch the timetable dynamically using student details
           fetch(`https://tkrcet-backend-g3zu.onrender.com/Section/${year}/${department}/${section}/timetable`)
             .then((response) => response.json())
             .then((data) => {
@@ -49,9 +43,9 @@ const Example = () => {
   }
 
   return (
-    <div>
+    <div style={styles.container}>
       <h1>Student Information</h1>
-      <div>
+      <div style={styles.studentInfo}>
         <img src={student.image} alt="Student" width={100} height={100} />
         <h3>{student.name}</h3>
         <p>Roll Number: {student.rollNumber}</p>
@@ -61,32 +55,64 @@ const Example = () => {
         <p>Section: {student.section}</p>
       </div>
       <h1>Timetable</h1>
-      <table>
-        <thead>
-          <tr>
-            <th>Day</th>
-            <th>Periods</th>
-          </tr>
-        </thead>
-        <tbody>
-          {timetable.map((day) => (
-            <tr key={day._id}>
-              <td>{day.day}</td>
-              <td>
-                <ul>
-                  {day.periods.map((period) => (
-                    <li key={period._id}>
-                      Period {period.periodNumber}: {period.subject}
-                    </li>
-                  ))}
-                </ul>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <div style={styles.timetable}>
+        <div style={styles.header}>
+          <div>Day</div>
+          <div>9:40-10:40</div>
+          <div>10:40-11:40</div>
+          <div>11:40-12:40</div>
+          <div>12:40-1:20</div>
+          <div>1:20-2:20</div>
+          <div>2:20-3:20</div>
+          <div>3:20-4:20</div>
+        </div>
+        {timetable.map((day) => (
+          <div style={styles.row} key={day._id}>
+            <div>{day.day}</div>
+            {day.periods.map((period) => (
+              <div key={period._id}>{period.subject}</div>
+            ))}
+          </div>
+        ))}
+      </div>
     </div>
   );
+};
+
+const styles = {
+  container: {
+    padding: '20px',
+    fontFamily: 'Arial, sans-serif',
+  },
+  studentInfo: {
+    marginBottom: '20px',
+  },
+  timetable: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(8, 1fr)',
+    gap: '1px',
+    backgroundColor: '#ddd',
+  },
+  header: {
+    display: 'contents',
+  },
+  row: {
+    display: 'contents',
+  },
+  headerDiv: {
+    padding: '10px',
+    backgroundColor: '#fff',
+    textAlign: 'center',
+    border: '1px solid #ddd',
+    fontWeight: 'bold',
+    backgroundColor: '#f4f4f4',
+  },
+  rowDiv: {
+    padding: '10px',
+    backgroundColor: '#fff',
+    textAlign: 'center',
+    border: '1px solid #ddd',
+  },
 };
 
 export default Example;
