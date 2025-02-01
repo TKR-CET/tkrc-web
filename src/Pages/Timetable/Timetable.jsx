@@ -117,7 +117,7 @@ return (
                     </tr>
                     <tr>
                         <td id="h3">Role</td>
-                        <td>{userDetails.role || "N/A"}</td>
+                        <td>{userDetails.designation || "N/A"}</td>
                     </tr>
                 </tbody>
             </table>
