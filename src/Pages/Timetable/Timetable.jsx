@@ -70,7 +70,12 @@ const Timetable = () => {
     <div>
 
       <Header />
-      
+            <div className="nav">
+        <NavBar />
+      </div>
+      <div className="mob-nav">
+        <MobileNav />
+      </div>
 
       {loading ? (
         <p>Loading timetable...</p>
