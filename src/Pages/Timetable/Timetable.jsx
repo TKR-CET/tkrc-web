@@ -18,7 +18,7 @@ const Timetable = () => {
                 if (facultyId) {
                     response = await axios.get(`https://tkrcet-backend-g3zu.onrender.com/faculty/${facultyId}`);
                 } else if (studentId) {
-                    response = await axios.get(`https://tkrcet-backend-g3zu.onrender.com/student/${studentId}`);
+                    response = await axios.get(`https://tkrcet-backend-g3zu.onrender.com/Section/${studentId}`);
                 }
 
                 console.log("User details:", response.data); // Debugging
