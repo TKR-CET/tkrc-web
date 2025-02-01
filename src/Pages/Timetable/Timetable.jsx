@@ -6,143 +6,176 @@ import NavBar from "../../Components/NavBar/NavBar";
 import MobileNav from "../../Components/MobileNav/MobileNav";
 
 const Timetable = () => {
-  const [timetable, setTimetable] = useState([]);
-  const [userDetails, setUserDetails] = useState(null);
-  const [loading, setLoading] = useState(true);
+    const [timetable, setTimetable] = useState([]);
+    const [userDetails, setUserDetails] = useState(null);
+    
+    const facultyId = localStorage.getItem("facultyId");
+    const studentId = localStorage.getItem("studentId");
 
-  const facultyId = localStorage.getItem("facultyId");
-  const studentId = localStorage.getItem("studentId");
+    // Fetch user details based on role
+    useEffect(() => {
+        const fetchUserDetails = async () => {
+            try {
+                let response;
+                if (facultyId) {
+                    response = await axios.get(`https://tkrcet-backend-g3zu.onrender.com/faculty/${facultyId}`);
+                } else if (studentId) {
+                    response = await axios.get(`https://tkrcet-backend-g3zu.onrender.com/Section/${studentId}`);
+                }
+                setUserDetails(response.data);
+            } catch (error) {
+                console.error("Error fetching user details:", error);
+            }
+        };
 
-  useEffect(() => {
-    const fetchUserDetails = async () => {
-      try {
-        if (facultyId) {
-          const response = await axios.get(
-            `https://tkrcet-backend-g3zu.onrender.com/faculty/${facultyId}`
-          );
-          setUserDetails(response.data);
-        } else if (studentId) {
-          const response = await axios.get(
-            `https://tkrcet-backend-g3zu.onrender.com/Section/${studentId}`
-          );
-          setUserDetails(response.data.student);
+        fetchUserDetails();
+    }, [facultyId, studentId]);
+
+    // Fetch timetable based on role
+    useEffect(() => {
+        const fetchTimetable = async () => {
+            try {
+                let response;
+                if (userDetails?.role === "faculty") {
+                    response = await axios.get(`https://tkrcet-backend-g3zu.onrender.com/faculty/${facultyId}/timetable`);
+                } else if (userDetails?.role === "student") {
+                    const { programYear, department, section } = userDetails.student;
+                    response = await axios.get(`https://tkrcet-backend-g3zu.onrender.com/Section/${programYear}/${department}/${section}/timetable`);
+                }
+                setTimetable(response.data.timetable);
+            } catch (error) {
+                console.error("Error fetching timetable:", error);
+            }
+        };
+
+        if (userDetails) fetchTimetable();
+    }, [userDetails, facultyId]);
+
+    // Function to merge consecutive periods
+    const processPeriods = (periods) => {
+        const mergedPeriods = [];
+        let i = 0;
+
+        while (i < periods.length) {
+            let span = 1;
+            while (
+                i + span < periods.length &&
+                periods[i] &&
+                periods[i + span] &&
+                periods[i].subject === periods[i + span].subject
+            ) {
+                span++;
+            }
+            mergedPeriods.push({ period: periods[i], span });
+            i += span;
         }
-      } catch (error) {
-        console.error("Error fetching user details:", error);
-      }
+
+        return mergedPeriods;
     };
 
-    fetchUserDetails();
-  }, [facultyId, studentId]);
-
-  useEffect(() => {
-    const fetchTimetable = async () => {
-      try {
-        if (!userDetails) return;
-
-        let url = "";
-        if (facultyId) {
-          url = `https://tkrcet-backend-g3zu.onrender.com/faculty/${facultyId}/timetable`;
-        } else if (studentId) {
-          const { programYear, department, section } = userDetails;
-          url = `https://tkrcet-backend-g3zu.onrender.com/Section/${programYear}/${department}/${section}/timetable`;
-        }
-
-        const response = await axios.get(url);
-        setTimetable(response.data.timetable);
-      } catch (error) {
-        console.error("Error fetching timetable:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (userDetails) {
-      fetchTimetable();
-    }
-  }, [userDetails]);
-
-  const handleImageError = (e) => {
-    e.target.src = "./images/logo.png"; // Default fallback image
-  };
-
-  return (
-    <div>
-
-      <Header />
-            <div className="nav">
-        <NavBar />
-      </div>
-      <div className="mob-nav">
-        <MobileNav />
-      </div>
-
-      {loading ? (
-        <p>Loading timetable...</p>
-      ) : (
+    return (
         <div>
-          {/* User Details */}
-          {userDetails && (
-            <section className="user-details">
-              <table>
-                <tbody>
-                  <tr>
-                    <td>Name</td>
-                    <td>{userDetails.name || "N/A"}</td>
-                    <td rowSpan={3}>
-                      <img
-                        src={userDetails.image || "./images/logo.png"}
-                        alt="Profile"
-                        className="profile-image"
-                        onError={handleImageError}
-                      />
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Department</td>
-                    <td>{userDetails.department || "N/A"}</td>
-                  </tr>
-                  <tr>
-                    <td>Role</td>
-                    <td>{facultyId ? "Faculty" : "Student"}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </section>
-          )}
+            <Header />
+            <NavBar />
+            <MobileNav />
 
-          {/* Timetable */}
-          <h2>Timetable</h2>
-          <section className="timetable">
-            <table>
-              <thead>
-                <tr>
-                  <th>DAY</th>
-                  <th>9:40-10:40</th>
-                  <th>10:40-11:40</th>
-                  <th>11:40-12:40</th>
-                  <th>12:40-1:20</th>
-                  <th>1:20-2:20</th>
-                  <th>2:20-3:20</th>
-                  <th>3:20-4:20</th>
-                </tr>
-              </thead>
-              <tbody>
-                {timetable.map((dayData, index) => (
-                  <tr key={index}>
-                    <td>{dayData.day || "N/A"}</td>
-                    {dayData.periods.map((period, i) => (
-                      <td key={i}>{period?.subject || "Free"}</td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </section>
+            <h2>Time Table - ODD Semester (2024-25)</h2>
+
+            {/* Faculty Details Section */}
+            {userDetails?.role === "faculty" && (
+                <section className="staff-details">
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td id="h3">Name</td>
+                                <td>{userDetails.name || "N/A"}</td>
+                                <td id="image" rowSpan={3}>
+                                    <img
+                                        src={userDetails.image || "./images/logo.png"}
+                                        alt={`${userDetails.name || "Faculty"} Profile`}
+                                        className="faculty-image"
+                                        onError={(e) => (e.target.src = "./images/logo.png")}
+                                    />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td id="h3">Department</td>
+                                <td>{userDetails.department || "N/A"}</td>
+                            </tr>
+                            <tr>
+                                <td id="h3">Designation</td>
+                                <td>{userDetails.role || "N/A"}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+            )}
+
+            {/* Timetable */}
+            <section className="timetable">
+                <table>
+                    <thead>
+                        <tr className="m4">
+                            <th>DAY</th>
+                            <th>9:40-10:40</th>
+                            <th>10:40-11:40</th>
+                            <th>11:40-12:40</th>
+                            <th>12:40-1:20</th> {/* Lunch */}
+                            <th>1:20-2:20</th>
+                            <th>2:20-3:20</th>
+                            <th>3:20-4:20</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {timetable.map((dayData, index) => {
+                            const periods = [...Array(7)].map((_, i) => 
+                                dayData.periods.find((p) => p.periodNumber === i + 1) || null
+                            );
+
+                            const periodsBeforeLunch = periods.slice(0, 3);
+                            const periodsAfterLunch = periods.slice(4);
+
+                            const mergedBeforeLunch = processPeriods(periodsBeforeLunch);
+                            const mergedAfterLunch = processPeriods(periodsAfterLunch);
+
+                            return (
+                                <tr key={index}>
+                                    <td>{dayData.day || "N/A"}</td>
+
+                                    {/* Before Lunch */}
+                                    {mergedBeforeLunch.map((merged, i) => (
+                                        <td key={i} colSpan={merged.span}>
+                                            {merged.period
+                                                ? userDetails?.role === "faculty"
+                                                    ? `${merged.period.subject} (${merged.period.year}, ${merged.period.section}, ${merged.period.department})`
+                                                    : merged.period.subject
+                                                : ""}
+                                        </td>
+                                    ))}
+
+                                    {/* Lunch Break */}
+                                    <td key="lunch" style={{ textAlign: "center", fontWeight: "bold" }}>
+                                        LUNCH
+                                    </td>
+
+                                    {/* After Lunch */}
+                                    {mergedAfterLunch.map((merged, i) => (
+                                        <td key={i + 4} colSpan={merged.span}>
+                                            {merged.period
+                                                ? userDetails?.role === "faculty"
+                                                    ? `${merged.period.subject} (${merged.period.year}, ${merged.period.section}, ${merged.period.department})`
+                                                    : merged.period.subject
+                                                : ""}
+                                        </td>
+                                    ))}
+                                </tr>
+                            );
+                        })}
+                    </tbody>
+                </table>
+            </section>
         </div>
-      )}
-    </div>
-  );
+    );
 };
 
 export default Timetable;
