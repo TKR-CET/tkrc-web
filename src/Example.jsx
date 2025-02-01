@@ -39,63 +39,70 @@ const Example = () => {
 
   return (
     <div className="container">
-      <h1 className="title">Student Details</h1>
-      <table className="student-table">
-        <tbody>
-          <tr>
-            <td className="image-cell" rowSpan="4">
-              <img src={student.image} alt="Student" className="student-image" />
-            </td>
-            <td><strong>Roll No.</strong></td>
-            <td>{student.rollNumber}</td>
-          </tr>
-          <tr>
-            <td><strong>Student Name</strong></td>
-            <td>{student.name}</td>
-          </tr>
-          <tr>
-            <td><strong>Father's Name</strong></td>
-            <td>{student.fatherName}</td>
-          </tr>
-          <tr>
-            <td><strong>Department</strong></td>
-            <td>{student.department} | {student.section}</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <h1 className="title">Timetable</h1>
-      <div className="table-container">
-        <table className="timetable">
-          <thead>
-            <tr>
-              <th>DAY</th>
-              <th>9:40-10:40</th>
-              <th>10:40-11:40</th>
-              <th>11:40-12:40</th>
-              <th>12:40-1:20</th>
-              <th>1:20-2:20</th>
-              <th>2:20-3:20</th>
-              <th>3:20-4:20</th>
-            </tr>
-          </thead>
+      {/* Student Details Section */}
+      <div className="student-details">
+        <h1 className="title">Student Details</h1>
+        <table className="student-table">
           <tbody>
-            {timetable.map((day) => (
-              <tr key={day._id}>
-                <td className="day-cell">{day.day}</td>
-                {day.periods.slice(0, 3).map((period, index) => (
-                  <td key={index}>{period.subject}</td>
-                ))}
-                <td className="lunch">LUNCH</td>
-                {day.periods.slice(3).map((period, index) => (
-                  <td key={index}>{period.subject}</td>
-                ))}
-              </tr>
-            ))}
+            <tr>
+              <td rowSpan="4" className="image-cell">
+                <img src={student.image} alt="Student" className="student-image" />
+              </td>
+              <td><strong>Roll No.</strong></td>
+              <td>{student.rollNumber}</td>
+            </tr>
+            <tr>
+              <td><strong>Student Name</strong></td>
+              <td>{student.name}</td>
+            </tr>
+            <tr>
+              <td><strong>Father's Name</strong></td>
+              <td>{student.fatherName}</td>
+            </tr>
+            <tr>
+              <td><strong>Department</strong></td>
+              <td>{student.department} | {student.section}</td>
+            </tr>
           </tbody>
         </table>
       </div>
 
+      {/* Timetable Section */}
+      <div className="timetable-section">
+        <h1 className="title">Timetable</h1>
+        <div className="table-container">
+          <table className="timetable">
+            <thead>
+              <tr>
+                <th>DAY</th>
+                <th>9:40-10:40</th>
+                <th>10:40-11:40</th>
+                <th>11:40-12:40</th>
+                <th>12:40-1:20</th>
+                <th>1:20-2:20</th>
+                <th>2:20-3:20</th>
+                <th>3:20-4:20</th>
+              </tr>
+            </thead>
+            <tbody>
+              {timetable.map((day) => (
+                <tr key={day._id}>
+                  <td className="day-cell">{day.day}</td>
+                  {day.periods.slice(0, 3).map((period, index) => (
+                    <td key={index}>{period.subject}</td>
+                  ))}
+                  <td className="lunch">LUNCH</td>
+                  {day.periods.slice(3).map((period, index) => (
+                    <td key={index}>{period.subject}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Internal CSS Styles */}
       <style>
         {`
           .container {
@@ -119,6 +126,9 @@ const Example = () => {
             font-size: 18px;
             color: red;
           }
+          .student-details {
+            margin-bottom: 30px;
+          }
           .student-table {
             width: 100%;
             border-collapse: collapse;
@@ -140,6 +150,9 @@ const Example = () => {
             height: 100px;
             border-radius: 50%;
             object-fit: cover;
+          }
+          .timetable-section {
+            margin-top: 40px;
           }
           .table-container {
             overflow-x: auto;
