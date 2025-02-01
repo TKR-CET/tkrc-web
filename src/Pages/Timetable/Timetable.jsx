@@ -36,24 +36,29 @@ useEffect(() => {
                 const { year, department, section } = userDetails.student || {};
                 if (!year || !department || !section) {
                     console.error("Missing student details for timetable fetch");
+                    alert("Missing student details for timetable fetch");
                     return;
                 }
+
                 const timetableUrl = `https://tkrcet-backend-g3zu.onrender.com/Section/${encodeURIComponent(year)}/${encodeURIComponent(department)}/${encodeURIComponent(section)}/timetable`;
                 console.log("Fetching timetable from:", timetableUrl);
+                alert("Fetching timetable from: " + timetableUrl); // Alert for URL verification
+
                 response = await axios.get(timetableUrl);
             }
 
-            console.log("Timetable data:", response?.data?.timetable); // Debugging
+            console.log("Timetable data:", response?.data?.timetable);
+            alert("Timetable data fetched: " + JSON.stringify(response?.data?.timetable)); // Alert for data check
+
             setTimetable(response?.data?.timetable || []);
         } catch (error) {
             console.error("Error fetching timetable:", error);
+            alert("Error fetching timetable: " + error.message); // Alert for error
         }
     };
 
     if (userDetails.role) fetchTimetable();
 }, [userDetails]);
-
-
 
 const handleImageError = (e) => {
     console.warn("Error loading user image. Using fallback image.");
