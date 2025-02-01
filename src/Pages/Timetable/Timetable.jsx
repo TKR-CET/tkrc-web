@@ -7,64 +7,53 @@ import MobileNav from "../../Components/MobileNav/MobileNav";
 
 const Timetable = () => {
     const [timetable, setTimetable] = useState([]);
-    const [userDetails, setUserDetails] = useState({});
-    const facultyId = localStorage.getItem("facultyId");
-    const studentId = localStorage.getItem("studentId");
-
-    useEffect(() => {
-        const fetchUserDetails = async () => {
-            try {
-                let response;
-                if (facultyId) {
-                    response = await axios.get(`https://tkrcet-backend-g3zu.onrender.com/faculty/${facultyId}`);
-                } else if (studentId) {
-                    response = await axios.get(`https://tkrcet-backend-g3zu.onrender.com/student/${studentId}`);
-                }
-
-                console.log("User details:", response.data); // Debugging
-                setUserDetails(response.data);
-            } catch (error) {
-                console.error("Error fetching user details:", error);
-            }
-        };
-
-        fetchUserDetails();
-    }, [facultyId, studentId]);
-
+    const [facultyDetails, setFacultyDetails] = useState({});
+    const facultyId = localStorage.getItem("facultyId"); // Using MongoDB _id from localStorage
+   alert(facultyId)
+    // Fetch timetable
     useEffect(() => {
         const fetchTimetable = async () => {
             try {
-                let response;
-                if (userDetails?.role === "faculty") {
-                    response = await axios.get(`https://tkrcet-backend-g3zu.onrender.com/faculty/${facultyId}/timetable`);
-                } else if (userDetails?.role === "student") {
-                    const { programYear, department, section } = userDetails.student || {};
-                    
-                    if (!programYear || !department || !section) {
-                        console.error("Missing student details for timetable fetch");
-                        return;
-                    }
-
-                    const timetableUrl = `https://tkrcet-backend-g3zu.onrender.com/Section/${encodeURIComponent(programYear)}/${encodeURIComponent(department)}/${encodeURIComponent(section)}/timetable`;
-
-                    console.log("Fetching timetable from:", timetableUrl); // Debugging
-
-                    response = await axios.get(timetableUrl);
-                }
-
-                console.log("Timetable data:", response?.data); // Debugging
-                setTimetable(response?.data?.timetable || []);
+                const response = await axios.get(
+                    `https://tkrcet-backend-g3zu.onrender.com/faculty/${facultyId}/timetable`
+                );
+                setTimetable(response.data.timetable);
             } catch (error) {
+                alert("Error fetching timetable: " + error.message);
                 console.error("Error fetching timetable:", error);
             }
         };
 
-        if (userDetails) fetchTimetable();
-    }, [userDetails, facultyId]);
+        if (facultyId) {
+            fetchTimetable();
+        } else {
+            alert("Faculty ID is missing!");
+            console.error("Faculty ID is missing!");
+        }
+    }, [facultyId]);
+
+    // Fetch faculty details
+    useEffect(() => {
+        const fetchFacultyDetails = async () => {
+            try {
+                const response = await axios.get(
+                    `https://tkrcet-backend-g3zu.onrender.com/faculty/${facultyId}`
+                );
+                setFacultyDetails(response.data);
+            } catch (error) {
+                alert("Error fetching faculty details: " + error.message);
+                console.error("Error fetching faculty details:", error);
+            }
+        };
+
+        if (facultyId) {
+            fetchFacultyDetails();
+        }
+    }, [facultyId]);
 
     const handleImageError = (e) => {
-        console.warn("Error loading user image. Using fallback image.");
-        e.target.src = "./images/logo.png"; // Fallback image
+        console.warn("Error loading faculty image. Using fallback image.");
+        e.target.src = "./images/logo.png"; // Fallback to default image
     };
 
     const processPeriods = (periods) => {
@@ -77,7 +66,9 @@ const Timetable = () => {
                 i + span < periods.length &&
                 periods[i] &&
                 periods[i + span] &&
-                periods[i].subject === periods[i + span].subject
+                periods[i].subject === periods[i + span].subject &&
+                periods[i].year === periods[i + span].year &&
+                periods[i].section === periods[i + span].section
             ) {
                 span++;
             }
@@ -93,25 +84,27 @@ const Timetable = () => {
         <div>
             <Header />
             <div className="nav">
-                <NavBar facultyName={userDetails.name || userDetails.student?.name} />
-            </div>
+  <NavBar facultyName={facultyDetails.name} />
+</div>
             <div className="mob-nav">
                 <MobileNav />
             </div>
 
-            {/* User Details Section */}
-            <section className="user-details">
+            {/* Staff Details */}
+            <section className="staff-details">
                 <table>
                     <tbody>
                         <tr>
                             <td id="h3">Name</td>
-                            <td>{userDetails.name || userDetails.student?.name || "N/A"}</td>
+                            <td>{facultyDetails.name || "N/A"}</td>
                             <td id="image" rowSpan={3}>
                                 <img
-                                    src={userDetails.image || userDetails.student?.image || "./images/logo.png"}
-                                    alt={`${userDetails.name || "User"} Profile`}
-                                    className="user-image"
+                                    src={facultyDetails.image || "./images/logo.png"} // Use image from separate fetch
+                                    alt={`${facultyDetails.name || "Faculty"} Profile`}
+                                    className="faculty-image"
                                     style={{
+                          position:"relative",
+                          left:"14px",
                                         width: "100px",
                                         height: "100px",
                                         borderRadius: "50%",
@@ -121,23 +114,23 @@ const Timetable = () => {
                             </td>
                         </tr>
                         <tr>
-                            <td id="h3">Department</td>
-                            <td>{userDetails.department || userDetails.student?.department || "N/A"}</td>
+                            <td id="h3" >Department</td>
+                            <td>{facultyDetails.department || "N/A"}</td>
                         </tr>
                         <tr>
-                            <td id="h3">Role</td>
-                            <td>{userDetails.role || "N/A"}</td>
+                            <td id="h3">Designation</td>
+                            <td>{facultyDetails.role || "N/A"}</td>
                         </tr>
                     </tbody>
                 </table>
             </section>
 
-            {/* Timetable Section */}
+            {/* Timetable */}
             <h2>Time Table - ODD Semester (2024-25)</h2>
             <section className="timetable">
                 <table>
                     <thead>
-                        <tr className="m4">
+                        <tr class="m4">
                             <th>DAY</th>
                             <th>9:40-10:40</th>
                             <th>10:40-11:40</th>
@@ -151,7 +144,9 @@ const Timetable = () => {
                     <tbody>
                         {timetable.map((dayData, index) => {
                             const periods = [...Array(7)].map((_, i) => {
-                                return dayData.periods.find((p) => p.periodNumber === i + 1) || null;
+                                return dayData.periods.find(
+                                    (p) => p.periodNumber === i + 1
+                                ) || null;
                             });
 
                             const periodsBeforeLunch = periods.slice(0, 3);
@@ -167,9 +162,7 @@ const Timetable = () => {
                                     {mergedBeforeLunch.map((merged, i) => (
                                         <td key={i} colSpan={merged.span}>
                                             {merged.period
-                                                ? userDetails.role === "faculty"
-                                                    ? `${merged.period.subject} (${merged.period.year}, ${merged.period.section}, ${merged.period.department || "N/A"})`
-                                                    : merged.period.subject
+                                                ? `${merged.period.subject} (${merged.period.year}, ${merged.period.section}, ${merged.period.department || "N/A"})`
                                                 : ""}
                                         </td>
                                     ))}
@@ -184,9 +177,7 @@ const Timetable = () => {
                                     {mergedAfterLunch.map((merged, i) => (
                                         <td key={i + 4} colSpan={merged.span}>
                                             {merged.period
-                                                ? userDetails.role === "faculty"
-                                                    ? `${merged.period.subject} (${merged.period.year}, ${merged.period.section}, ${merged.period.department || "N/A"})`
-                                                    : merged.period.subject
+                                                ? `${merged.period.subject} (${merged.period.year}, ${merged.period.section}, ${merged.period.department || "N/A"})`
                                                 : ""}
                                         </td>
                                     ))}
