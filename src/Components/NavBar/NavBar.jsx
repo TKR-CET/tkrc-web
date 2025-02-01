@@ -106,13 +106,6 @@ function NavBar() {
     }
   }, [userData]);
 
-  // Automatically show classes if none exist
-  useEffect(() => {
-    if (classOptions.length === 0) {
-      setShowDynamicClasses(true);
-    }
-  }, [classOptions]);
-
   return (
     <nav ref={navRef}>
       <div className="nav-left-section">
@@ -152,6 +145,7 @@ function NavBar() {
                         )
                       ) : (
                         <>
+                          {/* Display the initial options */}
                           <li onClick={() => setShowDynamicClasses(true)}>
                             Class
                           </li>
