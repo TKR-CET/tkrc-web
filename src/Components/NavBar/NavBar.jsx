@@ -42,7 +42,7 @@ function NavBar() {
     setLoading(true);
     try {
       const response = await axios.get(
-        `https://tkrcet-backend-g3zu.onrender.com/faculty/${userData.id}/timetable-today`
+        `https://tkrcet-backend-g3zu.onrender.com/faculty/${userData.facultyId}/timetable-today`
       );
 
       let classes = response.data.classes || [];
@@ -106,6 +106,13 @@ function NavBar() {
     }
   }, [userData]);
 
+  // Automatically show classes if none exist
+  useEffect(() => {
+    if (classOptions.length === 0) {
+      setShowDynamicClasses(true);
+    }
+  }, [classOptions]);
+
   return (
     <nav ref={navRef}>
       <div className="nav-left-section">
@@ -145,7 +152,9 @@ function NavBar() {
                         )
                       ) : (
                         <>
-                          <li onClick={() => setShowDynamicClasses(true)}>Class</li>
+                          <li onClick={() => setShowDynamicClasses(true)}>
+                            Class
+                          </li>
                           <Link to="/register">
                             <li>Register</li>
                           </Link>
@@ -168,7 +177,10 @@ function NavBar() {
       <div className="nav-user-profile">
         <span>Welcome, {userData?.name || "User"}</span>
         <div className="account-menu">
-          <button className="account-menu-button" onClick={() => setAccountMenuVisible(!accountMenuVisible)}>
+          <button
+            className="account-menu-button"
+            onClick={() => setAccountMenuVisible(!accountMenuVisible)}
+          >
             Account
           </button>
           {accountMenuVisible && (
