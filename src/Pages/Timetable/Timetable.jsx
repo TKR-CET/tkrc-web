@@ -22,36 +22,38 @@ useEffect(() => {
     fetchUserDetails();
 }, [facultyId, studentId]);
 
+
+
 useEffect(() => {
     const fetchTimetable = async () => {
         try {
+            if (!userDetails.role) return;
             let response;
-            if (userDetails?.role === "faculty") {
-                response = await axios.get(`https://tkrcet-backend-g3zu.onrender.com/faculty/${facultyId}/timetable`);
-            } else if (userDetails?.role === "student") {
-                const { programYear, department, section } = userDetails.student || {};
 
-                if (!programYear || !department || !section) {
+            if (userDetails.role === "faculty") {
+                response = await axios.get(`https://tkrcet-backend-g3zu.onrender.com/faculty/${facultyId}/timetable`);
+            } else if (userDetails.role === "student") {
+                const { year, department, section } = userDetails.student || {};
+                if (!year || !department || !section) {
                     console.error("Missing student details for timetable fetch");
                     return;
                 }
-
-                const timetableUrl = `https://tkrcet-backend-g3zu.onrender.com/Section/B.Tech%20I/CSD/A/timetable`;
-
-                console.log("Fetching timetable from:", timetableUrl); // Debugging
-
+                const timetableUrl = `https://tkrcet-backend-g3zu.onrender.com/Section/${encodeURIComponent(year)}/${encodeURIComponent(department)}/${encodeURIComponent(section)}/timetable`;
+                console.log("Fetching timetable from:", timetableUrl);
                 response = await axios.get(timetableUrl);
             }
 
-            console.log("Timetable data:", response?.data); // Debugging
+            console.log("Timetable data:", response?.data?.timetable); // Debugging
             setTimetable(response?.data?.timetable || []);
         } catch (error) {
             console.error("Error fetching timetable:", error);
         }
     };
 
-    if (userDetails) fetchTimetable();
-}, [userDetails, facultyId]);
+    if (userDetails.role) fetchTimetable();
+}, [userDetails]);
+
+
 
 const handleImageError = (e) => {
     console.warn("Error loading user image. Using fallback image.");
