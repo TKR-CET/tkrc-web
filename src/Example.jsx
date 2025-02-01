@@ -40,14 +40,25 @@ const Example = () => {
   return (
     <div>
       {/* Student Details Section */}
-      <div>
+      <div style={{ marginBottom: '20px' }}>
         <h1>Student Details</h1>
-        <div>
-          <img src={student.image} alt="Student" width="100" height="100" />
-          <p><strong>Roll No:</strong> {student.rollNumber}</p>
-          <p><strong>Name:</strong> {student.name}</p>
-          <p><strong>Father's Name:</strong> {student.fatherName}</p>
-          <p><strong>Department:</strong> {student.department} | {student.section}</p>
+        <div style={{ border: '1px solid #000', padding: '10px', width: 'fit-content' }}>
+          <div>
+            <strong>Roll No.</strong>
+            <div>{student.rollNumber}</div>
+          </div>
+          <div>
+            <strong>Student Name</strong>
+            <div>{student.name}</div>
+          </div>
+          <div>
+            <strong>Father's Name</strong>
+            <div>{student.fatherName}</div>
+          </div>
+          <div>
+            <strong>Department</strong>
+            <div>{student.department} | {student.section}</div>
+          </div>
         </div>
       </div>
 
