@@ -76,7 +76,10 @@ const Timetable = () => {
     return (
         <div>
             <Header />
+<div class="nav">
             <NavBar />
+</div>
+<div>
             <MobileNav />
 
             <h2>Time Table - ODD Semester (2024-25)</h2>
