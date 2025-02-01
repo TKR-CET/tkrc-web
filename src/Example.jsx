@@ -47,6 +47,29 @@ const Example = () => {
     studentDetails: {
       marginBottom: '20px',
     },
+    studentDetailsBox: {
+      border: '1px solid #ddd',
+      borderRadius: '8px',
+      padding: '15px',
+      width: 'fit-content',
+      backgroundColor: '#f9f9f9',
+    },
+    detailItem: {
+      marginBottom: '10px',
+      display: 'flex',
+      alignItems: 'center',
+    },
+    detailLabel: {
+      fontWeight: 'bold',
+      color: '#333',
+      width: '120px',
+    },
+    detailValue: {
+      color: '#555',
+    },
+    timetable: {
+      marginTop: '20px',
+    },
     table: {
       width: '100%',
       borderCollapse: 'collapse',
@@ -63,11 +86,6 @@ const Example = () => {
       border: '1px solid #ddd',
       textAlign: 'left',
     },
-    imageCell: {
-      width: '100px',
-      height: '100px',
-      objectFit: 'cover',
-    },
   };
 
   if (loading) return <div style={styles.loading}>Loading...</div>;
@@ -78,41 +96,28 @@ const Example = () => {
       {/* Student Details Section */}
       <div style={styles.studentDetails}>
         <h1>Student Details</h1>
-        <table style={styles.table}>
-          <thead>
-            <tr>
-              <th style={styles.tableHeader}>Image</th>
-              <th style={styles.tableHeader}>Roll No.</th>
-              <th style={styles.tableHeader}>Name</th>
-              <th style={styles.tableHeader}>Father's Name</th>
-              <th style={styles.tableHeader}>Year</th>
-              <th style={styles.tableHeader}>Department</th>
-              <th style={styles.tableHeader}>Section</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td rowSpan="3" style={styles.tableCell}>
-                <img
-                  src={student.image}
-                  alt="Student"
-                  style={styles.imageCell}
-                />
-              </td>
-              <td style={styles.tableCell}>{student.rollNumber}</td>
-              <td style={styles.tableCell}>{student.name}</td>
-              <td style={styles.tableCell}>{student.fatherName}</td>
-              <td style={styles.tableCell}>{student.year}</td>
-              <td style={styles.tableCell}>{student.department}</td>
-              <td style={styles.tableCell}>{student.section}</td>
-            </tr>
-            {/* Additional rows can be added here if needed */}
-          </tbody>
-        </table>
+        <div style={styles.studentDetailsBox}>
+          <div style={styles.detailItem}>
+            <span style={styles.detailLabel}>Roll No.</span>
+            <span style={styles.detailValue}>{student.rollNumber}</span>
+          </div>
+          <div style={styles.detailItem}>
+            <span style={styles.detailLabel}>Student Name</span>
+            <span style={styles.detailValue}>{student.name}</span>
+          </div>
+          <div style={styles.detailItem}>
+            <span style={styles.detailLabel}>Father's Name</span>
+            <span style={styles.detailValue}>{student.fatherName}</span>
+          </div>
+          <div style={styles.detailItem}>
+            <span style={styles.detailLabel}>Department</span>
+            <span style={styles.detailValue}>{student.department} | {student.section}</span>
+          </div>
+        </div>
       </div>
 
       {/* Timetable Section */}
-      <div>
+      <div style={styles.timetable}>
         <h1>Timetable</h1>
         <table style={styles.table}>
           <thead>
