@@ -9,7 +9,7 @@ import Homepage from "./Homepage/Homepage";
 import Marking from "./Pages/Marking/Marking.jsx";
 import AddFacultyForm from "./AddFacultyForm";
 import AddSectionData from "./AddSectionData";
-import Register from "./Pages/Register/Register.jsx";
+import Register from "./Pages/Register/Register.jsx";ggg
 import StudentDashboard from "./StudentDashboard";
 
 function Mainpage() {
