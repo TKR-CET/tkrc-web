@@ -45,7 +45,7 @@ const Timetable = () => {
                         return;
                     }
 
-                    const timetableUrl = `https://tkrcet-backend-g3zu.onrender.com/Section/${encodeURIComponent(programYear)}/${encodeURIComponent(department)}/${encodeURIComponent(section)}/timetable`;
+                    const timetableUrl = `https://tkrcet-backend-g3zu.onrender.com/Section/B.Tech%20I/CSD/A/timetable`;
 
                     console.log("Fetching timetable from:", timetableUrl); // Debugging
 
