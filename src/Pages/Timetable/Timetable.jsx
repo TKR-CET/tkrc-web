@@ -11,7 +11,7 @@ const Timetable = () => {
     const facultyId = localStorage.getItem("facultyId");
     const studentId = localStorage.getItem("studentId");
 
-    // Fetch User Details (Faculty/Student)
+    // Fetch User Details
     useEffect(() => {
         const fetchUserDetails = async () => {
             try {
@@ -54,7 +54,6 @@ const Timetable = () => {
                         return;
                     }
 
-                    // Constructing the API URL dynamically
                     const timetableUrl = `https://tkrcet-backend-g3zu.onrender.com/Section/${encodeURIComponent(year)}/${encodeURIComponent(department)}/${encodeURIComponent(section)}/timetable`;
                     console.log("Fetching timetable from:", timetableUrl);
 
@@ -63,12 +62,18 @@ const Timetable = () => {
 
                 if (response?.data?.timetable) {
                     console.log("Fetched Timetable Data:", response.data.timetable);
+                    
+                    // 🔔 Alert the fetched timetable data
+                    alert("Fetched Timetable:\n" + JSON.stringify(response.data.timetable, null, 2));
+
                     setTimetable(response.data.timetable);
                 } else {
                     console.error("No timetable data received!");
+                    alert("No timetable data found!");
                 }
             } catch (error) {
                 console.error("Error fetching timetable:", error);
+                alert("Error fetching timetable! Check console.");
             }
         };
 
@@ -76,35 +81,6 @@ const Timetable = () => {
             fetchTimetable();
         }
     }, [userDetails, facultyId]);
-
-    // Handle User Image Error
-    const handleImageError = (e) => {
-        console.warn("Error loading user image. Using fallback image.");
-        e.target.src = "./images/logo.png"; // Fallback image
-    };
-
-    // Merge consecutive identical periods
-    const processPeriods = (periods) => {
-        const mergedPeriods = [];
-        let i = 0;
-
-        while (i < periods.length) {
-            let span = 1;
-            while (
-                i + span < periods.length &&
-                periods[i] &&
-                periods[i + span] &&
-                periods[i].subject === periods[i + span].subject
-            ) {
-                span++;
-            }
-
-            mergedPeriods.push({ period: periods[i], span });
-            i += span;
-        }
-
-        return mergedPeriods;
-    };
 
     return (
         <div>
@@ -116,45 +92,11 @@ const Timetable = () => {
                 <MobileNav />
             </div>
 
-            {/* User Details Section */}
-            <section className="user-details">
-                <table>
-                    <tbody>
-                        <tr>
-                            <td id="h3">Name</td>
-                            <td>{userDetails.name || userDetails.student?.name || "N/A"}</td>
-                            <td id="image" rowSpan={3}>
-                                <img
-                                    src={userDetails.image || userDetails.student?.image || "./images/logo.png"}
-                                    alt={`${userDetails.name || "User"} Profile`}
-                                    className="user-image"
-                                    style={{
-                                        width: "100px",
-                                        height: "100px",
-                                        borderRadius: "50%",
-                                    }}
-                                    onError={handleImageError}
-                                />
-                            </td>
-                        </tr>
-                        <tr>
-                            <td id="h3">Department</td>
-                            <td>{userDetails.department || userDetails.student?.department || "N/A"}</td>
-                        </tr>
-                        <tr>
-                            <td id="h3">Role</td>
-                            <td>{userDetails.role || "N/A"}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </section>
-
-            {/* Timetable Section */}
             <h2>Time Table - ODD Semester (2024-25)</h2>
             <section className="timetable">
                 <table>
                     <thead>
-                        <tr className="m4">
+                        <tr>
                             <th>DAY</th>
                             <th>9:40-10:40</th>
                             <th>10:40-11:40</th>
@@ -166,50 +108,24 @@ const Timetable = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {timetable.map((dayData, index) => {
-                            const periods = [...Array(7)].map((_, i) => {
-                                return dayData.periods.find((p) => p.periodNumber === i + 1) || null;
-                            });
-
-                            const periodsBeforeLunch = periods.slice(0, 3);
-                            const periodsAfterLunch = periods.slice(4);
-
-                            const mergedBeforeLunch = processPeriods(periodsBeforeLunch);
-                            const mergedAfterLunch = processPeriods(periodsAfterLunch);
-
-                            return (
+                        {timetable.length > 0 ? (
+                            timetable.map((dayData, index) => (
                                 <tr key={index}>
                                     <td>{dayData.day || "N/A"}</td>
-
-                                    {mergedBeforeLunch.map((merged, i) => (
-                                        <td key={i} colSpan={merged.span}>
-                                            {merged.period
-                                                ? userDetails.role === "faculty"
-                                                    ? `${merged.period.subject} (${merged.period.year}, ${merged.period.section}, ${merged.period.department || "N/A"})`
-                                                    : merged.period.subject
-                                                : ""}
-                                        </td>
-                                    ))}
-
-                                    <td
-                                        key="lunch"
-                                        style={{ textAlign: "center", fontWeight: "bold" }}
-                                    >
-                                        LUNCH
-                                    </td>
-
-                                    {mergedAfterLunch.map((merged, i) => (
-                                        <td key={i + 4} colSpan={merged.span}>
-                                            {merged.period
-                                                ? userDetails.role === "faculty"
-                                                    ? `${merged.period.subject} (${merged.period.year}, ${merged.period.section}, ${merged.period.department || "N/A"})`
-                                                    : merged.period.subject
-                                                : ""}
+                                    {dayData.periods.map((period, i) => (
+                                        <td key={i}>
+                                            {period ? period.subject : ""}
                                         </td>
                                     ))}
                                 </tr>
-                            );
-                        })}
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan="8" style={{ textAlign: "center", fontWeight: "bold" }}>
+                                    No Timetable Available
+                                </td>
+                            </tr>
+                        )}
                     </tbody>
                 </table>
             </section>
