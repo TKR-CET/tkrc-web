@@ -11,6 +11,7 @@ const Timetable = () => {
     const facultyId = localStorage.getItem("facultyId");
     const studentId = localStorage.getItem("studentId");
 
+    // Fetch User Details (Faculty/Student)
     useEffect(() => {
         const fetchUserDetails = async () => {
             try {
@@ -21,8 +22,10 @@ const Timetable = () => {
                     response = await axios.get(`https://tkrcet-backend-g3zu.onrender.com/Section/${studentId}`);
                 }
 
-                console.log("User details:", response.data); // Debugging
-                setUserDetails(response.data);
+                if (response?.data) {
+                    console.log("User Details:", response.data);
+                    setUserDetails(response.data);
+                }
             } catch (error) {
                 console.error("Error fetching user details:", error);
             }
@@ -31,42 +34,56 @@ const Timetable = () => {
         fetchUserDetails();
     }, [facultyId, studentId]);
 
+    // Fetch Timetable
     useEffect(() => {
         const fetchTimetable = async () => {
             try {
+                if (!userDetails || Object.keys(userDetails).length === 0) {
+                    console.warn("User details not available yet.");
+                    return;
+                }
+
                 let response;
-                if (userDetails?.role === "faculty") {
+                if (userDetails.role === "faculty") {
                     response = await axios.get(`https://tkrcet-backend-g3zu.onrender.com/faculty/${facultyId}/timetable`);
-                } else if (userDetails?.role === "student") {
-                    const { programYear, department, section } = userDetails.student || {};
-                    
-                    if (!programYear || !department || !section) {
+                } else if (userDetails.role === "student") {
+                    const { year, department, section } = userDetails.student || {};
+
+                    if (!year || !department || !section) {
                         console.error("Missing student details for timetable fetch");
                         return;
                     }
 
-                    const timetableUrl = `https://tkrcet-backend-g3zu.onrender.com/Section/B.Tech%20I/CSD/A/timetable`;
-
-                    console.log("Fetching timetable from:", timetableUrl); // Debugging
+                    // Constructing the API URL dynamically
+                    const timetableUrl = `https://tkrcet-backend-g3zu.onrender.com/Section/${encodeURIComponent(year)}/${encodeURIComponent(department)}/${encodeURIComponent(section)}/timetable`;
+                    console.log("Fetching timetable from:", timetableUrl);
 
                     response = await axios.get(timetableUrl);
                 }
 
-                console.log("Timetable data:", response?.data); // Debugging
-                setTimetable(response?.data?.timetable || []);
+                if (response?.data?.timetable) {
+                    console.log("Fetched Timetable Data:", response.data.timetable);
+                    setTimetable(response.data.timetable);
+                } else {
+                    console.error("No timetable data received!");
+                }
             } catch (error) {
                 console.error("Error fetching timetable:", error);
             }
         };
 
-        if (userDetails) fetchTimetable();
+        if (userDetails.role) {
+            fetchTimetable();
+        }
     }, [userDetails, facultyId]);
 
+    // Handle User Image Error
     const handleImageError = (e) => {
         console.warn("Error loading user image. Using fallback image.");
         e.target.src = "./images/logo.png"; // Fallback image
     };
 
+    // Merge consecutive identical periods
     const processPeriods = (periods) => {
         const mergedPeriods = [];
         let i = 0;
