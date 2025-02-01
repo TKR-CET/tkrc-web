@@ -34,60 +34,111 @@ const Example = () => {
     }
   }, []);
 
-  if (loading) return <div>Loading...</div>;
-  if (!student) return <div>Student details not found!</div>;
+  // Internal CSS styles
+  const styles = {
+    container: {
+      fontFamily: 'Arial, sans-serif',
+      padding: '20px',
+    },
+    loading: {
+      fontSize: '18px',
+      color: '#555',
+    },
+    studentDetails: {
+      marginBottom: '20px',
+    },
+    studentDetailsBox: {
+      border: '1px solid #ddd',
+      borderRadius: '8px',
+      padding: '15px',
+      width: 'fit-content',
+      backgroundColor: '#f9f9f9',
+    },
+    detailItem: {
+      marginBottom: '10px',
+    },
+    detailLabel: {
+      fontWeight: 'bold',
+      color: '#333',
+    },
+    detailValue: {
+      marginLeft: '10px',
+      color: '#555',
+    },
+    timetable: {
+      marginTop: '20px',
+    },
+    table: {
+      width: '100%',
+      borderCollapse: 'collapse',
+    },
+    tableHeader: {
+      backgroundColor: '#f2f2f2',
+      fontWeight: 'bold',
+      padding: '10px',
+      border: '1px solid #ddd',
+    },
+    tableCell: {
+      padding: '10px',
+      border: '1px solid #ddd',
+      textAlign: 'center',
+    },
+  };
+
+  if (loading) return <div style={styles.loading}>Loading...</div>;
+  if (!student) return <div style={styles.loading}>Student details not found!</div>;
 
   return (
-    <div>
+    <div style={styles.container}>
       {/* Student Details Section */}
-      <div style={{ marginBottom: '20px' }}>
+      <div style={styles.studentDetails}>
         <h1>Student Details</h1>
-        <div style={{ border: '1px solid #000', padding: '10px', width: 'fit-content' }}>
-          <div>
-            <strong>Roll No.</strong>
-            <div>{student.rollNumber}</div>
+        <div style={styles.studentDetailsBox}>
+          <div style={styles.detailItem}>
+            <span style={styles.detailLabel}>Roll No.</span>
+            <span style={styles.detailValue}>{student.rollNumber}</span>
           </div>
-          <div>
-            <strong>Student Name</strong>
-            <div>{student.name}</div>
+          <div style={styles.detailItem}>
+            <span style={styles.detailLabel}>Student Name</span>
+            <span style={styles.detailValue}>{student.name}</span>
           </div>
-          <div>
-            <strong>Father's Name</strong>
-            <div>{student.fatherName}</div>
+          <div style={styles.detailItem}>
+            <span style={styles.detailLabel}>Father's Name</span>
+            <span style={styles.detailValue}>{student.fatherName}</span>
           </div>
-          <div>
-            <strong>Department</strong>
-            <div>{student.department} | {student.section}</div>
+          <div style={styles.detailItem}>
+            <span style={styles.detailLabel}>Department</span>
+            <span style={styles.detailValue}>{student.department} | {student.section}</span>
           </div>
         </div>
       </div>
 
       {/* Timetable Section */}
-      <div>
+      <div style={styles.timetable}>
         <h1>Timetable</h1>
-        <table border="1">
+        <table style={styles.table}>
           <thead>
             <tr>
-              <th>DAY</th>
-              <th>9:40-10:40</th>
-              <th>10:40-11:40</th>
-              <th>11:40-12:40</th>
-              <th>12:40-1:20</th>
-              <th>1:20-2:20</th>
-              <th>2:20-3:20</th>
-              <th>3:20-4:20</th>
+              <th style={styles.tableHeader}>DAY</th>
+              <th style={styles.tableHeader}>9:40-10:40</th>
+              <th style={styles.tableHeader}>10:40-11:40</th>
+              <th style={styles.tableHeader}>11:40-12:40</th>
+              <th style={styles.tableHeader}>12:40-1:20</th>
+              <th style={styles.tableHeader}>1:20-2:20</th>
+              <th style={styles.tableHeader}>2:20-3:20</th>
+              <th style={styles.tableHeader}>3:20-4:20</th>
             </tr>
           </thead>
           <tbody>
             {timetable.map((day) => (
               <tr key={day._id}>
-                <td>{day.day}</td>
+                <td style={styles.tableCell}>{day.day}</td>
                 {day.periods.slice(0, 3).map((period, index) => (
-                  <td key={index}>{period.subject}</td>
+                  <td style={styles.tableCell} key={index}>{period.subject}</td>
                 ))}
-                <td>LUNCH</td>
+                <td style={styles.tableCell}>LUNCH</td>
                 {day.periods.slice(3).map((period, index) => (
-                  <td key={index}>{period.subject}</td>
+                  <td style={styles.tableCell} key={index}>{period.subject}</td>
                 ))}
               </tr>
             ))}
