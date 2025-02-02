@@ -83,6 +83,9 @@
 .period-cell {
     background: #e8f4ff;
 }
+.profile-table td:not(.profile-image-cell) {
+    padding-left: 10px;
+}
 
 .lunch-cell {
     font-weight: bold;
