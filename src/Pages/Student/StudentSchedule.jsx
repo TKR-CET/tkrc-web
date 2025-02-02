@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const StudentDashboard = () => {
+const StudentSchedule = () => {
   const [studentInfo, setStudentInfo] = useState(null);
   const [classSchedule, setClassSchedule] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -123,4 +123,4 @@ const StudentDashboard = () => {
   );
 };
 
-export default StudentDashboard;
+export default StudentSchedule;
