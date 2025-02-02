@@ -11,12 +11,12 @@ import AddFacultyForm from "./AddFacultyForm";
 import AddSectionData from "./AddSectionData";
 import Register from "./Pages/Register/Register.jsx";
 import StudentDashboard from "./StudentDashboard";
-import Example from "./Example";
+import StudentTimetable from "./StudentTimetable";
 function Mainpage() {
   const location = useLocation();
 
   // List of routes where the other components should be hidden
-  const hideComponentsPaths = ['/timetable', '/index','/attendance','/activity','/home','/mark','/register','/add','/student','/exam']; // Add more paths here
+  const hideComponentsPaths = ['/timetable', '/index','/attendance','/activity','/home','/mark','/register','/add','/student','/Stimetable']; // Add more paths here
 
   return (
     <div className="maindiv">
@@ -33,7 +33,7 @@ function Mainpage() {
         <Route path="/register"  element={<Register/>}/>
  <Route path="/add" element={<AddSectionData/>}/>
         <Route path="/timetable" element={<Timetable />} />
-<Route path="/exam" element={<Example/>}/>
+<Route path="/Stimetable" element={<StudentTimetable/>}/>
 
         <Route path="/student" element={<StudentDashboard/>}/>
         <Route path="/index" element={<Landingpage/>}/>
