@@ -173,60 +173,126 @@ const StudentDashboard = () => {
       {/* Internal CSS */}
       <style>
         {`
-          .loading-text {
-            text-align: center;
-            font-size: 20px;
-            margin-top: 20px;
-          }
+          
+/* General Styles */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Poppins', sans-serif;
+}
 
-          .student-details, .attendance-summary, .daily-attendance {
-            margin-top: 20px;
-            padding: 20px;
-            background-color: #f9f9f9;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-          }
+.loading-text {
+  text-align: center;
+  font-size: 20px;
+  color: #ff4d4d;
+  margin-top: 20px;
+}
 
-          h2 {
-            text-align: center;
-            color: #333;
-          }
+/* Section Styles */
+.section {
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
 
-          table {
-            width: 100%;
-            margin: 20px 0;
-            border-collapse: collapse;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-          }
+.section h2 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 15px;
+  font-size: 24px;
+  border-bottom: 2px solid #007bff;
+  display: inline-block;
+  padding-bottom: 5px;
+}
 
-          th, td {
-            padding: 12px;
-            text-align: center;
-            border-bottom: 1px solid #ddd;
-          }
+/* Table Styling */
+.table-container {
+  overflow-x: auto;
+}
 
-          th {
-            background-color: #f2f2f2;
-            color: #333;
-          }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.08);
+}
 
-          td {
-            color: #555;
-          }
+th, td {
+  padding: 12px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+  font-size: 16px;
+}
 
-          img.student-image {
-            width: 100px;
-            height: 100px;
-            object-fit: cover;
-            border-radius: 50%;
-            margin-left: 20px;
-          }
+th {
+  background: #007bff;
+  color: #fff;
+  font-weight: 600;
+}
 
-          .nav, .mob-nav {
-            margin-top: 20px;
-          }
+td {
+  color: #555;
+}
+
+tr:hover {
+  background: rgba(0, 123, 255, 0.1);
+  transition: 0.3s ease-in-out;
+}
+
+/* Student Details */
+.student-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.student-details img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #007bff;
+  margin-left: 20px;
+}
+
+/* Attendance Summary */
+.attendance-summary {
+  text-align: center;
+}
+
+/* Daily Attendance */
+.daily-attendance th:nth-child(2),
+.daily-attendance td:nth-child(2) {
+  background: #f8f9fa;
+  font-weight: bold;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .student-details {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .student-details img {
+    margin-left: 0;
+    margin-top: 10px;
+  }
+
+  table {
+    font-size: 14px;
+  }
+
+  th, td {
+    padding: 8px;
+  }
+}
+
+
         `}
       </style>
     </div>
