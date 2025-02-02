@@ -17,6 +17,10 @@ nav {
   font-size:bold;
   
 }
+#time{
+text-decoration:none;
+color:white;
+}
 
 .nav-left-section {
   display: flex;
