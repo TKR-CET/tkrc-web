@@ -74,15 +74,15 @@ const Timetable = () => {
     };
 
     return (
-        <div className="timetable-container">
-            <Header />
+           <Header />
             <div className="nav">
                 <NavBar facultyName={facultyDetails?.name || "Faculty"} />
             </div>
             <div className="mob-nav">
                 <MobileNav />
             </div>
-
+  <div className="timetable-container">
+       
             {/* Faculty Details Section */}
             <section className="faculty-profile">
                 <table className="profile-table">
