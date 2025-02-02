@@ -29,7 +29,7 @@ const StudentDashboard = () => {
         setStudent(data.student);
         setLoading(false);
       })
-      .catch((err) => {
+      .catch(() => {
         setError("Error fetching student details.");
         setLoading(false);
       });
@@ -44,7 +44,7 @@ const StudentDashboard = () => {
         }
         setAttendance(data);
       })
-      .catch((err) => {
+      .catch(() => {
         setError("Error fetching attendance data.");
       });
   }, [studentId]);
@@ -120,6 +120,20 @@ const StudentDashboard = () => {
                 <td>{subject.percentage}%</td>
               </tr>
             ))}
+            <tr>
+              <td><b>Total</b></td>
+              <td><b>{attendance.subjectSummary.reduce((sum, sub) => sum + sub.classesConducted, 0)}</b></td>
+              <td><b>{attendance.subjectSummary.reduce((sum, sub) => sum + sub.classesAttended, 0)}</b></td>
+              <td>
+                <b>
+                  {(
+                    (attendance.subjectSummary.reduce((sum, sub) => sum + sub.classesAttended, 0) /
+                      attendance.subjectSummary.reduce((sum, sub) => sum + sub.classesConducted, 0)) *
+                    100
+                  ).toFixed(2)}%
+                </b>
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -131,7 +145,12 @@ const StudentDashboard = () => {
           <thead>
             <tr>
               <th>Date</th>
-              <th>Periods</th>
+              <th>1</th>
+              <th>2</th>
+              <th>3</th>
+              <th>4</th>
+              <th>5</th>
+              <th>6</th>
               <th>Total</th>
               <th>Attended</th>
             </tr>
@@ -140,7 +159,9 @@ const StudentDashboard = () => {
             {Object.entries(attendance.dailySummary).map(([date, data], index) => (
               <tr key={index}>
                 <td>{date}</td>
-                <td>{Object.values(data.periods).join(", ")}</td>
+                {[1, 2, 3, 4, 5, 6].map((period) => (
+                  <td key={period}>{data.periods[period] || "-"}</td>
+                ))}
                 <td>{data.total}</td>
                 <td>{data.attended}</td>
               </tr>
@@ -182,7 +203,7 @@ const StudentDashboard = () => {
 
           th, td {
             padding: 12px;
-            text-align: left;
+            text-align: center;
             border-bottom: 1px solid #ddd;
           }
 
