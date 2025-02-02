@@ -7,7 +7,7 @@ import MobileNav from "../../Components/MobileNav/MobileNav";
 
 const Timetable = () => {
     const [timetable, setTimetable] = useState([]);
-    const [userDetails, setUserDetails] = useState({});
+    const [userDetails, setUserDetails] = useState(null);
     const facultyId = localStorage.getItem("facultyId");
     const studentId = localStorage.getItem("studentId");
 
@@ -22,7 +22,7 @@ const Timetable = () => {
                     response = await axios.get(`https://tkrcet-backend-g3zu.onrender.com/Section/${studentId}`);
                 }
 
-                console.log("User details:", response.data); // Debugging
+                console.log("User details fetched:", response.data); // Debugging
                 setUserDetails(response.data);
             } catch (error) {
                 console.error("Error fetching user details:", error);
@@ -32,45 +32,42 @@ const Timetable = () => {
         fetchUserDetails();
     }, [facultyId, studentId]);
 
-    // Fetch timetable based on user role
-    
+    // Fetch timetable after user details are set
+    useEffect(() => {
+        const fetchTimetable = async () => {
+            if (!userDetails || !userDetails.role) return; // Ensure userDetails is set
 
-   useEffect(() => {
-    const fetchTimetable = async () => {
-        try {
-            if (!userDetails.role) return; // Wait until role is set
-            let response;
+            try {
+                let response;
 
-            if (userDetails.role === "faculty") {
-                response = await axios.get(`https://tkrcet-backend-g3zu.onrender.com/faculty/${facultyId}/timetable`);
-            } else if (userDetails.role === "student" && userDetails.student) {
-                const { year, department, section } = userDetails.student;
-                
-                // Ensure all required details exist
-                if (!year || !department || !section) {
-                    console.error("Missing student details for timetable fetch");
-                    return;
+                if (userDetails.role === "faculty") {
+                    response = await axios.get(`https://tkrcet-backend-g3zu.onrender.com/faculty/${facultyId}/timetable`);
+                } else if (userDetails.role === "student" && userDetails.student) {
+                    const { year, department, section } = userDetails.student;
+                    
+                    // Ensure all required details exist
+                    if (!year || !department || !section) {
+                        console.error("Missing student details for timetable fetch");
+                        return;
+                    }
+
+                    const timetableUrl = `https://tkrcet-backend-g3zu.onrender.com/Section/${year}/${department}/${section}/timetable`;
+                    console.log("Fetching timetable from:", timetableUrl); // Debugging
+
+                    response = await axios.get(timetableUrl);
                 }
 
-                const timetableUrl = `https://tkrcet-backend-g3zu.onrender.com/Section/${year}/${department}/${section}/timetable`;
-                console.log("Fetching timetable from:", timetableUrl);
-
-                response = await axios.get(timetableUrl);
+                console.log("Timetable data fetched:", response?.data?.timetable); // Debugging
+                setTimetable(response?.data?.timetable || []);
+            } catch (error) {
+                console.error("Error fetching timetable:", error);
             }
+        };
 
-            console.log("Timetable data:", response?.data?.timetable);
-            setTimetable(response?.data?.timetable || []);
-        } catch (error) {
-            console.error("Error fetching timetable:", error);
+        if (userDetails) {
+            fetchTimetable();
         }
-    };
-
-    if (userDetails.role && userDetails.student) {
-        fetchTimetable();
-    }
-}, [userDetails]); // Ensure this only runs when userDetails is fully updated
-
-
+    }, [userDetails]); // Runs when userDetails updates
 
     // Handle image loading errors
     const handleImageError = (e) => {
@@ -105,7 +102,7 @@ const Timetable = () => {
         <div>
             <Header />
             <div className="nav">
-                <NavBar facultyName={userDetails.name || userDetails.student?.name} />
+                <NavBar facultyName={userDetails?.name || userDetails?.student?.name || "User"} />
             </div>
             <div className="mob-nav">
                 <MobileNav />
@@ -117,11 +114,11 @@ const Timetable = () => {
                     <tbody>
                         <tr>
                             <td id="h3">Name</td>
-                            <td>{userDetails.name || userDetails.student?.name || "N/A"}</td>
+                            <td>{userDetails?.name || userDetails?.student?.name || "N/A"}</td>
                             <td id="image" rowSpan={3}>
                                 <img
-                                    src={userDetails.image || userDetails.student?.image || "./images/logo.png"}
-                                    alt={`${userDetails.name || "User"} Profile`}
+                                    src={userDetails?.image || userDetails?.student?.image || "./images/logo.png"}
+                                    alt={`${userDetails?.name || "User"} Profile`}
                                     className="user-image"
                                     style={{
                                         width: "100px",
@@ -134,11 +131,11 @@ const Timetable = () => {
                         </tr>
                         <tr>
                             <td id="h3">Department</td>
-                            <td>{userDetails.department || userDetails.student?.department || "N/A"}</td>
+                            <td>{userDetails?.department || userDetails?.student?.department || "N/A"}</td>
                         </tr>
                         <tr>
                             <td id="h3">Role</td>
-                            <td>{userDetails.designation || "N/A"}</td>
+                            <td>{userDetails?.designation || "N/A"}</td>
                         </tr>
                     </tbody>
                 </table>
