@@ -104,7 +104,7 @@ body {
   border-collapse: collapse;
 }
 .timetable-day{
-background-color:gold;
+background-color:#f3f3f3;
 }
 
 .student-table th, .student-table td {
