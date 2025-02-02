@@ -124,7 +124,7 @@ const StudentDashboard = () => {
               <td><b>Total</b></td>
               <td><b>{attendance.subjectSummary.reduce((sum, sub) => sum + sub.classesConducted, 0)}</b></td>
               <td><b>{attendance.subjectSummary.reduce((sum, sub) => sum + sub.classesAttended, 0)}</b></td>
-              <td>
+              <td id="total">
                 <b>
                   {(
                     (attendance.subjectSummary.reduce((sum, sub) => sum + sub.classesAttended, 0) /
@@ -208,9 +208,12 @@ const StudentDashboard = () => {
           }
 
           th {
-            background-color: #f2f2f2;
+            background-color: #6495ED;
             color: #333;
           }
+#total{
+color:red;
+}
 
           td {
             color: #555;
