@@ -1,190 +1,131 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import "./Timetable.css";
+import Header from "../../Components/Header/Header";
+import NavBar from "../../Components/NavBar/NavBar";
+import MobileNav from "../../Components/MobileNav/MobileNav";
 
-const StudentTimetable = () => {
-  const [student, setStudent] = useState(null);
-  const [timetable, setTimetable] = useState([]);
-  const [loading, setLoading] = useState(true);
+const Timetable = () => {
+    const [timetable, setTimetable] = useState([]);
+    const [userDetails, setUserDetails] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const facultyId = localStorage.getItem("facultyId");
+    const studentId = localStorage.getItem("studentId");
 
-  useEffect(() => {
-    const studentId = localStorage.getItem('studentId');
-    if (studentId) {
-      fetch(`https://tkrcet-backend-g3zu.onrender.com/Section/${studentId}`)
-        .then((response) => response.json())
-        .then((data) => {
-          setStudent(data.student);
-          const { year, department, section } = data.student;
-          fetch(`https://tkrcet-backend-g3zu.onrender.com/Section/${year}/${department}/${section}/timetable`)
-            .then((response) => response.json())
-            .then((data) => {
-              setTimetable(data.timetable);
-              setLoading(false);
-            })
-            .catch((error) => {
-              console.error('Error fetching timetable:', error);
-              setLoading(false);
-            });
-        })
-        .catch((error) => {
-          console.error('Error fetching student details:', error);
-          setLoading(false);
-        });
-    } else {
-      console.error('No studentId found in localStorage');
-      setLoading(false);
-    }
-  }, []);
+    // Fetch user details (faculty or student)
+    useEffect(() => {
+        const fetchUserDetails = async () => {
+            if (!facultyId && !studentId) {
+                console.error("No facultyId or studentId found in localStorage");
+                setLoading(false);
+                return;
+            }
 
-  if (loading) return <div className="loading-message">Loading...</div>;
-  if (!student) return <div className="loading-message">Student details not found!</div>;
+            try {
+                let response;
+                if (facultyId) {
+                    response = await axios.get(`https://tkrcet-backend-g3zu.onrender.com/faculty/${facultyId}`);
+                } else if (studentId) {
+                    response = await axios.get(`https://tkrcet-backend-g3zu.onrender.com/Section/${studentId}`);
+                }
 
-  const processTimetableRow = (periods) => {
-    let spannedPeriods = [];
-    let i = 0;
+                console.log("User details fetched:", response.data);
+                setUserDetails(response.data);
+            } catch (error) {
+                console.error("Error fetching user details:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
 
-    while (i < periods.length) {
-      let spanCount = 1;
-      while (i + spanCount < periods.length && periods[i].subject === periods[i + spanCount].subject) {
-        spanCount++;
-      }
-      spannedPeriods.push({ subject: periods[i].subject, colSpan: spanCount });
-      i += spanCount;
-    }
+        fetchUserDetails();
+    }, [facultyId, studentId]);
 
-    return spannedPeriods;
-  };
+    // Fetch timetable after userDetails are set
+    useEffect(() => {
+        const fetchTimetable = async () => {
+            if (!userDetails) return;
+            if (!userDetails.role) {
+                console.error("User details do not contain role information.");
+                return;
+            }
 
-  return (
-    <div className="timetable-container">
-      <style>
-        {`
-          .timetable-container {
-            font-family: 'Arial, sans-serif';
-            padding: 20px;
-            max-width: 900px;
-            margin: auto;
-          }
-          .loading-message {
-            font-size: 18px;
-            color: #555;
-            text-align: center;
-            margin-top: 50px;
-          }
-          .student-info {
-            background: #f9f9f9;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-          }
-          .student-info h2 {
-            text-align: center;
-            margin-bottom: 15px;
-            color: #333;
-          }
-          .student-table {
-            width: 100%;
-            border-collapse: collapse;
-          }
-          .student-table th, .student-table td {
-            padding: 10px;
-            border-bottom: 1px solid #ddd;
-            text-align: left;
-          }
-          .student-photo {
-            max-width: 80px;
-            border-radius: 50%;
-            display: block;
-            margin: auto;
-          }
-          .timetable-section {
-            margin-top: 20px;
-          }
-          .timetable-section h1 {
-            text-align: center;
-            color: #333;
-          }
-          .timetable-table {
-            width: 100%;
-            border-collapse: collapse;
-          }
-          .timetable-table th, .timetable-table td {
-            padding: 10px;
-            border: 1px solid #ddd;
-            text-align: center;
-          }
-          .timetable-table th {
-            background: #007BFF;
-            color: white;
-            font-weight: bold;
-          }
-          .timetable-table td {
-            background: #f2f2f2;
-          }
-        `}
-      </style>
+            try {
+                let response;
+                if (userDetails.role === "faculty") {
+                    response = await axios.get(`https://tkrcet-backend-g3zu.onrender.com/faculty/${facultyId}/timetable`);
+                } else if (userDetails.role === "student" && userDetails.student) {
+                    const { year, department, section } = userDetails.student;
 
-      {/* Student Details Section */}
-      <div className="student-info">
-        <h2>Student Details</h2>
-        <table className="student-table">
-          <tbody>
-            <tr>
-              <th>Roll No.</th>
-              <td>{student.rollNumber}</td>
-              <td rowSpan="4">
-                <img src={student.image} alt="Student" className="student-photo" />
-              </td>
-            </tr>
-            <tr>
-              <th>Student Name</th>
-              <td>{student.name}</td>
-            </tr>
-            <tr>
-              <th>Father's Name</th>
-              <td>{student.fatherName}</td>
-            </tr>
-            <tr>
-              <th>Department</th>
-              <td>{`${student.year} ${student.department} ${student.section}`}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+                    if (!year || !department || !section) {
+                        console.error("Missing student details for timetable fetch:", userDetails.student);
+                        return;
+                    }
 
-      {/* Timetable Section */}
-      <div className="timetable-section">
-        <h1>Timetable</h1>
-        <table className="timetable-table">
-          <thead>
-            <tr>
-              <th>DAY</th>
-              <th>9:40-10:40</th>
-              <th>10:40-11:40</th>
-              <th>11:40-12:40</th>
-              <th>12:40-1:20</th>
-              <th>1:20-2:20</th>
-              <th>2:20-3:20</th>
-              <th>3:20-4:20</th>
-            </tr>
-          </thead>
-          <tbody>
-            {timetable.map((day) => (
-              <tr key={day._id}>
-                <td>{day.day}</td>
-                {processTimetableRow(day.periods.slice(0, 3)).map((period, index) => (
-                  <td key={index} colSpan={period.colSpan}>{period.subject}</td>
-                ))}
-                <td>LUNCH</td>
-                {processTimetableRow(day.periods.slice(3)).map((period, index) => (
-                  <td key={index} colSpan={period.colSpan}>{period.subject}</td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
+                    const timetableUrl = `https://tkrcet-backend-g3zu.onrender.com/Section/${year}/${department}/${section}/timetable`;
+                    console.log("Fetching timetable from:", timetableUrl);
+
+                    response = await axios.get(timetableUrl);
+                }
+
+                console.log("Timetable data fetched:", response?.data?.timetable);
+                setTimetable(response?.data?.timetable || []);
+            } catch (error) {
+                console.error("Error fetching timetable:", error);
+            }
+        };
+
+        if (userDetails) {
+            fetchTimetable();
+        }
+    }, [userDetails]);
+
+    if (loading) return <p>Loading...</p>;
+    if (!userDetails) return <p>No user details found!</p>;
+
+    return (
+        <div>
+            <Header />
+            <div className="nav">
+                <NavBar facultyName={userDetails?.name || userDetails?.student?.name || "User"} />
+            </div>
+            <div className="mob-nav">
+                <MobileNav />
+            </div>
+
+            <h2>Timetable</h2>
+            <section className="timetable">
+                {timetable.length === 0 ? (
+                    <p>No timetable data available.</p>
+                ) : (
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>DAY</th>
+                                <th>9:40-10:40</th>
+                                <th>10:40-11:40</th>
+                                <th>11:40-12:40</th>
+                                <th>12:40-1:20</th>
+                                <th>1:20-2:20</th>
+                                <th>2:20-3:20</th>
+                                <th>3:20-4:20</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {timetable.map((day, index) => (
+                                <tr key={index}>
+                                    <td>{day.day}</td>
+                                    {day.periods.map((period, i) => (
+                                        <td key={i}>{period.subject || ""}</td>
+                                    ))}
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                )}
+            </section>
+        </div>
+    );
 };
 
-export default StudentTimetable;
+export default Timetable;
