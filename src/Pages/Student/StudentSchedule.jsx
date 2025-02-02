@@ -59,6 +59,14 @@ const StudentTimetable = () => {
 
   return (
     <>
+      <Header />
+      <div className="nav">
+        <NavBar />
+      </div>
+      <div className="mob-nav">
+        <MobileNav />
+      </div>
+
      
 <style>{`
 
