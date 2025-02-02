@@ -76,10 +76,10 @@ const Timetable = () => {
     return (
         <div className="timetable-container">
             <Header />
-            <div className="navigation">
+            <div className="nav">
                 <NavBar facultyName={facultyDetails?.name || "Faculty"} />
             </div>
-            <div className="mobile-navigation">
+            <div className="mob-nav">
                 <MobileNav />
             </div>
 
