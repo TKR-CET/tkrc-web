@@ -115,7 +115,7 @@ function NavBar() {
           </Link>
 
           {/* Timetable Navigation based on Role */}
-          <li onClick={() => navigate(studentId ? "/Schedule" : "/timetable")}>
+          <li id="time" onClick={() => navigate(studentId ? "/Schedule" : "/timetable")}>
             Timetable
           </li>
 
