@@ -54,7 +54,8 @@ const StudentSchedule = () => {
   };
 
   return (
-<style>{`/* General Styles */
+<>
+<style>{`
 * {
   box-sizing: border-box;
   margin: 0;
@@ -320,6 +321,7 @@ h2 {
         </table>
       </div>
     </div>
+</>
   );
 };
 
