@@ -1,55 +1,4 @@
-import React, { useState, useEffect } from "react";
-import styled from "styled-components";
-
-// Styled components
-const Container = styled.div`
-  font-family: "Arial, sans-serif";
-  padding: 20px;
-  max-width: 1000px;
-  margin: auto;
-`;
-
-const LoadingText = styled.div`
-  font-size: 18px;
-  color: #555;
-  text-align: center;
-`;
-
-const StudentDetails = styled.div`
-  margin-bottom: 20px;
-  padding: 15px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background-color: #f9f9f9;
-`;
-
-const Table = styled.table`
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-`;
-
-const Th = styled.th`
-  background-color: #f2f2f2;
-  font-weight: bold;
-  padding: 10px;
-  border: 1px solid #ddd;
-  text-align: left;
-`;
-
-const Td = styled.td`
-  padding: 10px;
-  border: 1px solid #ddd;
-  text-align: center;
-  vertical-align: middle;
-`;
-
-const Img = styled.img`
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  object-fit: cover;
-`;
+import React, { useState, useEffect } from 'react';
 
 const Example = () => {
   const [student, setStudent] = useState(null);
@@ -57,118 +6,185 @@ const Example = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const studentId = localStorage.getItem("studentId");
+    const studentId = localStorage.getItem('studentId');
     if (studentId) {
       fetch(`https://tkrcet-backend-g3zu.onrender.com/Section/${studentId}`)
         .then((response) => response.json())
         .then((data) => {
           setStudent(data.student);
           const { year, department, section } = data.student;
-          fetch(
-            `https://tkrcet-backend-g3zu.onrender.com/Section/${year}/${department}/${section}/timetable`
-          )
+          fetch(`https://tkrcet-backend-g3zu.onrender.com/Section/${year}/${department}/${section}/timetable`)
             .then((response) => response.json())
             .then((data) => {
               setTimetable(data.timetable);
               setLoading(false);
             })
             .catch((error) => {
-              console.error("Error fetching timetable:", error);
+              console.error('Error fetching timetable:', error);
               setLoading(false);
             });
         })
         .catch((error) => {
-          console.error("Error fetching student details:", error);
+          console.error('Error fetching student details:', error);
           setLoading(false);
         });
     } else {
-      console.error("No studentId found in localStorage");
+      console.error('No studentId found in localStorage');
       setLoading(false);
     }
   }, []);
 
-  if (loading) return <LoadingText>Loading...</LoadingText>;
-  if (!student) return <LoadingText>Student details not found!</LoadingText>;
+  if (loading) return <div className="loading">Loading...</div>;
+  if (!student) return <div className="loading">Student details not found!</div>;
 
-  // Function to merge same subjects into single cell
-  const renderTimetableRow = (day) => {
-    let mergedPeriods = [];
+  // Function to process timetable and apply column spans for repeated subjects
+  const processTimetableRow = (periods) => {
+    let spannedPeriods = [];
     let i = 0;
 
-    while (i < day.periods.length) {
-      let colSpan = 1;
-      while (
-        i + colSpan < day.periods.length &&
-        day.periods[i].subject === day.periods[i + colSpan].subject
-      ) {
-        colSpan++;
+    while (i < periods.length) {
+      let spanCount = 1;
+      while (i + spanCount < periods.length && periods[i].subject === periods[i + spanCount].subject) {
+        spanCount++;
       }
-      mergedPeriods.push({ subject: day.periods[i].subject, colSpan });
-      i += colSpan;
+      spannedPeriods.push({ subject: periods[i].subject, colSpan: spanCount });
+      i += spanCount;
     }
 
-    return (
-      <tr key={day._id}>
-        <Td>{day.day}</Td>
-        {mergedPeriods.slice(0, 3).map((period, index) => (
-          <Td key={index} colSpan={period.colSpan}>{period.subject}</Td>
-        ))}
-        <Td>LUNCH</Td>
-        {mergedPeriods.slice(3).map((period, index) => (
-          <Td key={index} colSpan={period.colSpan}>{period.subject}</Td>
-        ))}
-      </tr>
-    );
+    return spannedPeriods;
   };
 
   return (
-    <Container>
-      {/* Student Details */}
-      <StudentDetails>
+    <div className="container">
+      <style>
+        {`
+          .container {
+            font-family: 'Arial, sans-serif';
+            padding: 20px;
+            max-width: 900px;
+            margin: auto;
+          }
+          .loading {
+            font-size: 18px;
+            color: #555;
+            text-align: center;
+            margin-top: 50px;
+          }
+          .student-details {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+          }
+          .student-details h2 {
+            text-align: center;
+            margin-bottom: 15px;
+            color: #333;
+          }
+          .student-details table {
+            width: 100%;
+            border-collapse: collapse;
+          }
+          .student-details th, .student-details td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+          }
+          .student-image {
+            max-width: 80px;
+            border-radius: 50%;
+            display: block;
+            margin: auto;
+          }
+          .timetable {
+            margin-top: 20px;
+          }
+          .timetable h1 {
+            text-align: center;
+            color: #333;
+          }
+          .timetable table {
+            width: 100%;
+            border-collapse: collapse;
+          }
+          .timetable th, .timetable td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+          }
+          .timetable th {
+            background: #4CAF50;
+            color: white;
+            font-weight: bold;
+          }
+          .timetable td {
+            background: #f2f2f2;
+          }
+        `}
+      </style>
+
+      {/* Student Details Section */}
+      <div className="student-details">
         <h2>Student Details</h2>
-        <Table>
+        <table>
           <tbody>
             <tr>
-              <Th>Roll No.</Th>
-              <Td>{student.rollNumber}</Td>
-              <Td rowSpan="4">
-                <Img src={student.image} alt="Student" />
-              </Td>
+              <th>Roll No.</th>
+              <td>{student.rollNumber}</td>
+              <td rowSpan="4">
+                <img src={student.image} alt="Student" className="student-image" />
+              </td>
             </tr>
             <tr>
-              <Th>Student Name</Th>
-              <Td>{student.name}</Td>
+              <th>Student Name</th>
+              <td>{student.name}</td>
             </tr>
             <tr>
-              <Th>Father's Name</Th>
-              <Td>{student.fatherName}</Td>
+              <th>Father's Name</th>
+              <td>{student.fatherName}</td>
             </tr>
             <tr>
-              <Th>Department</Th>
-              <Td>{`${student.year} ${student.department} ${student.section}`}</Td>
+              <th>Department</th>
+              <td>{`${student.year} ${student.department} ${student.section}`}</td>
             </tr>
           </tbody>
-        </Table>
-      </StudentDetails>
+        </table>
+      </div>
 
-      {/* Timetable */}
-      <h2>Timetable</h2>
-      <Table>
-        <thead>
-          <tr>
-            <Th>DAY</Th>
-            <Th>9:40-10:40</Th>
-            <Th>10:40-11:40</Th>
-            <Th>11:40-12:40</Th>
-            <Th>12:40-1:20</Th>
-            <Th>1:20-2:20</Th>
-            <Th>2:20-3:20</Th>
-            <Th>3:20-4:20</Th>
-          </tr>
-        </thead>
-        <tbody>{timetable.map(renderTimetableRow)}</tbody>
-      </Table>
-    </Container>
+      {/* Timetable Section */}
+      <div className="timetable">
+        <h1>Timetable</h1>
+        <table>
+          <thead>
+            <tr>
+              <th>DAY</th>
+              <th>9:40-10:40</th>
+              <th>10:40-11:40</th>
+              <th>11:40-12:40</th>
+              <th>12:40-1:20</th>
+              <th>1:20-2:20</th>
+              <th>2:20-3:20</th>
+              <th>3:20-4:20</th>
+            </tr>
+          </thead>
+          <tbody>
+            {timetable.map((day) => (
+              <tr key={day._id}>
+                <td>{day.day}</td>
+                {processTimetableRow(day.periods.slice(0, 3)).map((period, index) => (
+                  <td key={index} colSpan={period.colSpan}>{period.subject}</td>
+                ))}
+                <td>LUNCH</td>
+                {processTimetableRow(day.periods.slice(3)).map((period, index) => (
+                  <td key={index} colSpan={period.colSpan}>{period.subject}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
   );
 };
 
