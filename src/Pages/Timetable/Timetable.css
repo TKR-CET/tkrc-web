@@ -1,119 +1,97 @@
-/* Staff Details */
-.staff-details {
-  width: 80%;
-  margin: 20px auto;
-}
-#h3{
-  color:purple;
-  font-family: Sans-Serif;
-  font-size: bold;
+/* General Styling */
+.timetable-container {
+    font-family: "Arial", sans-serif;
+    margin: 20px;
 }
 
-.staff-details table {
-  width: 100%;
-  border-collapse: collapse;
-  border:solid black 1px !important;
-}
-#image{
-  width:150px;
-  
-}
-.staff-details th {
-  background-color: #e6adad;
-  color: #000;
-  padding: 10px;
-  font-size: 16px;
-  text-align: left;
+.navigation,
+.mobile-navigation {
+    margin-bottom: 20px;
 }
 
-.staff-details td {
-  padding: 8px;
-  font-size: 14px;
-  border: 1px solid #ccc;
+/* Faculty Profile Section */
+.faculty-profile {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
 }
 
-/* Timetable */
-.timetable {
-  width: 90%;
-  margin: 20px auto;
-  text-align: center;
+.profile-table {
+    width: 80%;
+    border-collapse: collapse;
+    background: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-.timetable h2 {
-  color: purple;
-  font-size: 18px;
-  font-weight: bold;
-  margin-bottom: 10px;
-}
-.m4{
-background-color: #6495ED !important ;
-}
-.m4 th{
-  color:white !important;
-  font-weight: bold !important;
-}
-.timetable table {
-  width: 100%;
-  border-collapse: collapse;
-  border: solid 1px black;
-  background-color: #FEE68E;
+.label {
+    font-weight: bold;
+    background: #ececec;
+    padding: 10px;
 }
 
-.timetable th, .timetable td {
-  padding: 8px;
-  border: 1px solid black;
-  font-size: 14px;
+.profile-image-cell {
+    text-align: center;
+    padding: 10px;
 }
 
-.timetable th {
-  color: purple;
+.profile-image {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
 }
 
-.timetable td {
-  text-align: center;
+/* Timetable Section */
+.timetable-heading {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
 }
 
-.timetable td:first-child {
-  font-weight: bold;
-  color: purple;
+.timetable-content {
+    display: flex;
+    justify-content: center;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-  .staff-details,
-  .timetable {
-    width: 95%; /* Reduce width on smaller screens */
-  }
-
-  .staff-details th,
-  .staff-details td,
-  .timetable th,
-  .timetable td {
-    font-size: 12px; /* Adjust font size for smaller screens */
-    padding: 6px;
-  }
-
-  .timetable h2 {
-    font-size: 16px; /* Adjust heading font size */
-  }
+.timetable-table {
+    width: 90%;
+    border-collapse: collapse;
+    background: #fff;
+    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
 }
 
-@media (max-width: 480px) {
-  .staff-details th,
-  .staff-details td,
-  .timetable th,
-  .timetable td {
-    font-size: 10px; /* Further reduce font size for smaller screens */
-    padding: 4px;
-  }
+.timetable-table th,
+.timetable-table td {
+    padding: 12px;
+    border: 1px solid #ddd;
+    text-align: center;
+}
 
-  .staff-details table,
-  .timetable table {
-    font-size: 10px; /* Adjust overall table font size */
-  }
+.timetable-table th {
+    background: #007bff;
+    color: white;
+}
 
-  .timetable h2 {
-    font-size: 14px; /* Reduce heading font size */
-  }
-  }
-  
+.day-cell {
+    font-weight: bold;
+    background: #f3f3f3;
+}
+
+.period-cell {
+    background: #e8f4ff;
+}
+
+.lunch-cell {
+    font-weight: bold;
+    background: #ffefc1;
+}
+
+/* No Data */
+.no-data {
+    text-align: center;
+    font-size: 18px;
+    color: #666;
+}
