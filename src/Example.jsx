@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import './Example.css'; // Import CSS file
 
 const Example = () => {
   const [student, setStudent] = useState(null);
@@ -34,10 +35,7 @@ const Example = () => {
     }
   }, []);
 
-  if (loading) return <div className="loading">Loading...</div>;
-  if (!student) return <div className="loading">Student details not found!</div>;
-
-  // Function to process timetable and apply column spans for repeated subjects
+  // Function to span repeated subjects
   const processTimetableRow = (periods) => {
     let spannedPeriods = [];
     let i = 0;
@@ -54,86 +52,21 @@ const Example = () => {
     return spannedPeriods;
   };
 
-  return (
-    <div className="container">
-      <style>
-        {`
-          .container {
-            font-family: 'Arial, sans-serif';
-            padding: 20px;
-            max-width: 900px;
-            margin: auto;
-          }
-          .loading {
-            font-size: 18px;
-            color: #555;
-            text-align: center;
-            margin-top: 50px;
-          }
-          .student-details {
-            background: #f9f9f9;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-          }
-          .student-details h2 {
-            text-align: center;
-            margin-bottom: 15px;
-            color: #333;
-          }
-          .student-details table {
-            width: 100%;
-            border-collapse: collapse;
-          }
-          .student-details th, .student-details td {
-            padding: 10px;
-            border-bottom: 1px solid #ddd;
-            text-align: left;
-          }
-          .student-image {
-            max-width: 80px;
-            border-radius: 50%;
-            display: block;
-            margin: auto;
-          }
-          .timetable {
-            margin-top: 20px;
-          }
-          .timetable h1 {
-            text-align: center;
-            color: #333;
-          }
-          .timetable table {
-            width: 100%;
-            border-collapse: collapse;
-          }
-          .timetable th, .timetable td {
-            padding: 10px;
-            border: 1px solid #ddd;
-            text-align: center;
-          }
-          .timetable th {
-            background: #4CAF50;
-            color: white;
-            font-weight: bold;
-          }
-          .timetable td {
-            background: #f2f2f2;
-          }
-        `}
-      </style>
+  if (loading) return <div className="loading-text">Loading...</div>;
+  if (!student) return <div className="loading-text">Student details not found!</div>;
 
+  return (
+    <div className="example-container">
       {/* Student Details Section */}
-      <div className="student-details">
+      <div className="student-card">
         <h2>Student Details</h2>
-        <table>
+        <table className="student-table">
           <tbody>
             <tr>
               <th>Roll No.</th>
               <td>{student.rollNumber}</td>
               <td rowSpan="4">
-                <img src={student.image} alt="Student" className="student-image" />
+                <img src={student.image} alt="Student" className="student-photo" />
               </td>
             </tr>
             <tr>
@@ -153,9 +86,9 @@ const Example = () => {
       </div>
 
       {/* Timetable Section */}
-      <div className="timetable">
+      <div className="timetable-section">
         <h1>Timetable</h1>
-        <table>
+        <table className="timetable-table">
           <thead>
             <tr>
               <th>DAY</th>
@@ -175,7 +108,7 @@ const Example = () => {
                 {processTimetableRow(day.periods.slice(0, 3)).map((period, index) => (
                   <td key={index} colSpan={period.colSpan}>{period.subject}</td>
                 ))}
-                <td>LUNCH</td>
+                <td className="lunch-cell">LUNCH</td>
                 {processTimetableRow(day.periods.slice(3)).map((period, index) => (
                   <td key={index} colSpan={period.colSpan}>{period.subject}</td>
                 ))}
