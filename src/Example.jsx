@@ -92,29 +92,39 @@ const Example = () => {
   if (!student) return <div style={styles.loading}>Student details not found!</div>;
 
   return (
-    <div style={styles.container}>
-      {/* Student Details Section */}
-      <div style={styles.studentDetails}>
-        <h1>Student Details</h1>
-        <div style={styles.studentDetailsBox}>
-          <div style={styles.detailItem}>
-            <span style={styles.detailLabel}>Roll No.</span>
-            <span style={styles.detailValue}>{student.rollNumber}</span>
-          </div>
-          <div style={styles.detailItem}>
-            <span style={styles.detailLabel}>Student Name</span>
-            <span style={styles.detailValue}>{student.name}</span>
-          </div>
-          <div style={styles.detailItem}>
-            <span style={styles.detailLabel}>Father's Name</span>
-            <span style={styles.detailValue}>{student.fatherName}</span>
-          </div>
-          <div style={styles.detailItem}>
-            <span style={styles.detailLabel}>Department</span>
-            <span style={styles.detailValue}>{student.department} | {student.section}</span>
-          </div>
-        </div>
+    
+
+          <div className="student-details">
+        <h2>Student Details</h2>
+        <table>
+          <tbody>
+            <tr>
+              <th>Roll No.</th>
+              <td>{student.rollNumber}</td>
+              <td rowSpan="4">
+                <img src={student.image} alt="Student" className="student-image" />
+              </td>
+            </tr>
+            <tr>
+              <th>Student Name</th>
+              <td>{student.name}</td>
+            </tr>
+            <tr>
+              <th>Father's Name</th>
+              <td>{student.fatherName}</td>
+            </tr>
+            <tr>
+              <th>Department</th>
+              <td>{`${student.year} ${student.department} ${student.section}`}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
+
+
+
+
+
 
       {/* Timetable Section */}
       <div style={styles.timetable}>
