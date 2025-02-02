@@ -34,8 +34,8 @@ const StudentDashboard = () => {
     }
   }, []);
 
-  if (isLoading) return <div className="loading-message">Loading...</div>;
-  if (!studentInfo) return <div className="error-message">Student details not found!</div>;
+  if (isLoading) return <div id="loading-message">Loading...</div>;
+  if (!studentInfo) return <div id="error-message">Student details not found!</div>;
 
   const formatSchedule = (periods) => {
     let mergedPeriods = [];
@@ -54,61 +54,65 @@ const StudentDashboard = () => {
   };
 
   return (
-    <div className="dashboard-container">
+    <div id="dashboard-container">
       {/* Student Info Section */}
-      <div className="student-card">
+      <div id="student-card">
         <h2>Student Profile</h2>
-        <table className="student-details">
+        <table id="student-details">
           <tbody>
             <tr>
-              <th>Roll No.</th>
-              <td>{studentInfo.rollNumber}</td>
-              <td rowSpan="4">
-                <img src={studentInfo.image} alt="Student" className="profile-photo" />
+              <th id="roll-no-label">Roll No.</th>
+              <td id="roll-no-value">{studentInfo.rollNumber}</td>
+              <td id="student-photo" rowSpan="4">
+                <img src={studentInfo.image} alt="Student" id="profile-photo" />
               </td>
             </tr>
             <tr>
-              <th>Name</th>
-              <td>{studentInfo.name}</td>
+              <th id="name-label">Name</th>
+              <td id="name-value">{studentInfo.name}</td>
             </tr>
             <tr>
-              <th>Father's Name</th>
-              <td>{studentInfo.fatherName}</td>
+              <th id="father-name-label">Father's Name</th>
+              <td id="father-name-value">{studentInfo.fatherName}</td>
             </tr>
             <tr>
-              <th>Department</th>
-              <td>{`${studentInfo.year} ${studentInfo.department} ${studentInfo.section}`}</td>
+              <th id="department-label">Department</th>
+              <td id="department-value">{`${studentInfo.year} ${studentInfo.department} ${studentInfo.section}`}</td>
             </tr>
           </tbody>
         </table>
       </div>
 
       {/* Timetable Section */}
-      <div className="schedule-section">
-        <h1>Class Timetable</h1>
-        <table className="schedule-table">
+      <div id="schedule-section">
+        <h1 id="schedule-heading">Class Timetable</h1>
+        <table id="schedule-table">
           <thead>
             <tr>
-              <th>Day</th>
-              <th>9:40-10:40</th>
-              <th>10:40-11:40</th>
-              <th>11:40-12:40</th>
-              <th>12:40-1:20</th>
-              <th>1:20-2:20</th>
-              <th>2:20-3:20</th>
-              <th>3:20-4:20</th>
+              <th id="day-header">Day</th>
+              <th id="period-1">9:40-10:40</th>
+              <th id="period-2">10:40-11:40</th>
+              <th id="period-3">11:40-12:40</th>
+              <th id="period-4">12:40-1:20</th>
+              <th id="period-5">1:20-2:20</th>
+              <th id="period-6">2:20-3:20</th>
+              <th id="period-7">3:20-4:20</th>
             </tr>
           </thead>
           <tbody>
             {classSchedule.map((day) => (
-              <tr key={day._id}>
-                <td>{day.day}</td>
+              <tr key={day._id} id={`schedule-row-${day._id}`}>
+                <td id={`day-${day._id}`} className="schedule-cell">{day.day}</td>
                 {formatSchedule(day.periods.slice(0, 3)).map((period, index) => (
-                  <td key={index} colSpan={period.colSpan} className="schedule-cell">{period.subject}</td>
+                  <td key={index} id={`period-${index}`} className="schedule-period" colSpan={period.colSpan}>
+                    {period.subject}
+                  </td>
                 ))}
-                <td className="lunch-break">LUNCH</td>
+                <td id="lunch-cell" className="lunch-cell">LUNCH</td>
                 {formatSchedule(day.periods.slice(3)).map((period, index) => (
-                  <td key={index} colSpan={period.colSpan} className="schedule-cell">{period.subject}</td>
+                  <td key={index} id={`period-${index + 3}`} className="schedule-period" colSpan={period.colSpan}>
+                    {period.subject}
+                  </td>
                 ))}
               </tr>
             ))}
