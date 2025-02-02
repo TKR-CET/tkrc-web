@@ -144,7 +144,7 @@ background-color:gold;
 }
 
 .timetable-table th {
-  background-color: #007bff;
+  background-color: #6495ED;
   color: white;
 }
 
