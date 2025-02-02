@@ -7,67 +7,33 @@ import MobileNav from "../../Components/MobileNav/MobileNav";
 
 const Timetable = () => {
     const [timetable, setTimetable] = useState([]);
-    const [userDetails, setUserDetails] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [facultyDetails, setFacultyDetails] = useState(null);
     const facultyId = localStorage.getItem("facultyId");
-    const studentId = localStorage.getItem("studentId");
 
-    // Fetch user details (faculty or student)
+    // Fetch faculty details
     useEffect(() => {
-        const fetchUserDetails = async () => {
-            if (!facultyId && !studentId) {
-                console.error("No facultyId or studentId found in localStorage");
-                setLoading(false);
-                return;
-            }
-
+        const fetchFacultyDetails = async () => {
             try {
-                let response;
                 if (facultyId) {
-                    response = await axios.get(`https://tkrcet-backend-g3zu.onrender.com/faculty/${facultyId}`);
-                } else if (studentId) {
-                    response = await axios.get(`https://tkrcet-backend-g3zu.onrender.com/Section/${studentId}`);
+                    const response = await axios.get(`https://tkrcet-backend-g3zu.onrender.com/faculty/${facultyId}`);
+                    console.log("Faculty details fetched:", response.data);
+                    setFacultyDetails(response.data);
                 }
-
-                console.log("User details fetched:", response.data);
-                setUserDetails(response.data);
             } catch (error) {
-                console.error("Error fetching user details:", error);
-            } finally {
-                setLoading(false);
+                console.error("Error fetching faculty details:", error);
             }
         };
 
-        fetchUserDetails();
-    }, [facultyId, studentId]);
+        fetchFacultyDetails();
+    }, [facultyId]);
 
-    // Fetch timetable after userDetails are set
+    // Fetch faculty timetable
     useEffect(() => {
         const fetchTimetable = async () => {
-            if (!userDetails) return;
-            if (!userDetails.role) {
-                console.error("User details do not contain role information.");
-                return;
-            }
+            if (!facultyDetails) return;
 
             try {
-                let response;
-                if (userDetails.role === "faculty") {
-                    response = await axios.get(`https://tkrcet-backend-g3zu.onrender.com/faculty/${facultyId}/timetable`);
-                } else if (userDetails.role === "student" && userDetails.student) {
-                    const { year, department, section } = userDetails.student;
-
-                    if (!year || !department || !section) {
-                        console.error("Missing student details for timetable fetch:", userDetails.student);
-                        return;
-                    }
-
-                    const timetableUrl = `https://tkrcet-backend-g3zu.onrender.com/Section/${year}/${department}/${section}/timetable`;
-                    console.log("Fetching timetable from:", timetableUrl);
-
-                    response = await axios.get(timetableUrl);
-                }
-
+                const response = await axios.get(`https://tkrcet-backend-g3zu.onrender.com/faculty/${facultyId}/timetable`);
                 console.log("Timetable data fetched:", response?.data?.timetable);
                 setTimetable(response?.data?.timetable || []);
             } catch (error) {
@@ -75,32 +41,92 @@ const Timetable = () => {
             }
         };
 
-        if (userDetails) {
+        if (facultyDetails) {
             fetchTimetable();
         }
-    }, [userDetails]);
+    }, [facultyDetails]);
 
-    if (loading) return <p>Loading...</p>;
-    if (!userDetails) return <p>No user details found!</p>;
+    // Handle image loading errors
+    const handleImageError = (e) => {
+        console.warn("Error loading user image. Using fallback image.");
+        e.target.src = "./images/logo.png";
+    };
+
+    // Merge consecutive periods with the same subject
+    const processPeriods = (periods) => {
+        const mergedPeriods = [];
+        let i = 0;
+
+        while (i < periods.length) {
+            let span = 1;
+            while (
+                i + span < periods.length &&
+                periods[i] &&
+                periods[i + span] &&
+                periods[i].subject === periods[i + span].subject
+            ) {
+                span++;
+            }
+
+            mergedPeriods.push({ period: periods[i], span });
+            i += span;
+        }
+
+        return mergedPeriods;
+    };
 
     return (
         <div>
             <Header />
             <div className="nav">
-                <NavBar facultyName={userDetails?.name || userDetails?.student?.name || "User"} />
+                <NavBar facultyName={facultyDetails?.name || "Faculty"} />
             </div>
             <div className="mob-nav">
                 <MobileNav />
             </div>
 
-            <h2>Timetable</h2>
+            {/* Faculty Details Section */}
+            <section className="faculty-details">
+                <table>
+                    <tbody>
+                        <tr>
+                            <td id="h3">Name</td>
+                            <td>{facultyDetails?.name || "N/A"}</td>
+                            <td id="image" rowSpan={3}>
+                                <img
+                                    src={facultyDetails?.image || "./images/logo.png"}
+                                    alt={`${facultyDetails?.name || "Faculty"} Profile`}
+                                    className="user-image"
+                                    style={{
+                                        width: "100px",
+                                        height: "100px",
+                                        borderRadius: "50%",
+                                    }}
+                                    onError={handleImageError}
+                                />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td id="h3">Department</td>
+                            <td>{facultyDetails?.department || "N/A"}</td>
+                        </tr>
+                        <tr>
+                            <td id="h3">Designation</td>
+                            <td>{facultyDetails?.designation || "N/A"}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            {/* Timetable Section */}
+            <h2>Time Table - ODD Semester (2024-25)</h2>
             <section className="timetable">
                 {timetable.length === 0 ? (
                     <p>No timetable data available.</p>
                 ) : (
                     <table>
                         <thead>
-                            <tr>
+                            <tr className="m4">
                                 <th>DAY</th>
                                 <th>9:40-10:40</th>
                                 <th>10:40-11:40</th>
@@ -112,14 +138,46 @@ const Timetable = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {timetable.map((day, index) => (
-                                <tr key={index}>
-                                    <td>{day.day}</td>
-                                    {day.periods.map((period, i) => (
-                                        <td key={i}>{period.subject || ""}</td>
-                                    ))}
-                                </tr>
-                            ))}
+                            {timetable.map((dayData, index) => {
+                                const periods = [...Array(7)].map((_, i) => {
+                                    return dayData.periods.find((p) => p.periodNumber === i + 1) || null;
+                                });
+
+                                const periodsBeforeLunch = periods.slice(0, 3);
+                                const periodsAfterLunch = periods.slice(4);
+
+                                const mergedBeforeLunch = processPeriods(periodsBeforeLunch);
+                                const mergedAfterLunch = processPeriods(periodsAfterLunch);
+
+                                return (
+                                    <tr key={index}>
+                                        <td>{dayData.day || "N/A"}</td>
+
+                                        {mergedBeforeLunch.map((merged, i) => (
+                                            <td key={i} colSpan={merged.span}>
+                                                {merged.period
+                                                    ? `${merged.period.subject} (${merged.period.year}, ${merged.period.section}, ${merged.period.department || "N/A"})`
+                                                    : ""}
+                                            </td>
+                                        ))}
+
+                                        <td
+                                            key="lunch"
+                                            style={{ textAlign: "center", fontWeight: "bold" }}
+                                        >
+                                            LUNCH
+                                        </td>
+
+                                        {mergedAfterLunch.map((merged, i) => (
+                                            <td key={i + 4} colSpan={merged.span}>
+                                                {merged.period
+                                                    ? `${merged.period.subject} (${merged.period.year}, ${merged.period.section}, ${merged.period.department || "N/A"})`
+                                                    : ""}
+                                            </td>
+                                        ))}
+                                    </tr>
+                                );
+                            })}
                         </tbody>
                     </table>
                 )}
