@@ -214,7 +214,7 @@ const StudentDashboard = () => {
           th, td {
             padding: 12px;
             text-align: center;
-            border: 1px solid black;
+            border-bottom: 1px solid #ddd;
           }
 
           th {
