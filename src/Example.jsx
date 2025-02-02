@@ -65,6 +65,7 @@ const StudentTimetable = () => {
     padding: 20px;
 }
 
+/* Loading Message */
 .loading-message {
     font-size: 18px;
     color: #555;
@@ -125,7 +126,7 @@ const StudentTimetable = () => {
     width: 100%;
     border-collapse: collapse;
     background: #fff;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
 }
 
