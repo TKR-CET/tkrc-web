@@ -57,163 +57,163 @@ const StudentTimetable = () => {
     <div className="timetable-container">
       <style>
         {`
-          /* General Styling */
-          .timetable-container {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            max-width: 1000px;
-            margin: 30px auto;
-            padding: 30px;
-            background: #f7f7f7;
-            border-radius: 10px;
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
-          }
+        /* General Styling */
+.timetable-container {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    max-width: 1000px;
+    margin: 30px auto;
+    padding: 30px;
+    background: #f7f7f7;
+    border-radius: 10px;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
 
-          /* Loading Message */
-          .loading-message {
-            font-size: 20px;
-            color: #4a4a4a;
-            text-align: center;
-            margin-top: 50px;
-          }
+/* Loading Message */
+.loading-message {
+    font-size: 20px;
+    color: #4a4a4a;
+    text-align: center;
+    margin-top: 50px;
+}
 
-          /* Student Info Section */
-          .student-info {
-            background: #fff;
-            padding: 25px;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            margin-bottom: 30px;
-          }
+/* Student Info Section */
+.student-info {
+    background: #fff;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+}
 
-          .student-info h2 {
-            text-align: center;
-            margin-bottom: 20px;
-            color: #333;
-            font-size: 24px;
-            font-weight: bold;
-          }
+.student-info h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+    font-size: 24px;
+    font-weight: bold;
+}
 
-          .student-table {
-            width: 100%;
-            border-collapse: collapse;
-          }
+.student-table {
+    width: 100%;
+    border-collapse: collapse;
+}
 
-          .student-table th, .student-table td {
-            padding: 15px;
-            border-bottom: 1px solid #ddd;
-            text-align: left;
-            font-size: 16px;
-          }
+.student-table th, .student-table td {
+    padding: 15px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+    font-size: 16px;
+}
 
-          .student-table th {
-            background: #f4f6f9;
-            color: #333;
-          }
+.student-table th {
+    background: #f4f6f9;
+    color: #333;
+}
 
-          .student-photo {
-            width: 90px;
-            height: 90px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid #ddd;
-          }
+.student-photo {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #ddd;
+}
 
-          /* Timetable Section */
-          .timetable-section {
-            margin-top: 20px;
-          }
+/* Timetable Section */
+.timetable-section {
+    margin-top: 20px;
+}
 
-          .timetable-section h1 {
-            text-align: center;
-            color: #2c3e50;
-            font-size: 28px;
-            margin-bottom: 20px;
-            font-weight: 600;
-          }
+.timetable-section h1 {
+    text-align: center;
+    color: #2c3e50;
+    font-size: 28px;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
 
-          .timetable-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: #fff;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-          }
+.timetable-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
 
-          .timetable-table th, .timetable-table td {
-            padding: 18px;
-            border: 1px solid #ddd;
-            text-align: center;
-            font-size: 16px;
-            font-weight: 500;
-          }
+.timetable-table th, .timetable-table td {
+    padding: 18px;
+    border: 1px solid #ddd;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 500;
+}
 
-          .timetable-table th {
-            background: #3498db;
-            color: white;
-            font-weight: bold;
-          }
+.timetable-table th {
+    background: #3498db;
+    color: white;
+    font-weight: bold;
+}
 
-          .timetable-table td {
-            background: #f9fafb;
-            color: #2c3e50;
-          }
+.timetable-table td {
+    background: #f9fafb;
+    color: #2c3e50;
+}
 
-          /* Timetable Row Styling */
-          .timetable-table .period-cell {
-            background: #eaf5ff;
-          }
+/* Timetable Row Styling */
+.timetable-table .period-cell {
+    background: #eaf5ff;
+}
 
-          .timetable-table .lunch-cell {
-            font-weight: bold;
-            background: #fff3e5;
-            color: #f39c12;
-          }
+.timetable-table .lunch-cell {
+    font-weight: bold;
+    background: #fff3e5;
+    color: #f39c12;
+}
 
-          /* Responsiveness */
-          @media (max-width: 768px) {
-            .timetable-container {
-              padding: 20px;
-            }
+/* Responsiveness */
+@media (max-width: 768px) {
+    .timetable-container {
+        padding: 20px;
+    }
 
-            .student-info {
-              padding: 20px;
-            }
+    .student-info {
+        padding: 20px;
+    }
 
-            .student-photo {
-              width: 70px;
-              height: 70px;
-            }
+    .student-photo {
+        width: 70px;
+        height: 70px;
+    }
 
-            .student-table th, .student-table td {
-              font-size: 14px;
-              padding: 10px;
-            }
+    .student-table th, .student-table td {
+        font-size: 14px;
+        padding: 10px;
+    }
 
-            .timetable-table th, .timetable-table td {
-              font-size: 14px;
-              padding: 12px;
-            }
-          }
+    .timetable-table th, .timetable-table td {
+        font-size: 14px;
+        padding: 12px;
+    }
+}
 
-          @media (max-width: 480px) {
-            .student-info {
-              padding: 15px;
-            }
+@media (max-width: 480px) {
+    .student-info {
+        padding: 15px;
+    }
 
-            .student-table th, .student-table td {
-              font-size: 12px;
-              padding: 8px;
-            }
+    .student-table th, .student-table td {
+        font-size: 12px;
+        padding: 8px;
+    }
 
-            .timetable-table th, .timetable-table td {
-              font-size: 12px;
-              padding: 10px;
-            }
+    .timetable-table th, .timetable-table td {
+        font-size: 12px;
+        padding: 10px;
+    }
 
-            .timetable-section h1 {
-              font-size: 22px;
-            }
-          }
+    .timetable-section h1 {
+        font-size: 22px;
+    }
+}
         `}
       </style>
 
