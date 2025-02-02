@@ -1,4 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import Header from "../../Components/Header/Header";
+import NavBar from "../../Components/NavBar/NavBar";
+import MobileNav from "../../Components/MobileNav/MobileNav";
+
 
 const StudentTimetable = () => {
   const [studentInfo, setStudentInfo] = useState(null);
