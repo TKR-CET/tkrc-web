@@ -34,8 +34,8 @@ const StudentSchedule = () => {
     }
   }, []);
 
-  if (loading) return <div id="BIG_LOADING_MESSAGE">Loading...</div>;
-  if (!student) return <div id="BIG_NO_STUDENT_MESSAGE">Student details not found!</div>;
+  if (loading) return <div style={{ textAlign: 'center', fontSize: '20px', fontWeight: 'bold' }}>Loading...</div>;
+  if (!student) return <div style={{ textAlign: 'center', fontSize: '20px', fontWeight: 'bold', color: 'red' }}>Student details not found!</div>;
 
   const processTimetableRow = (periods) => {
     let spannedPeriods = [];
@@ -54,193 +54,97 @@ const StudentSchedule = () => {
   };
 
   return (
-    <>
-      <style>
-        {`
-        #BIG_STUDENT_SCHEDULE_CONTAINER {
-  font-family: 'Arial', sans-serif !important;
-  max-width: 90% !important;
-  margin: 30px auto !important;
-  background: #f9f9f9 !important;
-  border-radius: 10px !important;
-  padding: 20px !important;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1) !important;
-}
-
-#BIG_STUDENT_PROFILE_SECTION {
-  background: #007bff !important;
-  color: white !important;
-  padding: 15px !important;
-  border-radius: 8px !important;
-  text-align: center !important;
-  margin-bottom: 20px !important;
-}
-
-#BIG_PROFILE_TABLE {
-  width: 100% !important;
-  background: white !important;
-  border-radius: 8px !important;
-  overflow: hidden !important;
-  border-collapse: collapse !important;
-}
-
-.BIG_PROFILE_LABEL {
-  background: #0056b3 !important;
-  color: white !important;
-  padding: 10px !important;
-  text-align: left !important;
-  font-weight: bold !important;
-}
-
-.BIG_PROFILE_VALUE {
-  padding: 10px !important;
-  text-align: left !important;
-  border-bottom: 1px solid #ddd !important;
-}
-
-#BIG_PROFILE_IMAGE {
-  width: 100px !important;
-  height: 100px !important;
-  border-radius: 50% !important;
-  object-fit: cover !important;
-  border: 2px solid #0056b3 !important;
-}
-
-#BIG_SCHEDULE_SECTION {
-  background: white !important;
-  border-radius: 8px !important;
-  padding: 20px !important;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1) !important;
-}
-
-#BIG_SCHEDULE_HEADING {
-  text-align: center !important;
-  color: #333 !important;
-  font-size: 24px !important;
-  margin-bottom: 10px !important;
-}
-
-#BIG_SCHEDULE_TABLE {
-  width: 100% !important;
-  border-collapse: collapse !important;
-}
-
-#BIG_SCHEDULE_TABLE th,
-#BIG_SCHEDULE_TABLE td {
-  border: 1px solid #ddd !important;
-  padding: 12px !important;
-  text-align: center !important;
-  font-size: 16px !important;
-}
-
-#BIG_SCHEDULE_TABLE th {
-  background: #007bff !important;
-  color: white !important;
-  font-weight: bold !important;
-}
-
-.BIG_SCHEDULE_LUNCH_CELL {
-  background: #ffcc00 !important;
-  font-weight: bold !important;
-  color: #333 !important;
-}
-
-.BIG_SCHEDULE_PERIOD {
-  background: #f4f4f4 !important;
-  transition: background 0.3s ease-in-out !important;
-}
-
-.BIG_SCHEDULE_PERIOD:hover {
-  background: #ddd !important;
-}
-
-.BIG_SCHEDULE_ROW:nth-child(even) {
-  background: #f9f9f9 !important;
-}
-
-@media (max-width: 768px) {
-  #BIG_STUDENT_SCHEDULE_CONTAINER {
-    max-width: 100% !important;
-    padding: 10px !important;
-  }
-
-  #BIG_SCHEDULE_TABLE th,
-  #BIG_SCHEDULE_TABLE td {
-    padding: 8px !important;
-    font-size: 14px !important;
-  }
-
-  #BIG_PROFILE_IMAGE {
-    width: 80px !important;
-    height: 80px !important;
-  }
-}
-        `}
-      </style>
-
-      <div id="BIG_STUDENT_SCHEDULE_CONTAINER">
-        {/* Student Profile Section */}
-        <div id="BIG_STUDENT_PROFILE_SECTION">
-          <h2 id="BIG_STUDENT_PROFILE_HEADING">Student Details</h2>
-          <table id="BIG_PROFILE_TABLE">
-            <tbody>
-              <tr>
-                <th className="BIG_PROFILE_LABEL">Roll No.</th>
-                <td className="BIG_PROFILE_VALUE">{student.rollNumber}</td>
-                <td rowSpan="4">
-                  <img src={student.image} alt="Student" id="BIG_PROFILE_IMAGE" />
-                </td>
-              </tr>
-              <tr>
-                <th className="BIG_PROFILE_LABEL">Student Name</th>
-                <td className="BIG_PROFILE_VALUE">{student.name}</td>
-              </tr>
-              <tr>
-                <th className="BIG_PROFILE_LABEL">Father's Name</th>
-                <td className="BIG_PROFILE_VALUE">{student.fatherName}</td>
-              </tr>
-              <tr>
-                <th className="BIG_PROFILE_LABEL">Department</th>
-                <td className="BIG_PROFILE_VALUE">{`${student.year} ${student.department} ${student.section}`}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        {/* Schedule Section */}
-        <div id="BIG_SCHEDULE_SECTION">
-          <h1 id="BIG_SCHEDULE_HEADING">Timetable</h1>
-          <table id="BIG_SCHEDULE_TABLE">
-            <thead>
-              <tr>
-                <th>DAY</th>
-                <th>9:40-10:40</th>
-                <th>10:40-11:40</th>
-                <th>11:40-12:40</th>
-                <th>12:40-1:20</th>
-                <th>1:20-2:20</th>
-                <th>2:20-3:20</th>
-                <th>3:20-4:20</th>
-              </tr>
-            </thead>
-            <tbody>
-              {timetable.map((day) => (
-                <tr key={day._id} className="BIG_SCHEDULE_ROW">
-                  <td>{day.day}</td>
-                  {processTimetableRow(day.periods.slice(0, 3)).map((period, index) => (
-                    <td key={index} className="BIG_SCHEDULE_PERIOD" colSpan={period.colSpan}>{period.subject}</td>
-                  ))}
-                  <td className="BIG_SCHEDULE_LUNCH_CELL">LUNCH</td>
-                  {processTimetableRow(day.periods.slice(3)).map((period, index) => (
-                    <td key={index} className="BIG_SCHEDULE_PERIOD" colSpan={period.colSpan}>{period.subject}</td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+    <div style={{
+      fontFamily: 'Arial, sans-serif',
+      maxWidth: '90%',
+      margin: '30px auto',
+      background: '#f9f9f9',
+      borderRadius: '10px',
+      padding: '20px',
+      boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)'
+    }}>
+      {/* Student Profile Section */}
+      <div style={{
+        background: '#007bff',
+        color: 'white',
+        padding: '15px',
+        borderRadius: '8px',
+        textAlign: 'center',
+        marginBottom: '20px'
+      }}>
+        <h2>Student Details</h2>
+        <table style={{
+          width: '100%',
+          background: 'white',
+          borderRadius: '8px',
+          overflow: 'hidden',
+          borderCollapse: 'collapse'
+        }}>
+          <tbody>
+            <tr>
+              <th style={{ background: '#0056b3', color: 'white', padding: '10px', textAlign: 'left', fontWeight: 'bold' }}>Roll No.</th>
+              <td style={{ padding: '10px', textAlign: 'left', borderBottom: '1px solid #ddd' }}>{student.rollNumber}</td>
+              <td rowSpan="4">
+                <img src={student.image} alt="Student" style={{ width: '100px', height: '100px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #0056b3' }} />
+              </td>
+            </tr>
+            <tr>
+              <th style={{ background: '#0056b3', color: 'white', padding: '10px', textAlign: 'left', fontWeight: 'bold' }}>Student Name</th>
+              <td style={{ padding: '10px', textAlign: 'left', borderBottom: '1px solid #ddd' }}>{student.name}</td>
+            </tr>
+            <tr>
+              <th style={{ background: '#0056b3', color: 'white', padding: '10px', textAlign: 'left', fontWeight: 'bold' }}>Father's Name</th>
+              <td style={{ padding: '10px', textAlign: 'left', borderBottom: '1px solid #ddd' }}>{student.fatherName}</td>
+            </tr>
+            <tr>
+              <th style={{ background: '#0056b3', color: 'white', padding: '10px', textAlign: 'left', fontWeight: 'bold' }}>Department</th>
+              <td style={{ padding: '10px', textAlign: 'left', borderBottom: '1px solid #ddd' }}>{`${student.year} ${student.department} ${student.section}`}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
-    </>
+
+      {/* Schedule Section */}
+      <div style={{
+        background: 'white',
+        borderRadius: '8px',
+        padding: '20px',
+        boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)'
+      }}>
+        <h1 style={{ textAlign: 'center', color: '#333', fontSize: '24px', marginBottom: '10px' }}>Timetable</h1>
+        <table style={{
+          width: '100%',
+          borderCollapse: 'collapse'
+        }}>
+          <thead>
+            <tr>
+              <th style={{ border: '1px solid #ddd', padding: '12px', background: '#007bff', color: 'white', fontWeight: 'bold' }}>DAY</th>
+              <th style={{ border: '1px solid #ddd', padding: '12px' }}>9:40-10:40</th>
+              <th style={{ border: '1px solid #ddd', padding: '12px' }}>10:40-11:40</th>
+              <th style={{ border: '1px solid #ddd', padding: '12px' }}>11:40-12:40</th>
+              <th style={{ border: '1px solid #ddd', padding: '12px' }}>12:40-1:20</th>
+              <th style={{ border: '1px solid #ddd', padding: '12px' }}>1:20-2:20</th>
+              <th style={{ border: '1px solid #ddd', padding: '12px' }}>2:20-3:20</th>
+              <th style={{ border: '1px solid #ddd', padding: '12px' }}>3:20-4:20</th>
+            </tr>
+          </thead>
+          <tbody>
+            {timetable.map((day) => (
+              <tr key={day._id} style={{ background: '#f9f9f9' }}>
+                <td style={{ border: '1px solid #ddd', padding: '12px' }}>{day.day}</td>
+                {processTimetableRow(day.periods.slice(0, 3)).map((period, index) => (
+                  <td key={index} style={{ border: '1px solid #ddd', padding: '12px', background: '#f4f4f4' }}>{period.subject}</td>
+                ))}
+                <td style={{ border: '1px solid #ddd', padding: '12px', background: '#ffcc00', fontWeight: 'bold', color: '#333' }}>LUNCH</td>
+                {processTimetableRow(day.periods.slice(3)).map((period, index) => (
+                  <td key={index} style={{ border: '1px solid #ddd', padding: '12px', background: '#f4f4f4' }}>{period.subject}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
   );
 };
 
