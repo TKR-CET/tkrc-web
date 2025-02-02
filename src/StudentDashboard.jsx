@@ -53,12 +53,13 @@ const StudentDashboard = () => {
   if (error) return <h2 className="error-message">{error}</h2>;
 
   return (
-    <div className="dashboard-container">
+<>
+    
       <Header />
-      <div className="navigation">
+      <div className="nav">
         <NavBar />
       </div>
-      <div className="mobile-navigation">
+      <div className="mob-nav">
         <MobileNav />
       </div>
 
@@ -251,7 +252,7 @@ const StudentDashboard = () => {
         }
         `}
       </style>
-    </div>
+    </>
   );
 };
 
