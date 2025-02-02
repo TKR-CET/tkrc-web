@@ -209,7 +209,8 @@ const StudentDashboard = () => {
 
           th {
             background-color: #6495ED;
-            color: #333;
+            color: white;
+
           }
 #total{
 color:red;
