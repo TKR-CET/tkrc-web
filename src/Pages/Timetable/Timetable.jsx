@@ -74,6 +74,7 @@ const Timetable = () => {
     };
 
     return (
+<>
            <Header />
             <div className="nav">
                 <NavBar facultyName={facultyDetails?.name || "Faculty"} />
@@ -168,6 +169,7 @@ const Timetable = () => {
                 )}
             </section>
         </div>
+</>
     );
 };
 
