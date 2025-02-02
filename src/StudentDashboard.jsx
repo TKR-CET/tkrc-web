@@ -12,7 +12,7 @@ const StudentDashboard = () => {
 
   useEffect(() => {
     if (!studentId) {
-      setError("Student ID not found in local storage.");
+      setError("Student ID not found.");
       setLoading(false);
       return;
     }
@@ -22,7 +22,7 @@ const StudentDashboard = () => {
       .then((res) => res.json())
       .then((data) => {
         if (!data || !data.student) {
-          setError("Failed to fetch student data.");
+          setError("Failed to fetch student details.");
           setLoading(false);
           return;
         }
@@ -49,42 +49,33 @@ const StudentDashboard = () => {
       });
   }, [studentId]);
 
-  if (loading) {
-    return <h2 className="loading-text">Loading...</h2>;
-  }
-
-  if (error) {
-    return <h2 className="loading-text">{error}</h2>;
-  }
-
-  if (!student || !attendance) {
-    return <h2 className="loading-text">Error loading data. Please try again.</h2>;
-  }
+  if (loading) return <h2 className="loading-message">Loading...</h2>;
+  if (error) return <h2 className="error-message">{error}</h2>;
 
   return (
-    <div>
+    <div className="dashboard-container">
       <Header />
-      <div className="nav">
+      <div className="navigation">
         <NavBar />
       </div>
-      <div className="mob-nav">
+      <div className="mobile-navigation">
         <MobileNav />
       </div>
 
-      {/* Student Details */}
-      <div className="student-details">
-        <h2>Student Details</h2>
+      {/* Student Details Section */}
+      <div className="card student-info">
+        <h2>Student Information</h2>
         <table>
           <tbody>
             <tr>
               <th>Roll No.</th>
               <td>{student.rollNumber}</td>
               <td rowSpan="4">
-                <img src={student.image} alt="Student" className="student-image" />
+                <img src={student.image} alt="Student" className="profile-image" />
               </td>
             </tr>
             <tr>
-              <th>Student Name</th>
+              <th>Name</th>
               <td>{student.name}</td>
             </tr>
             <tr>
@@ -100,7 +91,7 @@ const StudentDashboard = () => {
       </div>
 
       {/* Attendance Summary */}
-      <div className="attendance-summary">
+      <div className="card attendance-overview">
         <h2>Attendance Summary</h2>
         <table>
           <thead>
@@ -120,7 +111,7 @@ const StudentDashboard = () => {
                 <td>{subject.percentage}%</td>
               </tr>
             ))}
-            <tr>
+            <tr className="total-row">
               <td><b>Total</b></td>
               <td><b>{attendance.subjectSummary.reduce((sum, sub) => sum + sub.classesConducted, 0)}</b></td>
               <td><b>{attendance.subjectSummary.reduce((sum, sub) => sum + sub.classesAttended, 0)}</b></td>
@@ -139,18 +130,13 @@ const StudentDashboard = () => {
       </div>
 
       {/* Daily Attendance Summary */}
-      <div className="daily-attendance">
+      <div className="card daily-attendance">
         <h2>Daily Attendance</h2>
         <table>
           <thead>
             <tr>
               <th>Date</th>
-              <th>1</th>
-              <th>2</th>
-              <th>3</th>
-              <th>4</th>
-              <th>5</th>
-              <th>6</th>
+              {[1, 2, 3, 4, 5, 6].map((period) => <th key={period}>{period}</th>)}
               <th>Total</th>
               <th>Attended</th>
             </tr>
@@ -170,129 +156,99 @@ const StudentDashboard = () => {
         </table>
       </div>
 
-      {/* Internal CSS */}
+      {/* CSS Styling */}
       <style>
         {`
-          
-/* General Styles */
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
-  font-family: 'Poppins', sans-serif;
-}
+        /* General Styles */
+        .dashboard-container {
+          max-width: 1200px;
+          margin: auto;
+          padding: 20px;
+          font-family: 'Poppins', sans-serif;
+          color: #333;
+        }
 
-.loading-text {
-  text-align: center;
-  font-size: 20px;
-  color: #ff4d4d;
-  margin-top: 20px;
-}
+        .loading-message, .error-message {
+          text-align: center;
+          font-size: 20px;
+          margin-top: 20px;
+        }
 
-/* Section Styles */
-.section {
-  background: #ffffff;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
-}
+        /* Card Layout */
+        .card {
+          background: #ffffff;
+          padding: 20px;
+          border-radius: 10px;
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+          margin-bottom: 20px;
+        }
 
-.section h2 {
-  text-align: center;
-  color: #333;
-  margin-bottom: 15px;
-  font-size: 24px;
-  border-bottom: 2px solid #007bff;
-  display: inline-block;
-  padding-bottom: 5px;
-}
+        .card h2 {
+          text-align: center;
+          color: #007bff;
+          border-bottom: 2px solid #007bff;
+          padding-bottom: 5px;
+          display: inline-block;
+        }
 
-/* Table Styling */
-.table-container {
-  overflow-x: auto;
-}
+        /* Table Styles */
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-top: 10px;
+        }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: #fff;
-  border-radius: 10px;
-  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.08);
-}
+        th, td {
+          padding: 12px;
+          text-align: center;
+          border-bottom: 1px solid #ddd;
+        }
 
-th, td {
-  padding: 12px;
-  text-align: center;
-  border-bottom: 1px solid #ddd;
-  font-size: 16px;
-}
+        th {
+          background: #007bff;
+          color: white;
+          font-weight: bold;
+        }
 
-th {
-  background: #007bff;
-  color: #fff;
-  font-weight: 600;
-}
+        td {
+          color: #555;
+        }
 
-td {
-  color: #555;
-}
+        tr:hover {
+          background: rgba(0, 123, 255, 0.1);
+          transition: 0.3s ease-in-out;
+        }
 
-tr:hover {
-  background: rgba(0, 123, 255, 0.1);
-  transition: 0.3s ease-in-out;
-}
+        .total-row {
+          font-weight: bold;
+          background: #f2f2f2;
+        }
 
-/* Student Details */
-.student-details {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+        /* Profile Image */
+        .profile-image {
+          width: 120px;
+          height: 120px;
+          border-radius: 50%;
+          object-fit: cover;
+          border: 3px solid #007bff;
+          margin-left: 20px;
+        }
 
-.student-details img {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 3px solid #007bff;
-  margin-left: 20px;
-}
+        /* Responsive Design */
+        @media (max-width: 768px) {
+          .profile-image {
+            margin-left: 0;
+            margin-top: 10px;
+          }
 
-/* Attendance Summary */
-.attendance-summary {
-  text-align: center;
-}
+          table {
+            font-size: 14px;
+          }
 
-/* Daily Attendance */
-.daily-attendance th:nth-child(2),
-.daily-attendance td:nth-child(2) {
-  background: #f8f9fa;
-  font-weight: bold;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .student-details {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .student-details img {
-    margin-left: 0;
-    margin-top: 10px;
-  }
-
-  table {
-    font-size: 14px;
-  }
-
-  th, td {
-    padding: 8px;
-  }
-}
-
-
+          th, td {
+            padding: 8px;
+          }
+        }
         `}
       </style>
     </div>
