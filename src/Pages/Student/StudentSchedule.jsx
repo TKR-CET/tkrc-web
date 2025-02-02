@@ -55,6 +55,106 @@ const StudentTimetable = () => {
 
   return (
     <>
+     
+<style>{`
+
+
+/* General Styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #f4f4f9;
+  color: #333;
+}
+
+/* Student Info Section */
+.student-container {
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-bottom: 30px;
+}
+
+.student-title {
+  font-size: 1.6em;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.student-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.student-table th, .student-table td {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+}
+
+.student-table th {
+  background-color: #007bff;
+  color: white;
+}
+
+#student-photo {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 2px solid #007bff;
+}
+
+/* Timetable Section */
+.timetable-container {
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.timetable-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.timetable-table th, .timetable-table td {
+  padding: 12px;
+  text-align: center;
+  border: 1px solid #ddd;
+}
+
+.timetable-table th {
+  background-color: #007bff;
+  color: white;
+}
+
+.timetable-lunch {
+  background-color: #ffcc00;
+  font-weight: bold;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .student-table th, .student-table td, .timetable-table th, .timetable-table td {
+    font-size: 1em !important;
+    padding: 8px !important;
+  }
+
+  #student-photo {
+    width: 100px !important;
+    height: 100px !important;
+  }
+}
+
+
+`}</style>
+
+
       {/* Student Info Section */}
       <div id="student-info-container" className="student-container">
         <h2 className="student-title">Student Profile</h2>
