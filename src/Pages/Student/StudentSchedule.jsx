@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const  StudentSchedule = () => {
+const StudentSchedule = () => {
   const [student, setStudent] = useState(null);
   const [timetable, setTimetable] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -34,8 +34,8 @@ const  StudentSchedule = () => {
     }
   }, []);
 
-  if (loading) return <div className="loading-text">Loading...</div>;
-  if (!student) return <div className="loading-text">Student details not found!</div>;
+  if (loading) return <div className="loading-message">Loading...</div>;
+  if (!student) return <div className="loading-message">Student details not found!</div>;
 
   const processTimetableRow = (periods) => {
     let spannedPeriods = [];
@@ -54,17 +54,17 @@ const  StudentSchedule = () => {
   };
 
   return (
-    <div className="student-timetable-container">
-      {/* Student Info Section */}
-      <div className="student-info-section">
+    <div className="student-schedule-container">
+      {/* Student Profile Section */}
+      <div className="student-profile">
         <h2>Student Details</h2>
-        <table className="student-info-table">
+        <table className="profile-table">
           <tbody>
             <tr>
               <th>Roll No.</th>
               <td>{student.rollNumber}</td>
               <td rowSpan="4">
-                <img src={student.image} alt="Student" className="student-photo" />
+                <img src={student.image} alt="Student" className="profile-image" />
               </td>
             </tr>
             <tr>
@@ -83,10 +83,10 @@ const  StudentSchedule = () => {
         </table>
       </div>
 
-      {/* Timetable Section */}
-      <div className="timetable-section">
-        <h1 className="timetable-heading">Timetable</h1>
-        <table className="timetable-table">
+      {/* Schedule Section */}
+      <div className="schedule-section">
+        <h1 className="schedule-heading">Timetable</h1>
+        <table className="schedule-table">
           <thead>
             <tr>
               <th>DAY</th>
@@ -104,11 +104,11 @@ const  StudentSchedule = () => {
               <tr key={day._id}>
                 <td>{day.day}</td>
                 {processTimetableRow(day.periods.slice(0, 3)).map((period, index) => (
-                  <td key={index} className="period-cell" colSpan={period.colSpan}>{period.subject}</td>
+                  <td key={index} className="schedule-period" colSpan={period.colSpan}>{period.subject}</td>
                 ))}
-                <td className="lunch-cell">LUNCH</td>
+                <td className="schedule-lunch">LUNCH</td>
                 {processTimetableRow(day.periods.slice(3)).map((period, index) => (
-                  <td key={index} className="period-cell" colSpan={period.colSpan}>{period.subject}</td>
+                  <td key={index} className="schedule-period" colSpan={period.colSpan}>{period.subject}</td>
                 ))}
               </tr>
             ))}
@@ -120,5 +120,3 @@ const  StudentSchedule = () => {
 };
 
 export default StudentSchedule;
-
-        
