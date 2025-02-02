@@ -200,9 +200,7 @@ const StudentDashboard = () => {
             text-align: center;
             color: #333;
           }
-         .t2 td{
-            border:solid 1px black;
-   }
+         
           table {
             width: 100%;
             margin: 20px 0;
