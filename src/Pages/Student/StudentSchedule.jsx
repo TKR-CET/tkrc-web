@@ -56,6 +56,8 @@ const StudentSchedule = () => {
   return (
 <>
 <style>{`
+
+/* General Styles */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -63,38 +65,51 @@ const StudentSchedule = () => {
 }
 
 body {
-  font-family: 'Arial', sans-serif;
-  background-color: #f4f4f9;
+  font-family: 'Roboto', sans-serif;
+  background-color: #f8f8f8;
   color: #333;
-}
-
-#dashboard-container {
-  width: 95%;
-  margin: 30px auto;
-  max-width: 1200px;
+  line-height: 1.6;
 }
 
 h1, h2 {
-  font-weight: bold;
+  font-weight: 600;
   color: #333;
 }
 
 h1 {
-  font-size: 1.8em;
-  margin-bottom: 15px;
+  font-size: 2rem;
+  margin-bottom: 20px;
 }
 
 h2 {
-  font-size: 1.6em;
+  font-size: 1.8rem;
   margin-bottom: 15px;
+}
+
+/* Dashboard Container */
+#dashboard-container {
+  width: 90%;
+  max-width: 1200px;
+  margin: 30px auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+#loading-message, #error-message {
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #ff6347;
 }
 
 /* Student Info Section */
 #student-card {
   background-color: #fff;
-  border-radius: 10px;
+  border-radius: 8px;
   padding: 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
   margin-bottom: 30px;
 }
 
@@ -112,7 +127,8 @@ h2 {
 
 #student-details th {
   background-color: #007bff;
-  color: white;
+  color: #fff;
+  font-weight: 600;
 }
 
 #student-photo img {
@@ -126,26 +142,33 @@ h2 {
 /* Timetable Section */
 #schedule-section {
   background-color: #fff;
-  border-radius: 10px;
+  border-radius: 8px;
   padding: 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+#schedule-heading {
+  text-align: center;
+  font-size: 1.8rem;
+  margin-bottom: 20px;
 }
 
 #schedule-table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 15px;
 }
 
 #schedule-table th, #schedule-table td {
-  padding: 12px;
+  padding: 14px;
   text-align: center;
   border: 1px solid #ddd;
+  font-size: 1.1rem;
 }
 
 #schedule-table th {
   background-color: #007bff;
-  color: white;
+  color: #fff;
+  font-weight: 600;
 }
 
 .schedule-cell {
@@ -160,71 +183,41 @@ h2 {
   background-color: #ffcc00;
   color: #333;
   font-weight: bold;
+  font-size: 1.1rem;
 }
 
-#schedule-table td {
-  font-size: 1em;
+.schedule-row:nth-child(even) {
+  background-color: #fafafa;
+}
+
+.schedule-period:hover {
+  background-color: #e0e0e0;
+  transition: background-color 0.3s ease-in-out;
 }
 
 /* Responsive Styles */
 @media (max-width: 1200px) {
   #dashboard-container {
-    width: 95%;
     padding: 15px;
   }
 
-  #student-card {
-    padding: 15px;
-  }
-
-  #schedule-section {
+  #student-card, #schedule-section {
     padding: 15px;
   }
 
   #schedule-table th, #schedule-table td {
-    padding: 10px;
+    padding: 12px;
   }
 
   #student-photo img {
     width: 100px;
     height: 100px;
   }
-
-  #schedule-table th {
-    font-size: 1.2em;
-  }
 }
 
 @media (max-width: 768px) {
-  #schedule-table th, #schedule-table td {
-    font-size: 0.9em;
-    padding: 8px;
-  }
-
-  #student-card {
-    padding: 10px;
-  }
-
-  #student-details {
-    font-size: 0.9em;
-  }
-
-  #student-photo img {
-    width: 90px;
-    height: 90px;
-  }
-
-  #schedule-table {
-    font-size: 0.9em;
-  }
-
-  #schedule-table td {
-    padding: 8px;
-  }
-}
-
-@media (max-width: 480px) {
   #dashboard-container {
+    width: 95%;
     padding: 10px;
   }
 
@@ -232,14 +225,30 @@ h2 {
     padding: 10px;
   }
 
-  #student-details th, #student-details td {
-    font-size: 0.8em;
-    padding: 6px;
+  #schedule-table th, #schedule-table td {
+    font-size: 1rem;
+    padding: 10px;
+  }
+
+  #student-photo img {
+    width: 90px;
+    height: 90px;
+  }
+}
+
+@media (max-width: 480px) {
+  #dashboard-container {
+    width: 100%;
+    padding: 8px;
+  }
+
+  #student-card, #schedule-section {
+    padding: 10px;
   }
 
   #schedule-table th, #schedule-table td {
-    font-size: 0.8em;
-    padding: 6px;
+    font-size: 0.9rem;
+    padding: 8px;
   }
 
   #student-photo img {
@@ -247,14 +256,13 @@ h2 {
     height: 80px;
   }
 
-  #schedule-table th {
-    font-size: 1em;
+  #schedule-heading {
+    font-size: 1.5rem;
   }
+}
 
-  #schedule-table {
-    font-size: 0.9em;
-  }
-}`}</style>
+
+`}</style>
     <div id="dashboard-container">
       {/* Student Info Section */}
       <div id="student-card">
