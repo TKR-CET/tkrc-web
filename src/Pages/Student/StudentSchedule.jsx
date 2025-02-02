@@ -103,6 +103,9 @@ body {
   width: 100%;
   border-collapse: collapse;
 }
+.timetable-day{
+background-color:gold;
+}
 
 .student-table th, .student-table td {
   padding: 12px;
@@ -110,7 +113,7 @@ body {
 }
 
 .student-table th {
-  background-color: #007bff;
+  background-color: #6495ED !important;
   color: white;
 }
 
@@ -118,7 +121,7 @@ body {
   width: 120px;
   height: 120px;
   border-radius: 50%;
-  border: 2px solid #007bff;
+  border: 2px solid white;
 }
 
 /* Timetable Section */
