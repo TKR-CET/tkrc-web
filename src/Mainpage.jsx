@@ -11,7 +11,7 @@ import AddFacultyForm from "./AddFacultyForm";
 import AddSectionData from "./AddSectionData";
 import Register from "./Pages/Register/Register.jsx";
 import StudentDashboard from "./StudentDashboard";
-import StudentSchedule from "./Pages/StudentSchedule";
+import StudentSchedule from "./Pages/Student/StudentSchedule";
 function Mainpage() {
   const location = useLocation();
 
