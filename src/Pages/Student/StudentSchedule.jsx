@@ -149,7 +149,7 @@ background-color:#f3f3f3;
 }
 
 .timetable-lunch {
-  background-color: #ffcc00;
+  background-color:#ffefc1 ;
   font-weight: bold;
 }
 
