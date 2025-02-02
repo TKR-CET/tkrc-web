@@ -28,6 +28,7 @@
     font-weight: bold;
     background: #ececec;
     padding: 10px;
+    margin-left:8px;
 }
 
 .profile-image-cell {
@@ -70,7 +71,7 @@
 }
 
 .timetable-table th {
-    background: #007bff;
+    background: #6495ED;
     color: white;
 }
 
