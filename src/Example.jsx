@@ -57,69 +57,148 @@ const StudentTimetable = () => {
     <div className="timetable-container">
       <style>
         {`
-          .timetable-container {
-            font-family: 'Arial, sans-serif';
-            padding: 20px;
-            max-width: 900px;
-            margin: auto;
-          }
-          .loading-message {
-            font-size: 18px;
-            color: #555;
-            text-align: center;
-            margin-top: 50px;
-          }
-          .student-info {
-            background: #f9f9f9;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-          }
-          .student-info h2 {
-            text-align: center;
-            margin-bottom: 15px;
-            color: #333;
-          }
-          .student-table {
-            width: 100%;
-            border-collapse: collapse;
-          }
-          .student-table th, .student-table td {
-            padding: 10px;
-            border-bottom: 1px solid #ddd;
-            text-align: left;
-          }
-          .student-photo {
-            max-width: 80px;
-            border-radius: 50%;
-            display: block;
-            margin: auto;
-          }
-          .timetable-section {
-            margin-top: 20px;
-          }
-          .timetable-section h1 {
-            text-align: center;
-            color: #333;
-          }
-          .timetable-table {
-            width: 100%;
-            border-collapse: collapse;
-          }
-          .timetable-table th, .timetable-table td {
-            padding: 10px;
-            border: 1px solid #ddd;
-            text-align: center;
-          }
-          .timetable-table th {
-            background: #007BFF;
-            color: white;
-            font-weight: bold;
-          }
-          .timetable-table td {
-            background: #f2f2f2;
-          }
+          /* General Styling */
+.timetable-container {
+    font-family: "Arial", sans-serif;
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 20px;
+}
+
+.loading-message {
+    font-size: 18px;
+    color: #555;
+    text-align: center;
+    margin-top: 50px;
+}
+
+/* Student Info Section */
+.student-info {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.student-info h2 {
+    text-align: center;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.student-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.student-table th, .student-table td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+}
+
+.student-table th {
+    background: #f4f4f4;
+    color: #333;
+}
+
+.student-photo {
+    max-width: 80px;
+    border-radius: 50%;
+    display: block;
+    margin: auto;
+}
+
+/* Timetable Section */
+.timetable-section {
+    margin-top: 20px;
+}
+
+.timetable-section h1 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.timetable-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+.timetable-table th, .timetable-table td {
+    padding: 12px;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+
+.timetable-table th {
+    background: #007bff;
+    color: white;
+    font-weight: bold;
+}
+
+.timetable-table td {
+    background: #f2f2f2;
+}
+
+/* Timetable Row Styling */
+.timetable-table .period-cell {
+    background: #e8f4ff;
+}
+
+.timetable-table .lunch-cell {
+    font-weight: bold;
+    background: #ffefc1;
+}
+
+/* Responsiveness */
+@media (max-width: 768px) {
+    .timetable-container {
+        padding: 10px;
+    }
+
+    .student-info {
+        padding: 15px;
+    }
+
+    .student-photo {
+        max-width: 60px;
+    }
+
+    .student-table th, .student-table td {
+        font-size: 14px;
+        padding: 8px;
+    }
+
+    .timetable-table th, .timetable-table td {
+        font-size: 14px;
+        padding: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .student-info {
+        padding: 10px;
+    }
+
+    .student-table th, .student-table td {
+        font-size: 12px;
+        padding: 6px;
+    }
+
+    .timetable-table th, .timetable-table td {
+        font-size: 12px;
+        padding: 8px;
+    }
+
+    .timetable-section h1 {
+        font-size: 18px;
+    }
+}
         `}
       </style>
 
