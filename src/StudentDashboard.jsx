@@ -141,7 +141,7 @@ const StudentDashboard = () => {
     {/* Daily Attendance Summary */}
 <div className="daily-attendance">
   <h2>Daily Attendance</h2>
-  <table>
+  <table class="t2">
     <thead>
       <tr>
         <th>Date</th>
@@ -200,7 +200,9 @@ const StudentDashboard = () => {
             text-align: center;
             color: #333;
           }
-
+         .t2 td,th{
+            border:solid 1px black;
+   }
           table {
             width: 100%;
             margin: 20px 0;
