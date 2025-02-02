@@ -228,9 +228,7 @@ color:red;
             margin-left: 20px;
           }
 
-          .nav, .mob-nav {
-            margin-top: 20px;
-          }
+         
 
           /* Responsive Styles */
           @media (max-width: 1024px) {
