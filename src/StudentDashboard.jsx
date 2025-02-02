@@ -12,7 +12,7 @@ const StudentDashboard = () => {
 
   useEffect(() => {
     if (!studentId) {
-      setError("Student ID not found.");
+      setError("Student ID not found in local storage.");
       setLoading(false);
       return;
     }
@@ -22,7 +22,7 @@ const StudentDashboard = () => {
       .then((res) => res.json())
       .then((data) => {
         if (!data || !data.student) {
-          setError("Failed to fetch student details.");
+          setError("Failed to fetch student data.");
           setLoading(false);
           return;
         }
@@ -49,12 +49,20 @@ const StudentDashboard = () => {
       });
   }, [studentId]);
 
-  if (loading) return <h2 className="loading-message">Loading...</h2>;
-  if (error) return <h2 className="error-message">{error}</h2>;
+  if (loading) {
+    return <h2 className="loading-text">Loading...</h2>;
+  }
+
+  if (error) {
+    return <h2 className="loading-text">{error}</h2>;
+  }
+
+  if (!student || !attendance) {
+    return <h2 className="loading-text">Error loading data. Please try again.</h2>;
+  }
 
   return (
-<>
-    
+    <div>
       <Header />
       <div className="nav">
         <NavBar />
@@ -63,20 +71,20 @@ const StudentDashboard = () => {
         <MobileNav />
       </div>
 
-      {/* Student Details Section */}
-      <div className="card student-info">
-        <h2>Student Information</h2>
+      {/* Student Details */}
+      <div className="student-details">
+        <h2>Student Details</h2>
         <table>
           <tbody>
             <tr>
               <th>Roll No.</th>
               <td>{student.rollNumber}</td>
               <td rowSpan="4">
-                <img src={student.image} alt="Student" className="profile-image" />
+                <img src={student.image} alt="Student" className="student-image" />
               </td>
             </tr>
             <tr>
-              <th>Name</th>
+              <th>Student Name</th>
               <td>{student.name}</td>
             </tr>
             <tr>
@@ -92,7 +100,7 @@ const StudentDashboard = () => {
       </div>
 
       {/* Attendance Summary */}
-      <div className="card attendance-overview">
+      <div className="attendance-summary">
         <h2>Attendance Summary</h2>
         <table>
           <thead>
@@ -112,7 +120,7 @@ const StudentDashboard = () => {
                 <td>{subject.percentage}%</td>
               </tr>
             ))}
-            <tr className="total-row">
+            <tr>
               <td><b>Total</b></td>
               <td><b>{attendance.subjectSummary.reduce((sum, sub) => sum + sub.classesConducted, 0)}</b></td>
               <td><b>{attendance.subjectSummary.reduce((sum, sub) => sum + sub.classesAttended, 0)}</b></td>
@@ -131,13 +139,18 @@ const StudentDashboard = () => {
       </div>
 
       {/* Daily Attendance Summary */}
-      <div className="card daily-attendance">
+      <div className="daily-attendance">
         <h2>Daily Attendance</h2>
         <table>
           <thead>
             <tr>
               <th>Date</th>
-              {[1, 2, 3, 4, 5, 6].map((period) => <th key={period}>{period}</th>)}
+              <th>1</th>
+              <th>2</th>
+              <th>3</th>
+              <th>4</th>
+              <th>5</th>
+              <th>6</th>
               <th>Total</th>
               <th>Attended</th>
             </tr>
@@ -157,102 +170,116 @@ const StudentDashboard = () => {
         </table>
       </div>
 
-      {/* CSS Styling */}
+      {/* Internal CSS */}
       <style>
         {`
-        /* General Styles */
-        .dashboard-container {
-          max-width: 1200px;
-          margin: auto;
-          padding: 20px;
-          font-family: 'Poppins', sans-serif;
-          color: #333;
-        }
+          .loading-text {
+            text-align: center;
+            font-size: 20px;
+            margin-top: 20px;
+          }
 
-        .loading-message, .error-message {
-          text-align: center;
-          font-size: 20px;
-          margin-top: 20px;
-        }
+          .student-details, .attendance-summary, .daily-attendance {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+          }
 
-        /* Card Layout */
-        .card {
-          background: #ffffff;
-          padding: 20px;
-          border-radius: 10px;
-          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-          margin-bottom: 20px;
-        }
-
-        .card h2 {
-          text-align: center;
-          color: #007bff;
-          border-bottom: 2px solid #007bff;
-          padding-bottom: 5px;
-          display: inline-block;
-        }
-
-        /* Table Styles */
-        table {
-          width: 100%;
-          border-collapse: collapse;
-          margin-top: 10px;
-        }
-
-        th, td {
-          padding: 12px;
-          text-align: center;
-          border-bottom: 1px solid #ddd;
-        }
-
-        th {
-          background: #007bff;
-          color: white;
-          font-weight: bold;
-        }
-
-        td {
-          color: #555;
-        }
-
-        tr:hover {
-          background: rgba(0, 123, 255, 0.1);
-          transition: 0.3s ease-in-out;
-        }
-
-        .total-row {
-          font-weight: bold;
-          background: #f2f2f2;
-        }
-
-        /* Profile Image */
-        .profile-image {
-          width: 120px;
-          height: 120px;
-          border-radius: 50%;
-          object-fit: cover;
-          border: 3px solid #007bff;
-          margin-left: 20px;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-          .profile-image {
-            margin-left: 0;
-            margin-top: 10px;
+          h2 {
+            text-align: center;
+            color: #333;
           }
 
           table {
-            font-size: 14px;
+            width: 100%;
+            margin: 20px 0;
+            border-collapse: collapse;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
           }
 
           th, td {
-            padding: 8px;
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
           }
-        }
+
+          th {
+            background-color: #f2f2f2;
+            color: #333;
+          }
+
+          td {
+            color: #555;
+          }
+
+          img.student-image {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin-left: 20px;
+          }
+
+          .nav, .mob-nav {
+            margin-top: 20px;
+          }
+
+          /* Responsive Styles */
+          @media (max-width: 1024px) {
+            table {
+              font-size: 14px;
+            }
+
+            th, td {
+              padding: 8px;
+            }
+
+            img.student-image {
+              width: 80px;
+              height: 80px;
+            }
+          }
+
+          @media (max-width: 768px) {
+            table {
+              font-size: 12px;
+            }
+
+            th, td {
+              padding: 6px;
+            }
+
+            img.student-image {
+              width: 70px;
+              height: 70px;
+            }
+
+            .student-details table, .attendance-summary table, .daily-attendance table {
+              font-size: 10px;
+            }
+          }
+
+          @media (max-width: 480px) {
+            table {
+              font-size: 10px;
+            }
+
+            th, td {
+              padding: 4px;
+            }
+
+            img.student-image {
+              width: 60px;
+              height: 60px;
+            }
+          }
         `}
       </style>
-    </>
+    </div>
   );
 };
 
