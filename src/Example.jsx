@@ -1,4 +1,55 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
+import styled from "styled-components";
+
+// Styled components
+const Container = styled.div`
+  font-family: "Arial, sans-serif";
+  padding: 20px;
+  max-width: 1000px;
+  margin: auto;
+`;
+
+const LoadingText = styled.div`
+  font-size: 18px;
+  color: #555;
+  text-align: center;
+`;
+
+const StudentDetails = styled.div`
+  margin-bottom: 20px;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+`;
+
+const Table = styled.table`
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+`;
+
+const Th = styled.th`
+  background-color: #f2f2f2;
+  font-weight: bold;
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: left;
+`;
+
+const Td = styled.td`
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: center;
+  vertical-align: middle;
+`;
+
+const Img = styled.img`
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+`;
 
 const Example = () => {
   const [student, setStudent] = useState(null);
@@ -6,159 +57,118 @@ const Example = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const studentId = localStorage.getItem('studentId');
+    const studentId = localStorage.getItem("studentId");
     if (studentId) {
       fetch(`https://tkrcet-backend-g3zu.onrender.com/Section/${studentId}`)
         .then((response) => response.json())
         .then((data) => {
           setStudent(data.student);
           const { year, department, section } = data.student;
-          fetch(`https://tkrcet-backend-g3zu.onrender.com/Section/${year}/${department}/${section}/timetable`)
+          fetch(
+            `https://tkrcet-backend-g3zu.onrender.com/Section/${year}/${department}/${section}/timetable`
+          )
             .then((response) => response.json())
             .then((data) => {
               setTimetable(data.timetable);
               setLoading(false);
             })
             .catch((error) => {
-              console.error('Error fetching timetable:', error);
+              console.error("Error fetching timetable:", error);
               setLoading(false);
             });
         })
         .catch((error) => {
-          console.error('Error fetching student details:', error);
+          console.error("Error fetching student details:", error);
           setLoading(false);
         });
     } else {
-      console.error('No studentId found in localStorage');
+      console.error("No studentId found in localStorage");
       setLoading(false);
     }
   }, []);
 
-  // Internal CSS styles
-  const styles = {
-    container: {
-      fontFamily: 'Arial, sans-serif',
-      padding: '20px',
-    },
-    loading: {
-      fontSize: '18px',
-      color: '#555',
-    },
-    studentDetails: {
-      marginBottom: '20px',
-    },
-    studentDetailsBox: {
-      border: '1px solid #ddd',
-      borderRadius: '8px',
-      padding: '15px',
-      width: 'fit-content',
-      backgroundColor: '#f9f9f9',
-    },
-    detailItem: {
-      marginBottom: '10px',
-      display: 'flex',
-      alignItems: 'center',
-    },
-    detailLabel: {
-      fontWeight: 'bold',
-      color: '#333',
-      width: '120px',
-    },
-    detailValue: {
-      color: '#555',
-    },
-    timetable: {
-      marginTop: '20px',
-    },
-    table: {
-      width: '100%',
-      borderCollapse: 'collapse',
-    },
-    tableHeader: {
-      backgroundColor: '#f2f2f2',
-      fontWeight: 'bold',
-      padding: '10px',
-      border: '1px solid #ddd',
-      textAlign: 'left',
-    },
-    tableCell: {
-      padding: '10px',
-      border: '1px solid #ddd',
-      textAlign: 'left',
-    },
+  if (loading) return <LoadingText>Loading...</LoadingText>;
+  if (!student) return <LoadingText>Student details not found!</LoadingText>;
+
+  // Function to merge same subjects into single cell
+  const renderTimetableRow = (day) => {
+    let mergedPeriods = [];
+    let i = 0;
+
+    while (i < day.periods.length) {
+      let colSpan = 1;
+      while (
+        i + colSpan < day.periods.length &&
+        day.periods[i].subject === day.periods[i + colSpan].subject
+      ) {
+        colSpan++;
+      }
+      mergedPeriods.push({ subject: day.periods[i].subject, colSpan });
+      i += colSpan;
+    }
+
+    return (
+      <tr key={day._id}>
+        <Td>{day.day}</Td>
+        {mergedPeriods.slice(0, 3).map((period, index) => (
+          <Td key={index} colSpan={period.colSpan}>{period.subject}</Td>
+        ))}
+        <Td>LUNCH</Td>
+        {mergedPeriods.slice(3).map((period, index) => (
+          <Td key={index} colSpan={period.colSpan}>{period.subject}</Td>
+        ))}
+      </tr>
+    );
   };
 
-  if (loading) return <div style={styles.loading}>Loading...</div>;
-  if (!student) return <div style={styles.loading}>Student details not found!</div>;
-
   return (
-    
-
-          <div className="student-details">
+    <Container>
+      {/* Student Details */}
+      <StudentDetails>
         <h2>Student Details</h2>
-        <table>
+        <Table>
           <tbody>
             <tr>
-              <th>Roll No.</th>
-              <td>{student.rollNumber}</td>
-              <td rowSpan="4">
-                <img src={student.image} alt="Student" className="student-image" />
-              </td>
+              <Th>Roll No.</Th>
+              <Td>{student.rollNumber}</Td>
+              <Td rowSpan="4">
+                <Img src={student.image} alt="Student" />
+              </Td>
             </tr>
             <tr>
-              <th>Student Name</th>
-              <td>{student.name}</td>
+              <Th>Student Name</Th>
+              <Td>{student.name}</Td>
             </tr>
             <tr>
-              <th>Father's Name</th>
-              <td>{student.fatherName}</td>
+              <Th>Father's Name</Th>
+              <Td>{student.fatherName}</Td>
             </tr>
             <tr>
-              <th>Department</th>
-              <td>{`${student.year} ${student.department} ${student.section}`}</td>
+              <Th>Department</Th>
+              <Td>{`${student.year} ${student.department} ${student.section}`}</Td>
             </tr>
           </tbody>
-        </table>
-      </div>
+        </Table>
+      </StudentDetails>
 
-
-
-
-
-
-      {/* Timetable Section */}
-      <div style={styles.timetable}>
-        <h1>Timetable</h1>
-        <table style={styles.table}>
-          <thead>
-            <tr>
-              <th style={styles.tableHeader}>DAY</th>
-              <th style={styles.tableHeader}>9:40-10:40</th>
-              <th style={styles.tableHeader}>10:40-11:40</th>
-              <th style={styles.tableHeader}>11:40-12:40</th>
-              <th style={styles.tableHeader}>12:40-1:20</th>
-              <th style={styles.tableHeader}>1:20-2:20</th>
-              <th style={styles.tableHeader}>2:20-3:20</th>
-              <th style={styles.tableHeader}>3:20-4:20</th>
-            </tr>
-          </thead>
-          <tbody>
-            {timetable.map((day) => (
-              <tr key={day._id}>
-                <td style={styles.tableCell}>{day.day}</td>
-                {day.periods.slice(0, 3).map((period, index) => (
-                  <td style={styles.tableCell} key={index}>{period.subject}</td>
-                ))}
-                <td style={styles.tableCell}>LUNCH</td>
-                {day.periods.slice(3).map((period, index) => (
-                  <td style={styles.tableCell} key={index}>{period.subject}</td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
+      {/* Timetable */}
+      <h2>Timetable</h2>
+      <Table>
+        <thead>
+          <tr>
+            <Th>DAY</Th>
+            <Th>9:40-10:40</Th>
+            <Th>10:40-11:40</Th>
+            <Th>11:40-12:40</Th>
+            <Th>12:40-1:20</Th>
+            <Th>1:20-2:20</Th>
+            <Th>2:20-3:20</Th>
+            <Th>3:20-4:20</Th>
+          </tr>
+        </thead>
+        <tbody>{timetable.map(renderTimetableRow)}</tbody>
+      </Table>
+    </Container>
   );
 };
 
