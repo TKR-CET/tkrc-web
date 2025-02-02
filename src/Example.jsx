@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import './Example.css'; // Import CSS file
 
-const Example = () => {
+const StudentTimetable = () => {
   const [student, setStudent] = useState(null);
   const [timetable, setTimetable] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -35,7 +34,9 @@ const Example = () => {
     }
   }, []);
 
-  // Function to span repeated subjects
+  if (loading) return <div className="loading-message">Loading...</div>;
+  if (!student) return <div className="loading-message">Student details not found!</div>;
+
   const processTimetableRow = (periods) => {
     let spannedPeriods = [];
     let i = 0;
@@ -52,13 +53,78 @@ const Example = () => {
     return spannedPeriods;
   };
 
-  if (loading) return <div className="loading-text">Loading...</div>;
-  if (!student) return <div className="loading-text">Student details not found!</div>;
-
   return (
-    <div className="example-container">
+    <div className="timetable-container">
+      <style>
+        {`
+          .timetable-container {
+            font-family: 'Arial, sans-serif';
+            padding: 20px;
+            max-width: 900px;
+            margin: auto;
+          }
+          .loading-message {
+            font-size: 18px;
+            color: #555;
+            text-align: center;
+            margin-top: 50px;
+          }
+          .student-info {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+          }
+          .student-info h2 {
+            text-align: center;
+            margin-bottom: 15px;
+            color: #333;
+          }
+          .student-table {
+            width: 100%;
+            border-collapse: collapse;
+          }
+          .student-table th, .student-table td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+          }
+          .student-photo {
+            max-width: 80px;
+            border-radius: 50%;
+            display: block;
+            margin: auto;
+          }
+          .timetable-section {
+            margin-top: 20px;
+          }
+          .timetable-section h1 {
+            text-align: center;
+            color: #333;
+          }
+          .timetable-table {
+            width: 100%;
+            border-collapse: collapse;
+          }
+          .timetable-table th, .timetable-table td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+          }
+          .timetable-table th {
+            background: #007BFF;
+            color: white;
+            font-weight: bold;
+          }
+          .timetable-table td {
+            background: #f2f2f2;
+          }
+        `}
+      </style>
+
       {/* Student Details Section */}
-      <div className="student-card">
+      <div className="student-info">
         <h2>Student Details</h2>
         <table className="student-table">
           <tbody>
@@ -108,7 +174,7 @@ const Example = () => {
                 {processTimetableRow(day.periods.slice(0, 3)).map((period, index) => (
                   <td key={index} colSpan={period.colSpan}>{period.subject}</td>
                 ))}
-                <td className="lunch-cell">LUNCH</td>
+                <td>LUNCH</td>
                 {processTimetableRow(day.periods.slice(3)).map((period, index) => (
                   <td key={index} colSpan={period.colSpan}>{period.subject}</td>
                 ))}
@@ -121,4 +187,4 @@ const Example = () => {
   );
 };
 
-export default Example;
+export default StudentTimetable;
