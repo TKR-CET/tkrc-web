@@ -33,41 +33,44 @@ const Timetable = () => {
     }, [facultyId, studentId]);
 
     // Fetch timetable based on user role
-    useEffect(() => {
-        const fetchTimetable = async () => {
-            try {
-                if (!userDetails.role) return; // Wait until role is set
-                let response;
+    
 
-                if (userDetails.role === "faculty") {
-                    response = await axios.get(`https://tkrcet-backend-g3zu.onrender.com/faculty/${facultyId}/timetable`);
-                } else if (userDetails.role === "student") {
-                    const { year, department, section } = userDetails.student || {};
-                    if (!year || !department || !section) {
-                        console.error("Missing student details for timetable fetch");
-                        alert("Missing student details for timetable fetch");
-                        return;
-                    }
+   useEffect(() => {
+    const fetchTimetable = async () => {
+        try {
+            if (!userDetails.role) return; // Wait until role is set
+            let response;
 
-                    const timetableUrl = `https://tkrcet-backend-g3zu.onrender.com/Section/${encodeURIComponent(year)}/${encodeURIComponent(department)}/${encodeURIComponent(section)}/timetable`;
-                    console.log("Fetching timetable from:", timetableUrl); // Debugging
-                    alert("Fetching timetable from: " + timetableUrl); // Alert for URL verification
-
-                    response = await axios.get(timetableUrl);
+            if (userDetails.role === "faculty") {
+                response = await axios.get(`https://tkrcet-backend-g3zu.onrender.com/faculty/${facultyId}/timetable`);
+            } else if (userDetails.role === "student" && userDetails.student) {
+                const { year, department, section } = userDetails.student;
+                
+                // Ensure all required details exist
+                if (!year || !department || !section) {
+                    console.error("Missing student details for timetable fetch");
+                    return;
                 }
 
-                console.log("Timetable data:", response?.data?.timetable); // Debugging
-                alert("Timetable data fetched: " + JSON.stringify(response?.data?.timetable)); // Alert for data check
+                const timetableUrl = `https://tkrcet-backend-g3zu.onrender.com/Section/${year}/${department}/${section}/timetable`;
+                console.log("Fetching timetable from:", timetableUrl);
 
-                setTimetable(response?.data?.timetable || []);
-            } catch (error) {
-                console.error("Error fetching timetable:", error);
-                alert("Error fetching timetable: " + error.message); // Alert for error
+                response = await axios.get(timetableUrl);
             }
-        };
 
-        if (userDetails.role) fetchTimetable();
-    }, [userDetails]);
+            console.log("Timetable data:", response?.data?.timetable);
+            setTimetable(response?.data?.timetable || []);
+        } catch (error) {
+            console.error("Error fetching timetable:", error);
+        }
+    };
+
+    if (userDetails.role && userDetails.student) {
+        fetchTimetable();
+    }
+}, [userDetails]); // Ensure this only runs when userDetails is fully updated
+
+
 
     // Handle image loading errors
     const handleImageError = (e) => {
