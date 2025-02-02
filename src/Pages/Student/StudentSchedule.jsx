@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import styles from './StudentSchedule.module.css';  // Import CSS Module
 
-const StudentSchedule = () => {
-  const [student, setStudent] = useState(null);
-  const [timetable, setTimetable] = useState([]);
-  const [loading, setLoading] = useState(true);
+const StudentDashboard = () => {
+  const [studentInfo, setStudentInfo] = useState(null);
+  const [classSchedule, setClassSchedule] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const studentId = localStorage.getItem('studentId');
@@ -12,34 +11,34 @@ const StudentSchedule = () => {
       fetch(`https://tkrcet-backend-g3zu.onrender.com/Section/${studentId}`)
         .then((response) => response.json())
         .then((data) => {
-          setStudent(data.student);
+          setStudentInfo(data.student);
           const { year, department, section } = data.student;
           fetch(`https://tkrcet-backend-g3zu.onrender.com/Section/${year}/${department}/${section}/timetable`)
             .then((response) => response.json())
             .then((data) => {
-              setTimetable(data.timetable);
-              setLoading(false);
+              setClassSchedule(data.timetable);
+              setIsLoading(false);
             })
             .catch((error) => {
               console.error('Error fetching timetable:', error);
-              setLoading(false);
+              setIsLoading(false);
             });
         })
         .catch((error) => {
           console.error('Error fetching student details:', error);
-          setLoading(false);
+          setIsLoading(false);
         });
     } else {
       console.error('No studentId found in localStorage');
-      setLoading(false);
+      setIsLoading(false);
     }
   }, []);
 
-  if (loading) return <div className={styles.BIG_LOADING_MESSAGE}>Loading...</div>;
-  if (!student) return <div className={styles.BIG_NO_STUDENT_MESSAGE}>Student details not found!</div>;
+  if (isLoading) return <div id="loading-message">Loading...</div>;
+  if (!studentInfo) return <div id="error-message">Student details not found!</div>;
 
-  const processTimetableRow = (periods) => {
-    let spannedPeriods = [];
+  const formatSchedule = (periods) => {
+    let mergedPeriods = [];
     let i = 0;
 
     while (i < periods.length) {
@@ -47,69 +46,73 @@ const StudentSchedule = () => {
       while (i + spanCount < periods.length && periods[i].subject === periods[i + spanCount].subject) {
         spanCount++;
       }
-      spannedPeriods.push({ subject: periods[i].subject, colSpan: spanCount });
+      mergedPeriods.push({ subject: periods[i].subject, colSpan: spanCount });
       i += spanCount;
     }
 
-    return spannedPeriods;
+    return mergedPeriods;
   };
 
   return (
-    <div className={styles.BIG_STUDENT_SCHEDULE_CONTAINER}>
-      {/* Student Profile Section */}
-      <div className={styles.BIG_STUDENT_PROFILE_SECTION}>
-        <h2>Student Details</h2>
-        <table className={styles.BIG_PROFILE_TABLE}>
+    <div id="dashboard-container">
+      {/* Student Info Section */}
+      <div id="student-card">
+        <h2>Student Profile</h2>
+        <table id="student-details">
           <tbody>
             <tr>
-              <th className={styles.BIG_PROFILE_LABEL}>Roll No.</th>
-              <td className={styles.BIG_PROFILE_VALUE}>{student.rollNumber}</td>
-              <td rowSpan="4">
-                <img src={student.image} alt="Student" className={styles.BIG_PROFILE_IMAGE} />
+              <th id="roll-no-label">Roll No.</th>
+              <td id="roll-no-value">{studentInfo.rollNumber}</td>
+              <td id="student-photo" rowSpan="4">
+                <img src={studentInfo.image} alt="Student" id="profile-photo" />
               </td>
             </tr>
             <tr>
-              <th className={styles.BIG_PROFILE_LABEL}>Student Name</th>
-              <td className={styles.BIG_PROFILE_VALUE}>{student.name}</td>
+              <th id="name-label">Name</th>
+              <td id="name-value">{studentInfo.name}</td>
             </tr>
             <tr>
-              <th className={styles.BIG_PROFILE_LABEL}>Father's Name</th>
-              <td className={styles.BIG_PROFILE_VALUE}>{student.fatherName}</td>
+              <th id="father-name-label">Father's Name</th>
+              <td id="father-name-value">{studentInfo.fatherName}</td>
             </tr>
             <tr>
-              <th className={styles.BIG_PROFILE_LABEL}>Department</th>
-              <td className={styles.BIG_PROFILE_VALUE}>{`${student.year} ${student.department} ${student.section}`}</td>
+              <th id="department-label">Department</th>
+              <td id="department-value">{`${studentInfo.year} ${studentInfo.department} ${studentInfo.section}`}</td>
             </tr>
           </tbody>
         </table>
       </div>
 
-      {/* Schedule Section */}
-      <div className={styles.BIG_SCHEDULE_SECTION}>
-        <h1 className={styles.BIG_SCHEDULE_HEADING}>Timetable</h1>
-        <table className={styles.BIG_SCHEDULE_TABLE}>
+      {/* Timetable Section */}
+      <div id="schedule-section">
+        <h1 id="schedule-heading">Class Timetable</h1>
+        <table id="schedule-table">
           <thead>
             <tr>
-              <th>DAY</th>
-              <th>9:40-10:40</th>
-              <th>10:40-11:40</th>
-              <th>11:40-12:40</th>
-              <th>12:40-1:20</th>
-              <th>1:20-2:20</th>
-              <th>2:20-3:20</th>
-              <th>3:20-4:20</th>
+              <th id="day-header">Day</th>
+              <th id="period-1">9:40-10:40</th>
+              <th id="period-2">10:40-11:40</th>
+              <th id="period-3">11:40-12:40</th>
+              <th id="period-4">12:40-1:20</th>
+              <th id="period-5">1:20-2:20</th>
+              <th id="period-6">2:20-3:20</th>
+              <th id="period-7">3:20-4:20</th>
             </tr>
           </thead>
           <tbody>
-            {timetable.map((day) => (
-              <tr key={day._id} className={styles.BIG_SCHEDULE_ROW}>
-                <td>{day.day}</td>
-                {processTimetableRow(day.periods.slice(0, 3)).map((period, index) => (
-                  <td key={index} className={styles.BIG_SCHEDULE_PERIOD} colSpan={period.colSpan}>{period.subject}</td>
+            {classSchedule.map((day) => (
+              <tr key={day._id} id={`schedule-row-${day._id}`}>
+                <td id={`day-${day._id}`} className="schedule-cell">{day.day}</td>
+                {formatSchedule(day.periods.slice(0, 3)).map((period, index) => (
+                  <td key={index} id={`period-${index}`} className="schedule-period" colSpan={period.colSpan}>
+                    {period.subject}
+                  </td>
                 ))}
-                <td className={styles.BIG_SCHEDULE_LUNCH_CELL}>LUNCH</td>
-                {processTimetableRow(day.periods.slice(3)).map((period, index) => (
-                  <td key={index} className={styles.BIG_SCHEDULE_PERIOD} colSpan={period.colSpan}>{period.subject}</td>
+                <td id="lunch-cell" className="lunch-cell">LUNCH</td>
+                {formatSchedule(day.periods.slice(3)).map((period, index) => (
+                  <td key={index} id={`period-${index + 3}`} className="schedule-period" colSpan={period.colSpan}>
+                    {period.subject}
+                  </td>
                 ))}
               </tr>
             ))}
@@ -120,4 +123,4 @@ const StudentSchedule = () => {
   );
 };
 
-export default StudentSchedule;
+export default StudentDashboard;
