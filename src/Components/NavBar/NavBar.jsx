@@ -23,12 +23,12 @@ function NavBar() {
         const response = await axios.get(
           `https://tkrcet-backend-g3zu.onrender.com/faculty/${facultyId}`
         );
-        setUserData(response.data); // Faculty data is directly available
+        setUserData(response.data);
       } else if (studentId) {
         const response = await axios.get(
           `https://tkrcet-backend-g3zu.onrender.com/Section/${studentId}`
         );
-        setUserData(response.data.student); // Extract 'student' object
+        setUserData(response.data.student);
       }
     } catch (error) {
       console.error("Error fetching user data:", error);
@@ -81,9 +81,9 @@ function NavBar() {
   // Handle Attendance click (Student Redirects Only on Click)
   const handleAttendanceClick = () => {
     if (userData?.role === "student") {
-      navigate("/student"); // Redirect student to student page **ONLY on click**
+      navigate("/student");
     } else {
-      setAttendanceMenuVisible(!attendanceMenuVisible); // Show faculty dropdown
+      setAttendanceMenuVisible(!attendanceMenuVisible);
     }
   };
 
@@ -114,10 +114,10 @@ function NavBar() {
             <li>Home</li>
           </Link>
 
-          {/* Show Timetable for Faculty & Students */}
-          <Link to="/timetable">
-            <li>Timetable</li>
-          </Link>
+          {/* Timetable Navigation based on Role */}
+          <li onClick={() => navigate(studentId ? "/Schedule" : "/timetable")}>
+            Timetable
+          </li>
 
           <li>
             <div className="menu-dropdown">
@@ -145,7 +145,6 @@ function NavBar() {
                         )
                       ) : (
                         <>
-                          {/* Display the initial options */}
                           <li onClick={() => setShowDynamicClasses(true)}>
                             Class
                           </li>
@@ -163,11 +162,13 @@ function NavBar() {
               )}
             </div>
           </li>
+
           <li>
             <a href="#notifications">Notifications</a>
           </li>
         </ul>
       </div>
+      
       <div className="nav-user-profile">
         <span>Welcome, {userData?.name || "User"}</span>
         <div className="account-menu">
