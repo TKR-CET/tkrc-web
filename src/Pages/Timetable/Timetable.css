@@ -41,6 +41,7 @@
     height: 100px;
     border-radius: 50%;
     object-fit: cover;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 /* Timetable Section */
@@ -118,6 +119,8 @@
     .profile-image {
         width: 90px !important;
         height: 90px !important;
+           box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+
     }
 
     .timetable-table th,
