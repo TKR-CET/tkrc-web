@@ -145,13 +145,13 @@ function NavBar() {
                         )
                       ) : (
                         <>
-                          <li onClick={() => setShowDynamicClasses(true)}>
+                          <li id="g" onClick={() => setShowDynamicClasses(true)}>
                             Class
                           </li>
-                          <Link to="/register">
+                          <Link id="g" to="/register">
                             <li>Register</li>
                           </Link>
-                          <Link to="/activity">
+                          <Link id="g"  to="/activity">
                             <li>Activity Diary</li>
                           </Link>
                         </>
