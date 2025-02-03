@@ -146,12 +146,12 @@ const MobileNav = () => {
         <div className="menu">
           <span className="user-welcome">Welcome, {userData?.name || "User"}</span>
 
-          <Link to="/index">
-            <MenuItem id="h" label="Home" />
+          <Link id="h" to="/index">
+            <MenuItem label="Home" />
           </Link>
 
-          <Link to={studentId ? "/Schedule" : "/timetable"}>
-            <MenuItem id="h" label="Timetable" />
+          <Link id="h" to={studentId ? "/Schedule" : "/timetable"}>
+            <MenuItem  label="Timetable" />
           </Link>
 
           <MenuItem label="Notifications" />
