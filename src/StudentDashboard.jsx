@@ -231,8 +231,8 @@ color:red;
           }
 
           img.student-image {
-            width: 100px;
-            height: 100px;
+            width: 120px !important;
+            height: 120px !important;
             object-fit: cover;
             border-radius: 50%;
             margin-left: 20px;
@@ -251,8 +251,8 @@ color:red;
             }
 
             img.student-image {
-              width: 80px;
-              height: 80px;
+              width: 120px;
+              height: 120px;
             }
           }
 
@@ -285,8 +285,8 @@ color:red;
             }
 
             img.student-image {
-              width: 60px;
-              height: 60px;
+              width: 90px !important;
+              height: 90px !important;
             }
           }
         `}
