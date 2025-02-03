@@ -138,7 +138,7 @@ const MobileNav = () => {
           onClick={toggleMenu}
           aria-label={menuOpen ? "Close menu" : "Open menu"}
         >
-          {menuOpen ? "×" : "☰"}
+          {menuOpen ? "X" : "☰"}
         </button>
       </div>
 
@@ -147,11 +147,11 @@ const MobileNav = () => {
           <span className="user-welcome">Welcome, {userData?.name || "User"}</span>
 
           <Link to="/index">
-            <MenuItem label="Home" />
+            <MenuItem "h" label="Home" />
           </Link>
 
           <Link to={studentId ? "/Schedule" : "/timetable"}>
-            <MenuItem label="Timetable" />
+            <MenuItem id="h" label="Timetable" />
           </Link>
 
           <MenuItem label="Notifications" />
