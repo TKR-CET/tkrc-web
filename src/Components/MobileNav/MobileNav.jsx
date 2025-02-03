@@ -25,41 +25,47 @@ const MobileNav = () => {
   const [showDynamicClasses, setShowDynamicClasses] = useState(false);
   const [classOptions, setClassOptions] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [facultyData, setFacultyData] = useState(null);
+  const [userData, setUserData] = useState(null);
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
 
-  const facultyIdFromStorage = localStorage.getItem("facultyId");
+  const facultyId = localStorage.getItem("facultyId");
+  const studentId = localStorage.getItem("studentId");
   const navigate = useNavigate();
 
-  // Fetch faculty details using stored facultyId
-  const fetchFacultyData = async () => {
-    if (!facultyIdFromStorage) return;
-
+  // Fetch user data based on role
+  const fetchUserData = async () => {
     try {
-      const response = await axios.get(
-        `https://tkrcet-backend-g3zu.onrender.com/faculty/${facultyIdFromStorage}`
-      );
-      setFacultyData(response.data);
+      if (facultyId) {
+        const response = await axios.get(
+          `https://tkrcet-backend-g3zu.onrender.com/faculty/${facultyId}`
+        );
+        setUserData(response.data);
+      } else if (studentId) {
+        const response = await axios.get(
+          `https://tkrcet-backend-g3zu.onrender.com/Section/${studentId}`
+        );
+        setUserData(response.data.student);
+      }
     } catch (error) {
-      console.error("Error fetching faculty data:", error);
+      console.error("Error fetching user data:", error);
     }
   };
 
-  // Fetch today's timetable dynamically
+  // Fetch faculty timetable dynamically
   const fetchClassOptions = async () => {
-    if (!facultyData) return;
+    if (!userData || userData.role !== "faculty") return;
 
     setLoading(true);
     try {
       const response = await axios.get(
-        `https://tkrcet-backend-g3zu.onrender.com/faculty/${facultyData.facultyId}/timetable-today`
+        `https://tkrcet-backend-g3zu.onrender.com/faculty/${userData.facultyId}/timetable-today`
       );
       const classes = response.data.classes || [];
 
-      // Filter out duplicates and exclude empty periods
+      // Remove empty periods and duplicate classes
       const uniqueClasses = classes.filter((period, index, self) => {
         return (
-          period.subject && // Exclude empty periods
+          period.subject &&
           self.findIndex(
             (item) =>
               item.subject === period.subject &&
@@ -82,6 +88,7 @@ const MobileNav = () => {
   // Logout function
   const handleLogout = () => {
     localStorage.removeItem("facultyId");
+    localStorage.removeItem("studentId");
     navigate("/"); // Redirect to login page
   };
 
@@ -93,7 +100,7 @@ const MobileNav = () => {
     setAccountMenuOpen(false);
   };
 
-  // Handle navigation to attendance page
+  // Handle class selection for faculty
   const handleClassSelect = (option) => {
     const { programYear, department, section, subject } = option;
     navigate(
@@ -101,19 +108,26 @@ const MobileNav = () => {
     );
   };
 
-  // Fetch faculty data on component mount
-  useEffect(() => {
-    if (facultyIdFromStorage) {
-      fetchFacultyData();
+  // Handle Attendance Click
+  const handleAttendanceClick = () => {
+    if (userData?.role === "student") {
+      navigate("/student");
+    } else {
+      setActiveMenu(activeMenu === "attendance" ? null : "attendance");
     }
-  }, [facultyIdFromStorage]);
+  };
 
-  // Fetch timetable data once faculty data is available
+  // Fetch user data on component mount
   useEffect(() => {
-    if (facultyData) {
+    fetchUserData();
+  }, []);
+
+  // Fetch faculty's timetable once data is available
+  useEffect(() => {
+    if (userData?.role === "faculty") {
       fetchClassOptions();
     }
-  }, [facultyData]);
+  }, [userData]);
 
   return (
     <div className="mobile-nav-container">
@@ -130,55 +144,65 @@ const MobileNav = () => {
 
       {menuOpen && (
         <div className="menu">
+          <span className="user-welcome">Welcome, {userData?.name || "User"}</span>
+
           <Link to="/index">
             <MenuItem label="Home" />
           </Link>
-          <Link to="/timetable">
+
+          <Link to={studentId ? "/Schedule" : "/timetable"}>
             <MenuItem label="Timetable" />
           </Link>
+
           <MenuItem label="Notifications" />
 
-          {/* Attendance Dropdown */}
+          {/* Attendance Menu */}
           <MenuItem
             label="Attendance"
-            onClick={() => setActiveMenu(activeMenu === "attendance" ? null : "attendance")}
+            onClick={handleAttendanceClick}
             active={activeMenu === "attendance"}
           />
 
           {activeMenu === "attendance" && (
             <Dropdown isOpen>
-              <MenuItem
-                label="Class"
-                onClick={() => setShowDynamicClasses(!showDynamicClasses)}
-                active={showDynamicClasses}
-              />
-              {showDynamicClasses && (
-                <Dropdown isOpen>
-                  {loading ? (
-                    <MenuItem label="Loading..." />
-                  ) : classOptions.length === 0 ? (
-                    <MenuItem label="No Classes Today" />
-                  ) : (
-                    classOptions.map((option, index) => (
-                      <MenuItem
-                        key={index}
-                        label={`${option.programYear} ${option.department}-${option.section} - ${option.subject}`}
-                        onClick={() => handleClassSelect(option)}
-                      />
-                    ))
+              {userData?.role === "faculty" ? (
+                <>
+                  <MenuItem
+                    label="Class"
+                    onClick={() => setShowDynamicClasses(!showDynamicClasses)}
+                    active={showDynamicClasses}
+                  />
+                  {showDynamicClasses && (
+                    <Dropdown isOpen>
+                      {loading ? (
+                        <MenuItem label="Loading..." />
+                      ) : classOptions.length === 0 ? (
+                        <MenuItem label="No Classes Today" />
+                      ) : (
+                        classOptions.map((option, index) => (
+                          <MenuItem
+                            key={index}
+                            label={`${option.programYear} ${option.department}-${option.section} - ${option.subject}`}
+                            onClick={() => handleClassSelect(option)}
+                          />
+                        ))
+                      )}
+                    </Dropdown>
                   )}
-                </Dropdown>
+                  <Link to="/register">
+                    <MenuItem label="Register" />
+                  </Link>
+                  <Link to="/activity">
+                    <MenuItem label="Activity Diary" />
+                  </Link>
+                </>
+              ) : (
+                <MenuItem label="Go to Attendance" onClick={() => navigate("/student")} />
               )}
-              <Link to="/register">
-                <MenuItem label="Register" />
-              </Link>
-              <Link to="/activity">
-                <MenuItem label="Activity Diary" />
-              </Link>
             </Dropdown>
           )}
 
-          {/* Account Dropdown */}
+          {/* Account Menu */}
           <MenuItem
             label="Account"
             onClick={() => setAccountMenuOpen(!accountMenuOpen)}
