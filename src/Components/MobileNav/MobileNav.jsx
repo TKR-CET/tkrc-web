@@ -147,7 +147,7 @@ const MobileNav = () => {
           <span className="user-welcome">Welcome, {userData?.name || "User"}</span>
 
           <Link to="/index">
-            <MenuItem "h" label="Home" />
+            <MenuItem id="h" label="Home" />
           </Link>
 
           <Link to={studentId ? "/Schedule" : "/timetable"}>
