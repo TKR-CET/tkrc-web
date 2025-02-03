@@ -73,6 +73,10 @@ const StudentTimetable = () => {
           margin: 0;
           padding: 0;
         }
+.day-column{
+    font-weight: bold;
+    background: #f3f3f3;
+}
 
         body {
           font-family: 'Arial', sans-serif;
@@ -88,6 +92,7 @@ const StudentTimetable = () => {
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
           margin-bottom: 30px;
         }
+
 
         .profile-title {
           font-size: 1.6em;
