@@ -189,10 +189,10 @@ const MobileNav = () => {
                       )}
                     </Dropdown>
                   )}
-                  <Link to="/register">
+                  <Link id="h" to="/register">
                     <MenuItem label="Register" />
                   </Link>
-                  <Link to="/activity">
+                  <Link id="h" to="/activity">
                     <MenuItem label="Activity Diary" />
                   </Link>
                 </>
