@@ -3,7 +3,6 @@ import Header from "../../Components/Header/Header";
 import NavBar from "../../Components/NavBar/NavBar";
 import MobileNav from "../../Components/MobileNav/MobileNav";
 
-
 const StudentTimetable = () => {
   const [studentInfo, setStudentInfo] = useState(null);
   const [classSchedule, setClassSchedule] = useState([]);
@@ -38,8 +37,8 @@ const StudentTimetable = () => {
     }
   }, []);
 
-  if (isLoading) return <div id="loading-message">Loading...</div>;
-  if (!studentInfo) return <div id="error-message">Student details not found!</div>;
+  if (isLoading) return <div className="loading-text">Loading...</div>;
+  if (!studentInfo) return <div className="error-text">Student details not found!</div>;
 
   const formatSchedule = (periods) => {
     let mergedPeriods = [];
@@ -60,174 +59,198 @@ const StudentTimetable = () => {
   return (
     <>
       <Header />
-      <div className="nav">
+      <div className="navbar-container">
         <NavBar />
       </div>
-      <div className="mob-nav">
+      <div className="mobile-nav-container">
         <MobileNav />
       </div>
 
-     
-<style>{`
+      <style>{`
+        /* General Styles */
+        * {
+          box-sizing: border-box;
+          margin: 0;
+          padding: 0;
+        }
 
+        body {
+          font-family: 'Arial', sans-serif;
+          background-color: #f4f4f9;
+          color: #333;
+        }
 
-/* General Styles */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+        /* Student Info Section */
+        .profile-container {
+          background-color: #fff;
+          border-radius: 10px;
+          padding: 20px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+          margin-bottom: 30px;
+        }
 
-body {
-  font-family: 'Arial', sans-serif;
-  background-color: #f4f4f9;
-  color: #333;
-}
+        .profile-title {
+          font-size: 1.6em;
+          color: #333;
+          margin-bottom: 15px;
+        }
 
-/* Student Info Section */
-.student-container {
-  background-color: #fff;
-  border-radius: 10px;
-  padding: 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  margin-bottom: 30px;
-}
+        .profile-table {
+          width: 100%;
+          border-collapse: collapse;
+        }
 
-.student-title {
-  font-size: 1.6em;
-  color: #333;
-  margin-bottom: 15px;
-}
+        .profile-table th, .profile-table td {
+          padding: 12px;
+          border-bottom: 1px solid #ddd;
+        }
 
-.student-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-.timetable-day{
-background-color:#f3f3f3;
-}
+        .profile-table th {
+          background-color: #6495ED;
+          color: white;
+        }
 
-.student-table th, .student-table td {
-  padding: 12px;
-  border-bottom: 1px solid #ddd;
-}
+        .profile-photo {
+          width: 100px;
+          height: 100px;
+          border-radius: 50%;
+          border: 2px solid white;
+        }
 
-.student-table th {
-  background-color: #6495ED !important;
-  color: white;
-}
+        /* Timetable Section */
+        .schedule-container {
+          background-color: #fff;
+          border-radius: 10px;
+          padding: 20px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+          overflow-x: auto;
+        }
 
-#student-photo {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  border: 2px solid white;
-}
+        .schedule-title {
+          font-size: 1.4em;
+          margin-bottom: 15px;
+          color: #333;
+        }
 
-/* Timetable Section */
-.timetable-container {
-  background-color: #fff;
-  border-radius: 10px;
-  padding: 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
+        .schedule-table {
+          width: 100%;
+          border-collapse: collapse;
+        }
 
-.timetable-table {
-  width: 100%;
-  border-collapse: collapse;
-}
+        .schedule-table th, .schedule-table td {
+          padding: 12px;
+          text-align: center;
+          border: 1px solid #ddd;
+        }
 
-.timetable-table th, .timetable-table td {
-  padding: 12px;
-  text-align: center;
-  border: 1px solid #ddd;
-}
+        .schedule-table th {
+          background-color: #6495ED;
+          color: white;
+        }
 
-.timetable-table th {
-  background-color: #6495ED;
-  color: white;
-}
+        .lunch-break {
+          background-color: #ffefc1;
+          font-weight: bold;
+        }
 
-.timetable-lunch {
-  background-color:#ffefc1 ;
-  font-weight: bold;
-}
+        /* Responsive */
+        @media (max-width: 768px) {
+          .profile-table th, .profile-table td, 
+          .schedule-table th, .schedule-table td {
+            font-size: 0.8em;
+            padding: 6px;
+          }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .student-table th, .student-table td, .timetable-table th, .timetable-table td {
-    font-size: 1em !important;
-    padding: 8px !important;
-  }
+          .profile-photo {
+            width: 80px;
+            height: 80px;
+          }
 
-  #student-photo {
-    width: 100px !important;
-    height: 100px !important;
-  }
-}
+          .schedule-table {
+            font-size: 0.8em;
+          }
 
+          .schedule-container {
+            padding: 10px;
+          }
 
-`}</style>
+          .schedule-title {
+            font-size: 1.2em;
+          }
+        }
 
+        @media (max-width: 480px) {
+          .profile-photo {
+            width: 70px;
+            height: 70px;
+          }
+
+          .profile-title, .schedule-title {
+            font-size: 1em;
+          }
+
+          .schedule-table th, .schedule-table td {
+            font-size: 0.7em;
+            padding: 5px;
+          }
+        }
+
+      `}</style>
 
       {/* Student Info Section */}
-      <div id="student-info-container" className="student-container">
-        <h2 className="student-title">Student Profile</h2>
-        <table id="student-info-table" className="student-table">
+      <div className="profile-container">
+        <h2 className="profile-title">Student Profile</h2>
+        <table className="profile-table">
           <tbody>
             <tr>
-              <th id="student-roll-label">Roll No.</th>
-              <td id="student-roll-value">{studentInfo.rollNumber}</td>
-              <td id="student-photo-container" rowSpan="4">
-                <img src={studentInfo.image} alt="Student" id="student-photo" />
+              <th>Roll No.</th>
+              <td>{studentInfo.rollNumber}</td>
+              <td rowSpan="4">
+                <img src={studentInfo.image} alt="Student" className="profile-photo" />
               </td>
             </tr>
             <tr>
-              <th id="student-name-label">Name</th>
-              <td id="student-name-value">{studentInfo.name}</td>
+              <th>Name</th>
+              <td>{studentInfo.name}</td>
             </tr>
             <tr>
-              <th id="student-father-label">Father's Name</th>
-              <td id="student-father-value">{studentInfo.fatherName}</td>
+              <th>Father's Name</th>
+              <td>{studentInfo.fatherName}</td>
             </tr>
             <tr>
-              <th id="student-department-label">Department</th>
-              <td id="student-department-value">{`${studentInfo.year} ${studentInfo.department} ${studentInfo.section}`}</td>
+              <th>Department</th>
+              <td>{`${studentInfo.year} ${studentInfo.department} ${studentInfo.section}`}</td>
             </tr>
           </tbody>
         </table>
       </div>
 
       {/* Timetable Section */}
-      <div id="timetable-container" className="timetable-container">
-        <h1 id="timetable-title">Class Timetable</h1>
-        <table id="timetable-table" className="timetable-table">
+      <div className="schedule-container">
+        <h1 className="schedule-title">Class Timetable</h1>
+        <table className="schedule-table">
           <thead>
             <tr>
-              <th id="timetable-day-header">Day</th>
-              <th id="timetable-period-1">9:40-10:40</th>
-              <th id="timetable-period-2">10:40-11:40</th>
-              <th id="timetable-period-3">11:40-12:40</th>
-              <th id="timetable-period-4">12:40-1:20</th>
-              <th id="timetable-period-5">1:20-2:20</th>
-              <th id="timetable-period-6">2:20-3:20</th>
-              <th id="timetable-period-7">3:20-4:20</th>
+              <th>Day</th>
+              <th>9:40-10:40</th>
+              <th>10:40-11:40</th>
+              <th>11:40-12:40</th>
+              <th>12:40-1:20</th>
+              <th>1:20-2:20</th>
+              <th>2:20-3:20</th>
+              <th>3:20-4:20</th>
             </tr>
           </thead>
           <tbody>
             {classSchedule.map((day) => (
-              <tr key={day._id} id={`timetable-row-${day._id}`}>
-                <td id={`timetable-day-${day._id}`} className="timetable-day">{day.day}</td>
+              <tr key={day._id}>
+                <td className="day-column">{day.day}</td>
                 {formatSchedule(day.periods.slice(0, 3)).map((period, index) => (
-                  <td key={index} id={`timetable-period-${index}`} className="timetable-period" colSpan={period.colSpan}>
-                    {period.subject}
-                  </td>
+                  <td key={index} colSpan={period.colSpan}>{period.subject}</td>
                 ))}
-                <td id="timetable-lunch-cell" className="timetable-lunch">LUNCH</td>
+                <td className="lunch-break">LUNCH</td>
                 {formatSchedule(day.periods.slice(3)).map((period, index) => (
-                  <td key={index} id={`timetable-period-${index + 3}`} className="timetable-period" colSpan={period.colSpan}>
-                    {period.subject}
-                  </td>
+                  <td key={index + 3} colSpan={period.colSpan}>{period.subject}</td>
                 ))}
               </tr>
             ))}
