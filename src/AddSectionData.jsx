@@ -31,31 +31,22 @@ const handleSubmit = async (e) => {
   e.preventDefault();
 
   try {
+    // Prepare FormData object
     const data = new FormData();
+    data.append("rollNumber", formData.rollNumber);
+    data.append("name", formData.name);
+    data.append("fatherName", formData.fatherName);
+    data.append("password", formData.password);
+    data.append("role", formData.role);
 
-    // Convert student data to JSON string
-    const studentData = {
-      rollNumber: formData.rollNumber,
-      name: formData.name,
-      fatherName: formData.fatherName,
-      password: formData.password,
-      role: formData.role,
-    };
-
-    data.append("students", JSON.stringify([studentData])); // Send as string
-
-    if (image) {
-      data.append("image", image);
-    }
+    if (image) data.append("image", image);
 
     const apiUrl = `https://tkrcet-backend-g3zu.onrender.com/Section/${formData.year}/${formData.department}/${formData.section}/students`;
 
     console.log("Sending FormData:", data); // Debugging
 
     const response = await axios.post(apiUrl, data, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
+      headers: { "Content-Type": "multipart/form-data" },
     });
 
     alert("Success: " + response.data.message);
@@ -64,7 +55,6 @@ const handleSubmit = async (e) => {
     alert("Error: " + (error.response?.data?.message || "Failed to add student"));
   }
 };
-
 
   return (
     <div>
