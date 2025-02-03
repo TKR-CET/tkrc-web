@@ -25,25 +25,32 @@ const AddStudentForm = () => {
     setImage(e.target.files[0]);
   };
 
-  
+
 
 const handleSubmit = async (e) => {
   e.preventDefault();
 
   try {
-    // Prepare FormData object
     const data = new FormData();
-    data.append("rollNumber", formData.rollNumber);
-    data.append("name", formData.name);
-    data.append("fatherName", formData.fatherName);
-    data.append("password", formData.password);
-    data.append("role", formData.role);
+
+    const studentData = {
+      rollNumber: formData.rollNumber,
+      name: formData.name,
+      fatherName: formData.fatherName,
+      password: formData.password,
+      role: formData.role,
+    };
+
+    const studentsArray = [studentData];
+
+    // ✅ Send as a JSON string
+    data.append("students", JSON.stringify(studentsArray));
 
     if (image) data.append("image", image);
 
     const apiUrl = `https://tkrcet-backend-g3zu.onrender.com/Section/${formData.year}/${formData.department}/${formData.section}/students`;
 
-    console.log("Sending FormData:", data); // Debugging
+    alert("Sending data: " + JSON.stringify(studentsArray)); // Debugging alert
 
     const response = await axios.post(apiUrl, data, {
       headers: { "Content-Type": "multipart/form-data" },
@@ -51,10 +58,10 @@ const handleSubmit = async (e) => {
 
     alert("Success: " + response.data.message);
   } catch (error) {
-    console.error("Error:", error.response?.data || error.message);
     alert("Error: " + (error.response?.data?.message || "Failed to add student"));
   }
 };
+
 
   return (
     <div>
