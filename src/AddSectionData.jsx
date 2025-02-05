@@ -6,6 +6,8 @@ const AddStudentForm = () => {
     rollNumber: "",
     name: "",
     fatherName: "",
+    mobileNumber: "",
+    fatherMobileNumber: "",
     password: "",
     role: "student",
     year: "B.Tech I",
@@ -25,43 +27,42 @@ const AddStudentForm = () => {
     setImage(e.target.files[0]);
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
+    try {
+      const data = new FormData();
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
+      const studentData = {
+        rollNumber: formData.rollNumber,
+        name: formData.name,
+        fatherName: formData.fatherName,
+        mobileNumber: formData.mobileNumber,
+        fatherMobileNumber: formData.fatherMobileNumber,
+        password: formData.password,
+        role: formData.role,
+      };
 
-  try {
-    const data = new FormData();
+      const studentsArray = [studentData];
 
-    const studentData = {
-      rollNumber: formData.rollNumber,
-      name: formData.name,
-      fatherName: formData.fatherName,
-      password: formData.password,
-      role: formData.role,
-    };
+      // ✅ Send as a JSON string
+      data.append("students", JSON.stringify(studentsArray));
 
-    const studentsArray = [studentData];
+      if (image) data.append("image", image);
 
-    // ✅ Send as a JSON string
-    data.append("students", JSON.stringify(studentsArray));
+      const apiUrl = `https://tkrcet-backend-g3zu.onrender.com/Section/${formData.year}/${formData.department}/${formData.section}/students`;
 
-    if (image) data.append("image", image);
+      alert("Sending data: " + JSON.stringify(studentsArray)); // Debugging alert
 
-    const apiUrl = `https://tkrcet-backend-g3zu.onrender.com/Section/${formData.year}/${formData.department}/${formData.section}/students`;
+      const response = await axios.post(apiUrl, data, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
 
-    alert("Sending data: " + JSON.stringify(studentsArray)); // Debugging alert
-
-    const response = await axios.post(apiUrl, data, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-
-    alert("Success: " + response.data.message);
-  } catch (error) {
-    alert("Error: " + (error.response?.data?.message || "Failed to add student"));
-  }
-};
-
+      alert("Success: " + response.data.message);
+    } catch (error) {
+      alert("Error: " + (error.response?.data?.message || "Failed to add student"));
+    }
+  };
 
   return (
     <div>
@@ -100,6 +101,14 @@ const handleSubmit = async (e) => {
         <div>
           <label>Father Name:</label>
           <input type="text" name="fatherName" value={formData.fatherName} onChange={handleChange} required />
+        </div>
+        <div>
+          <label>Mobile Number:</label>
+          <input type="tel" name="mobileNumber" value={formData.mobileNumber} onChange={handleChange} required />
+        </div>
+        <div>
+          <label>Father's Mobile Number:</label>
+          <input type="tel" name="fatherMobileNumber" value={formData.fatherMobileNumber} onChange={handleChange} required />
         </div>
         <div>
           <label>Password:</label>
