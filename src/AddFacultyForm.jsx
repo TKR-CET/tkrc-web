@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import axios from "axios";
 
@@ -8,8 +7,12 @@ const AddFacultyForm = () => {
     facultyId: "",
     role: "",
     department: "",
-    subject: "", // Added subject field
-    designation: "", // Added designation field
+    subject: "",
+    designation: "",
+    qualification: "", // New field
+    experience: "", // New field
+    areaOfInterest: "", // New field (comma-separated)
+    jntuId: "", // New field
     password: "",
     timetable: "", // Store timetable as a raw JSON string
   });
@@ -45,8 +48,12 @@ const AddFacultyForm = () => {
       data.append("facultyId", formData.facultyId);
       data.append("role", formData.role);
       data.append("department", formData.department);
-      data.append("subject", formData.subject); // Added subject field
-      data.append("designation", formData.designation); // Added designation field
+      data.append("subject", formData.subject);
+      data.append("designation", formData.designation);
+      data.append("qualification", formData.qualification); // Added qualification field
+      data.append("experience", formData.experience); // Added experience field
+      data.append("areaOfInterest", formData.areaOfInterest); // Added areaOfInterest field
+      data.append("jntuId", formData.jntuId); // Added jntuId field
       data.append("password", formData.password);
       data.append("timetable", formData.timetable); // Send raw JSON string
       if (image) data.append("image", image);
@@ -92,6 +99,22 @@ const AddFacultyForm = () => {
         <div>
           <label>Designation:</label>
           <input type="text" name="designation" value={formData.designation} onChange={handleChange} required />
+        </div>
+        <div>
+          <label>Qualification:</label>
+          <input type="text" name="qualification" value={formData.qualification} onChange={handleChange} required />
+        </div>
+        <div>
+          <label>Experience:</label>
+          <input type="text" name="experience" value={formData.experience} onChange={handleChange} required />
+        </div>
+        <div>
+          <label>Area of Interest (comma-separated):</label>
+          <input type="text" name="areaOfInterest" value={formData.areaOfInterest} onChange={handleChange} required />
+        </div>
+        <div>
+          <label>JNTU ID:</label>
+          <input type="text" name="jntuId" value={formData.jntuId} onChange={handleChange} required />
         </div>
         <div>
           <label>Password:</label>
