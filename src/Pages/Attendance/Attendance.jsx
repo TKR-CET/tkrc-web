@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import axios from "axios";
 import "./Attendance.css";
 import Header from "../../Components/Header/Header";
 import NavBar from "../../Components/NavBar/NavBar";
@@ -20,8 +21,29 @@ const Attendance = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [markedPeriods, setMarkedPeriods] = useState([]);
+  const [editPermissions, setEditPermissions] = useState({});
+  const [facultyId, setFacultyId] = useState("");
 
   const todayDate = new Date().toISOString().split("T")[0];
+  const facultyMongoId = localStorage.getItem("facultyId"); // This is MongoDB `_id`
+
+  useEffect(() => {
+    const fetchFacultyDetails = async () => {
+      try {
+        if (facultyMongoId) {
+          const response = await axios.get(
+            `https://tkrcet-backend-g3zu.onrender.com/faculty/${facultyMongoId}`
+          );
+          console.log("Faculty details fetched:", response.data);
+          setFacultyId(response.data.facultyId); // Extract actual facultyId (e.g., D600)
+        }
+      } catch (error) {
+        console.error("Error fetching faculty details:", error);
+      }
+    };
+
+    fetchFacultyDetails();
+  }, [facultyMongoId]);
 
   useEffect(() => {
     fetchAttendanceRecords();
@@ -32,18 +54,12 @@ const Attendance = () => {
     setError("");
 
     try {
-      const response = await fetch(
+      const response = await axios.get(
         `https://tkrcet-backend-g3zu.onrender.com/Attendance/date?date=${date}`
       );
 
-      if (!response.ok) {
-        throw new Error(`No attendance records found for ${date}.`);
-      }
-
-      const { data } = await response.json();
-
-      if (Array.isArray(data)) {
-        const processedData = data.map((record) => ({
+      if (response.data && Array.isArray(response.data.data)) {
+        const processedData = response.data.data.map((record) => ({
           ...record,
           classDetails: `${record.year} ${record.department}-${record.section}`,
           absentees: record.attendance
@@ -52,9 +68,9 @@ const Attendance = () => {
         }));
 
         setAttendanceData(processedData);
-        setMarkedPeriods(processedData.map((record) => record.period)); // Store marked periods
+        setMarkedPeriods(processedData.map((record) => record.period));
       } else {
-        throw new Error("Invalid data format received.");
+        throw new Error(`No attendance records found for ${date}.`);
       }
     } catch (err) {
       setError(err.message);
@@ -63,29 +79,56 @@ const Attendance = () => {
     }
   };
 
-  
-    const handleGoClick = () => {
-  const selectedDate = new Date(date).toISOString().split("T")[0];
-  const todayDate = new Date().toISOString().split("T")[0];
+  const checkEditPermission = async (record) => {
+    try {
+      if (!facultyId) return;
 
-  if (selectedDate !== todayDate) {
-    alert("You can only mark attendance for today's date.");
-    setDate(todayDate); // Reset the date to today's date
-  } else {
-    navigate(
-      `/mark?programYear=${programYear}&department=${department}&section=${section}&subject=${subject}&date=${date}`
-    );
-  }
-};
- 
+      const response = await axios.get(
+        `https://tkrcet-backend-g3zu.onrender.com/Attendance/checkEditPermission?facultyId=${facultyId}&year=${record.year}&department=${record.department}&section=${record.section}&date=${record.date}`
+      );
+      const data = response.data;
+
+      setEditPermissions((prev) => ({
+        ...prev,
+        [record.date]: data.canEdit,
+      }));
+    } catch (err) {
+      console.error("Error checking edit permission:", err);
+    }
+  };
+
+  useEffect(() => {
+    if (facultyId && attendanceData.length > 0) {
+      attendanceData.forEach((record) => {
+        if (record.date !== todayDate) {
+          checkEditPermission(record);
+        }
+      });
+    }
+  }, [facultyId, attendanceData]);
+
+  const handleGoClick = () => {
+    const selectedDate = new Date(date).toISOString().split("T")[0];
+    if (selectedDate !== todayDate) {
+      alert("You can only mark attendance for today's date.");
+      setDate(todayDate);
+    } else {
+      navigate(
+        `/mark?programYear=${programYear}&department=${department}&section=${section}&subject=${subject}&date=${date}`
+      );
+    }
+  };
 
   const handleEdit = (record) => {
-  if (record.date === todayDate) {
-    navigate(
-      `/mark?programYear=${record.year}&department=${record.department}&section=${record.section}&subject=${record.subject}&date=${record.date}&editPeriod=${record.period}`
-    );
-  }
-};
+    const canEdit =
+      record.date === todayDate || editPermissions[record.date] === true;
+
+    if (canEdit) {
+      navigate(
+        `/mark?programYear=${record.year}&department=${record.department}&section=${record.section}&subject=${record.subject}&date=${record.date}&editPeriod=${record.period}`
+      );
+    }
+  };
 
   return (
     <div>
@@ -134,26 +177,40 @@ const Attendance = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {attendanceData.map((record, index) => (
-                    <tr key={index}>
-                      <td>{record.classDetails}</td>
-                      <td>{record.subject}</td>
-                      <td>{record.date}</td>
-                      <td>{record.period}</td>
-                      <td>{record.topic}</td>
-                      <td>{record.remarks}</td>
-                      <td>{record.absentees.length > 0 ? record.absentees.join(", ") : "None"}</td>
-                      <td>
-                        <button
-                          onClick={() => handleEdit(record)}
-                          disabled={record.date !== todayDate}
-                          title={record.date !== todayDate ? "Editing allowed only for today's records" : ""}
-                        >
-                          Edit
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
+                  {attendanceData.map((record, index) => {
+                    const canEdit =
+                      record.date === todayDate ||
+                      editPermissions[record.date] === true;
+
+                    return (
+                      <tr key={index}>
+                        <td>{record.classDetails}</td>
+                        <td>{record.subject}</td>
+                        <td>{record.date}</td>
+                        <td>{record.period}</td>
+                        <td>{record.topic}</td>
+                        <td>{record.remarks}</td>
+                        <td>
+                          {record.absentees.length > 0
+                            ? record.absentees.join(", ")
+                            : "None"}
+                        </td>
+                        <td>
+                          <button
+                            onClick={() => handleEdit(record)}
+                            disabled={!canEdit}
+                            title={
+                              !canEdit
+                                ? "Editing is restricted for this record."
+                                : ""
+                            }
+                          >
+                            Edit
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             ) : (
