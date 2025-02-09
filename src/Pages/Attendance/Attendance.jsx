@@ -25,7 +25,7 @@ const Attendance = () => {
   const [facultyId, setFacultyId] = useState("");
 
   const todayDate = new Date().toISOString().split("T")[0];
-  const facultyMongoId = localStorage.getItem("facultyId"); // This is MongoDB `_id`
+  const facultyMongoId = localStorage.getItem("facultyId"); // MongoDB `_id`
 
   useEffect(() => {
     const fetchFacultyDetails = async () => {
@@ -83,14 +83,18 @@ const Attendance = () => {
     try {
       if (!facultyId) return;
 
+      console.log("Checking edit permission for:", record);
+
       const response = await axios.get(
         `https://tkrcet-backend-g3zu.onrender.com/Attendance/checkEditPermission?facultyId=${facultyId}&year=${record.year}&department=${record.department}&section=${record.section}&date=${record.date}`
       );
       const data = response.data;
 
+      console.log("Edit permission response:", data);
+
       setEditPermissions((prev) => ({
         ...prev,
-        [record.date]: data.canEdit,
+        [`${record.date}-${record.section}`]: data.canEdit,
       }));
     } catch (err) {
       console.error("Error checking edit permission:", err);
@@ -121,7 +125,7 @@ const Attendance = () => {
 
   const handleEdit = (record) => {
     const canEdit =
-      record.date === todayDate || editPermissions[record.date] === true;
+      record.date === todayDate || editPermissions[`${record.date}-${record.section}`] === true;
 
     if (canEdit) {
       navigate(
@@ -180,7 +184,7 @@ const Attendance = () => {
                   {attendanceData.map((record, index) => {
                     const canEdit =
                       record.date === todayDate ||
-                      editPermissions[record.date] === true;
+                      editPermissions[`${record.date}-${record.section}`] === true;
 
                     return (
                       <tr key={index}>
