@@ -188,6 +188,18 @@ const StudentDashboard = () => {
         font-size: 20px;  
         margin-top: 20px;  
       }  
+/* Green for present, Red for absent */
+          .present-cell {
+            
+            color: green !important; /* Dark green */
+            font-weight: bold;
+          }
+
+          .absent-cell {
+           
+            color: red !important; /* Dark red */
+            font-weight: bold;
+          }
 
       .student-details, .attendance-summary, .daily-attendance {  
         margin-top: 20px;  
@@ -298,18 +310,7 @@ td {
 
 
 
-          /* Green for present, Red for absent */
-          .present-cell {
-            
-            color: black !important; /* Dark green */
-            font-weight: bold;
-          }
-
-          .absent-cell {
-           
-            color: red !important; /* Dark red */
-            font-weight: bold;
-          }
+          
 
           
         `}
