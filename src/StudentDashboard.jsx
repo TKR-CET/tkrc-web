@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import NavBar from "./Components/NavBar/NavBar";
 import MobileNav from "./Components/MobileNav/MobileNav";
 import Header from "./Components/Header/Header";
- 
+import "./StudentDashboard.css"; // External CSS
 
 const StudentDashboard = () => {
   const [student, setStudent] = useState(null);
@@ -50,31 +50,138 @@ const StudentDashboard = () => {
       });
   }, [studentId]);
 
-  if (loading) return <h2 className="loading-message">Loading...</h2>;
-  if (error) return <h2 className="loading-message">{error}</h2>;
-  if (!student || !attendance) return <h2 className="loading-message">Error loading data. Please try again.</h2>;
+  if (loading) {
+    return <h2 className="loading-text">Loading...</h2>;
+  }
+
+  if (error) {
+    return <h2 className="loading-text">{error}</h2>;
+  }
+
+  if (!student || !attendance) {
+    return <h2 className="loading-text">Error loading data. Please try again.</h2>;
+  }
 
   return (
-<>
-    <div className="student-dashboard">
+    <div>
+
+    <style>
+ {`
+.loading-text {
+  text-align: center;
+  font-size: 20px;
+  margin-top: 20px;
+}
+
+.student-details, .attendance-summary, .daily-attendance {
+  margin-top: 20px;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+  text-align: center;
+  color: #333;
+}
+
+table {
+  width: 100%;
+  margin: 20px 0;
+  border-collapse: collapse;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+}
+
+th, td {
+  padding: 12px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+}
+
+th {
+  background-color: #6495ED;
+  color: white;
+}
+
+#total {
+  color: red;
+}
+
+td {
+  color: #555;
+}
+
+img.student-image {
+  width: 140px;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 50%;
+  margin-left: 20px;
+}
+
+/* Attendance Colors */
+.present {
+  color: green;
+  font-weight: bold;
+}
+
+.absent {
+  color: red;
+  font-weight: bold;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  table {
+    font-size: 12px;
+  }
+  th, td {
+    padding: 6px;
+  }
+  img.student-image {
+    width: 100px;
+    height: 100px;
+  }
+}
+
+@media (max-width: 480px) {
+  table {
+    font-size: 10px;
+  }
+  th, td {
+    padding: 4px;
+  }
+  img.student-image {
+    width: 70px;
+    height: 70px;
+  }
+}
+
+`}
+</style>
+
+
       <Header />
-      <div className="navbar-container">
+      <div className="nav">
         <NavBar />
       </div>
-      <div className="mobile-navbar">
+      <div className="mob-nav">
         <MobileNav />
       </div>
 
       {/* Student Details */}
-      <div className="student-info">
+      <div className="student-details">
         <h2>Student Details</h2>
-        <table className="student-table">
+        <table>
           <tbody>
             <tr>
               <th>Roll No.</th>
               <td>{student.rollNumber}</td>
               <td rowSpan="4">
-                <img src={student.image} alt="Student" className="student-photo" />
+                <img src={student.image} alt="Student" className="student-image" />
               </td>
             </tr>
             <tr>
@@ -96,7 +203,7 @@ const StudentDashboard = () => {
       {/* Attendance Summary */}
       <div className="attendance-summary">
         <h2>Attendance Summary</h2>
-        <table className="attendance-table">
+        <table>
           <thead>
             <tr>
               <th>Subject</th>
@@ -114,11 +221,11 @@ const StudentDashboard = () => {
                 <td>{subject.percentage}%</td>
               </tr>
             ))}
-            <tr className="total-row">
+            <tr>
               <td><b>Total</b></td>
               <td><b>{attendance.subjectSummary.reduce((sum, sub) => sum + sub.classesConducted, 0)}</b></td>
               <td><b>{attendance.subjectSummary.reduce((sum, sub) => sum + sub.classesAttended, 0)}</b></td>
-              <td className="total-percentage">
+              <td id="total">
                 <b>
                   {(
                     (attendance.subjectSummary.reduce((sum, sub) => sum + sub.classesAttended, 0) /
@@ -135,7 +242,7 @@ const StudentDashboard = () => {
       {/* Daily Attendance Summary */}
       <div className="daily-attendance">
         <h2>Daily Attendance</h2>
-        <table className="daily-attendance-table">
+        <table className="t2">
           <thead>
             <tr>
               <th>Date</th>
@@ -155,7 +262,7 @@ const StudentDashboard = () => {
                 <td>{date}</td>
                 {[1, 2, 3, 4, 5, 6].map((period) => (
                   <td key={period} className={data.periods[period] === "P" ? "present" : "absent"}>
-                    {data.periods[period] || "-"}
+                    {data.subjects[period] || "-"}
                   </td>
                 ))}
                 <td>{data.total}</td>
@@ -165,10 +272,7 @@ const StudentDashboard = () => {
           </tbody>
         </table>
       </div>
-
-
     </div>
-</>
   );
 };
 
