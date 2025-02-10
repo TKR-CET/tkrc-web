@@ -246,6 +246,7 @@ td {
       @media (max-width: 1024px) {  
         table {  
           font-size: 14px;  
+           padding:10px;
         }  
 
         th, td {  
@@ -264,7 +265,7 @@ td {
         }  
 
         th, td {  
-          padding: 6px;  
+          padding: 10px;  
         }  
 
         img.student-image {  
