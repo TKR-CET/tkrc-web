@@ -3,7 +3,6 @@ import NavBar from "./Components/NavBar/NavBar";
 import MobileNav from "./Components/MobileNav/MobileNav";
 import Header from "./Components/Header/Header";
 
-
 const StudentDashboard = () => {
   const [student, setStudent] = useState(null);
   const [attendance, setAttendance] = useState(null);
@@ -64,106 +63,6 @@ const StudentDashboard = () => {
 
   return (
     <div>
-
-    <style>
- {`
-.loading-text {
-  text-align: center;
-  font-size: 20px;
-  margin-top: 20px;
-}
-
-.student-details, .attendance-summary, .daily-attendance {
-  margin-top: 20px;
-  padding: 20px;
-  background-color: #f9f9f9;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-h2 {
-  text-align: center;
-  color: #333;
-}
-
-table {
-  width: 100%;
-  margin: 20px 0;
-  border-collapse: collapse;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-}
-
-th, td {
-  padding: 12px;
-  text-align: center;
-  border-bottom: 1px solid #ddd;
-}
-
-th {
-  background-color: #6495ED;
-  color: white;
-}
-
-#total {
-  color: red;
-}
-
-td {
-  color: #555;
-}
-
-img.student-image {
-  width: 140px;
-  height: 140px;
-  object-fit: cover;
-  border-radius: 50%;
-  margin-left: 20px;
-}
-
-/* Attendance Colors */
-.present {
-  color: green;
-  font-weight: bold;
-}
-
-.absent {
-  color: red;
-  font-weight: bold;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  table {
-    font-size: 12px;
-  }
-  th, td {
-    padding: 6px;
-  }
-  img.student-image {
-    width: 100px;
-    height: 100px;
-  }
-}
-
-@media (max-width: 480px) {
-  table {
-    font-size: 10px;
-  }
-  th, td {
-    padding: 4px;
-  }
-  img.student-image {
-    width: 70px;
-    height: 70px;
-  }
-}
-
-`}
-</style>
-
-
       <Header />
       <div className="nav">
         <NavBar />
@@ -261,8 +160,11 @@ img.student-image {
               <tr key={index}>
                 <td>{date}</td>
                 {[1, 2, 3, 4, 5, 6].map((period) => (
-                  <td key={period} className={data.periods[period] === "P" ? "present" : "absent"}>
-                    {data.subjects[period] || "-"}
+                  <td 
+                    key={period}
+                    className={data.periods[period]?.status === "Present" ? "present" : "absent"}
+                  >
+                    {data.periods[period] ? data.periods[period].subject : "-"}
                   </td>
                 ))}
                 <td>{data.total}</td>
@@ -272,6 +174,86 @@ img.student-image {
           </tbody>
         </table>
       </div>
+
+      {/* Internal CSS */}
+      <style>
+        {`
+          .loading-text {
+            text-align: center;
+            font-size: 20px;
+            margin-top: 20px;
+          }
+
+          .student-details, .attendance-summary, .daily-attendance {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+          }
+
+          h2 {
+            text-align: center;
+            color: #333;
+          }
+
+          table {
+            width: 100%;
+            margin: 20px 0;
+            border-collapse: collapse;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+          }
+
+          th, td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+          }
+
+          th {
+            background-color: #6495ED;
+            color: white;
+          }
+
+          #total {
+            color: red;
+          }
+
+          img.student-image {
+            width: 140px !important;
+            height: 140px !important;
+            object-fit: cover;
+            border-radius: 50%;
+            margin-left: 20px;
+          }
+
+          .present {
+            background-color: #d4edda;
+            color: #155724;
+            font-weight: bold;
+          }
+
+          .absent {
+            background-color: #f8d7da;
+            color: #721c24;
+            font-weight: bold;
+          }
+
+          /* Responsive Styles */
+          @media (max-width: 768px) {
+            table {
+              font-size: 12px;
+            }
+
+            img.student-image {
+              width: 70px;
+              height: 70px;
+            }
+          }
+        `}
+      </style>
     </div>
   );
 };
