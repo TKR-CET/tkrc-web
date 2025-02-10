@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import NavBar from "./Components/NavBar/NavBar";
 import MobileNav from "./Components/MobileNav/MobileNav";
 import Header from "./Components/Header/Header";
-import "./StudentDashboard.css"; // External CSS
+
 
 const StudentDashboard = () => {
   const [student, setStudent] = useState(null);
