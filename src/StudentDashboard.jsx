@@ -246,7 +246,7 @@ td {
       @media (max-width: 1024px) {  
         table {  
           font-size: 14px;  
-           padding:10px;
+           padding:10px !important;
         }  
 
         th, td {  
@@ -265,7 +265,7 @@ td {
         }  
 
         th, td {  
-          padding: 10px;  
+          padding: 15px !important;  
         }  
 
         img.student-image {  
@@ -275,6 +275,7 @@ td {
 
         .student-details table, .attendance-summary table, .daily-attendance table {  
           font-size: 10px;  
+         padding:5px !important;
         }  
       }  
 
@@ -298,13 +299,13 @@ td {
           /* Green for present, Red for absent */
           .present-cell {
             
-            color: #155724 !important; /* Dark green */
+            color: black !important; /* Dark green */
             font-weight: bold;
           }
 
           .absent-cell {
            
-            color: #721c24 !important; /* Dark red */
+            color: red !important; /* Dark red */
             font-weight: bold;
           }
 
