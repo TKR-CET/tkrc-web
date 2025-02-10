@@ -163,7 +163,7 @@ const Attendance = () => {
         {loading ? (
           <p>Loading attendance records...</p>
         ) : error ? (
-          <p className="error">{error}</p>
+          <p className="error">No Attendance record found </p>
         ) : (
           <div className="attendance-table-wrapper">
             {attendanceData.length > 0 ? (
