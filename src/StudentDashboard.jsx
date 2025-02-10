@@ -191,7 +191,7 @@ const StudentDashboard = () => {
 
       .student-details, .attendance-summary, .daily-attendance {  
         margin-top: 20px;  
-        padding: 20px;  
+        padding: 25px;  
         background-color: #f9f9f9;  
         border-radius: 8px;  
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);  
@@ -297,13 +297,13 @@ td {
 
           /* Green for present, Red for absent */
           .present-cell {
-            background-color: #d4edda !important; /* Light green */
+            
             color: #155724 !important; /* Dark green */
             font-weight: bold;
           }
 
           .absent-cell {
-            background-color: #f8d7da !important; /* Light red */
+           
             color: #721c24 !important; /* Dark red */
             font-weight: bold;
           }
