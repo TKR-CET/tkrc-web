@@ -99,45 +99,6 @@ const StudentDashboard = () => {
         </table>
       </div>
 
-      {/* Attendance Summary */}
-      <div className="attendance-summary">
-        <h2>Attendance Summary</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Subject</th>
-              <th>Classes Conducted</th>
-              <th>Classes Attended</th>
-              <th>Percentage</th>
-            </tr>
-          </thead>
-          <tbody>
-            {attendance.subjectSummary.map((subject, index) => (
-              <tr key={index}>
-                <td>{subject.subject}</td>
-                <td>{subject.classesConducted}</td>
-                <td>{subject.classesAttended}</td>
-                <td>{subject.percentage}%</td>
-              </tr>
-            ))}
-            <tr>
-              <td><b>Total</b></td>
-              <td><b>{attendance.subjectSummary.reduce((sum, sub) => sum + sub.classesConducted, 0)}</b></td>
-              <td><b>{attendance.subjectSummary.reduce((sum, sub) => sum + sub.classesAttended, 0)}</b></td>
-              <td id="total">
-                <b>
-                  {(
-                    (attendance.subjectSummary.reduce((sum, sub) => sum + sub.classesAttended, 0) /
-                      attendance.subjectSummary.reduce((sum, sub) => sum + sub.classesConducted, 0)) *
-                    100
-                  ).toFixed(2)}%
-                </b>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
       {/* Daily Attendance Summary */}
       <div className="daily-attendance">
         <h2>Daily Attendance</h2>
@@ -159,14 +120,17 @@ const StudentDashboard = () => {
             {Object.entries(attendance.dailySummary).map(([date, data], index) => (
               <tr key={index}>
                 <td>{date}</td>
-                {[1, 2, 3, 4, 5, 6].map((period) => (
-                  <td 
-                    key={period}
-                    className={data.periods[period]?.status === "Present" ? "present" : "absent"}
-                  >
-                    {data.periods[period] ? data.periods[period].subject : "-"}
-                  </td>
-                ))}
+                {[1, 2, 3, 4, 5, 6].map((period) => {
+                  const periodData = data.periods[period];
+                  return (
+                    <td
+                      key={period}
+                      className={periodData?.status === "present" ? "present-cell" : "absent-cell"}
+                    >
+                      {periodData?.subject || "-"}
+                    </td>
+                  );
+                })}
                 <td>{data.total}</td>
                 <td>{data.attended}</td>
               </tr>
@@ -184,7 +148,7 @@ const StudentDashboard = () => {
             margin-top: 20px;
           }
 
-          .student-details, .attendance-summary, .daily-attendance {
+          .student-details, .daily-attendance {
             margin-top: 20px;
             padding: 20px;
             background-color: #f9f9f9;
@@ -217,8 +181,17 @@ const StudentDashboard = () => {
             color: white;
           }
 
-          #total {
-            color: red;
+          /* Green for present, Red for absent */
+          .present-cell {
+            background-color: #d4edda !important; /* Light green */
+            color: #155724 !important; /* Dark green */
+            font-weight: bold;
+          }
+
+          .absent-cell {
+            background-color: #f8d7da !important; /* Light red */
+            color: #721c24 !important; /* Dark red */
+            font-weight: bold;
           }
 
           img.student-image {
@@ -229,19 +202,6 @@ const StudentDashboard = () => {
             margin-left: 20px;
           }
 
-          .present {
-            background-color: #d4edda;
-            color: #155724;
-            font-weight: bold;
-          }
-
-          .absent {
-            background-color: #f8d7da;
-            color: #721c24;
-            font-weight: bold;
-          }
-
-          /* Responsive Styles */
           @media (max-width: 768px) {
             table {
               font-size: 12px;
