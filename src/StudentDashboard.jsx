@@ -142,44 +142,116 @@ const StudentDashboard = () => {
       {/* Internal CSS */}
       <style>
         {`
-          .loading-text {
-            text-align: center;
-            font-size: 20px;
-            margin-top: 20px;
-          }
+             .loading-text {  
+        text-align: center;  
+        font-size: 20px;  
+        margin-top: 20px;  
+      }  
 
-          .student-details, .daily-attendance {
-            margin-top: 20px;
-            padding: 20px;
-            background-color: #f9f9f9;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-          }
+      .student-details, .attendance-summary, .daily-attendance {  
+        margin-top: 20px;  
+        padding: 20px;  
+        background-color: #f9f9f9;  
+        border-radius: 8px;  
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);  
+      }  
 
-          h2 {
-            text-align: center;
-            color: #333;
-          }
+      h2 {  
+        text-align: center;  
+        color: #333;  
+      }  
+       
+      table {  
+        width: 100%;  
+        margin: 20px 0;  
+        border-collapse: collapse;  
+        background-color: #fff;  
+        border-radius: 8px;  
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);  
 
-          table {
-            width: 100%;
-            margin: 20px 0;
-            border-collapse: collapse;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-          }
+      }  
 
-          th, td {
-            padding: 12px;
-            text-align: center;
-            border-bottom: 1px solid #ddd;
-          }
+      th, td {  
+        padding: 12px;  
+        text-align: center;  
+        border-bottom: 1px solid #ddd;  
+      }  
 
-          th {
-            background-color: #6495ED;
-            color: white;
-          }
+      th {  
+        background-color: #6495ED;  
+        color: white;  
+
+      }
+
+#total{
+color:red;
+}
+
+td {  
+        color: #555;  
+      }  
+
+      img.student-image {  
+        width: 140px !important;  
+        height: 140px !important;  
+        object-fit: cover;  
+        border-radius: 50%;  
+        margin-left: 20px;  
+      }  
+
+       
+
+      /* Responsive Styles */  
+      @media (max-width: 1024px) {  
+        table {  
+          font-size: 14px;  
+        }  
+
+        th, td {  
+          padding: 8px;  
+        }  
+
+        img.student-image {  
+          width: 120px;  
+          height: 120px;  
+        }  
+      }  
+
+      @media (max-width: 768px) {  
+        table {  
+          font-size: 12px;  
+        }  
+
+        th, td {  
+          padding: 6px;  
+        }  
+
+        img.student-image {  
+          width: 70px;  
+          height: 70px;  
+        }  
+
+        .student-details table, .attendance-summary table, .daily-attendance table {  
+          font-size: 10px;  
+        }  
+      }  
+
+      @media (max-width: 480px) {  
+        table {  
+          font-size: 10px;  
+        }  
+
+        th, td {  
+          padding: 4px;  
+        }  
+
+        img.student-image {  
+          width: 70px !important;  
+          height: 70px !important;  
+        }  
+      }  
+
+
 
           /* Green for present, Red for absent */
           .present-cell {
@@ -194,24 +266,7 @@ const StudentDashboard = () => {
             font-weight: bold;
           }
 
-          img.student-image {
-            width: 140px !important;
-            height: 140px !important;
-            object-fit: cover;
-            border-radius: 50%;
-            margin-left: 20px;
-          }
-
-          @media (max-width: 768px) {
-            table {
-              font-size: 12px;
-            }
-
-            img.student-image {
-              width: 70px;
-              height: 70px;
-            }
-          }
+          
         `}
       </style>
     </div>
