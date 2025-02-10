@@ -138,46 +138,39 @@ const StudentDashboard = () => {
         </table>
       </div>
 
-    {/* Daily Attendance Summary */}
-<div className="daily-attendance">
-  <h2>Daily Attendance</h2>
-  <table class="t2">
-    <thead>
-      <tr>
-        <th>Date</th>
-        <th>1</th>
-        <th>2</th>
-        <th>3</th>
-        <th>4</th>
-        <th>5</th>
-        <th>6</th>
-        <th>Total</th>
-        <th>Attended</th>
-      </tr>
-    </thead>
-    <tbody>
-      {Object.entries(attendance.dailySummary).map(([date, data], index) => (
-        <tr key={index}>
-          <td>{date}</td>
-          {[1, 2, 3, 4, 5, 6].map((period) => (
-            <td key={period}>
-              {/* Conditional rendering for attendance */}
-              <span
-                style={{
-                  color: data.periods[period] === "P" ? "green" : data.periods[period] === "A" ? "red" : "black",
-                }}
-              >
-                {data.periods[period] || "-"}
-              </span>
-            </td>
-          ))}
-          <td>{data.total}</td>
-          <td>{data.attended}</td>
-        </tr>
-      ))}
-    </tbody>
-  </table>
-</div>
+      {/* Daily Attendance Summary */}
+      <div className="daily-attendance">
+        <h2>Daily Attendance</h2>
+        <table className="t2">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>1</th>
+              <th>2</th>
+              <th>3</th>
+              <th>4</th>
+              <th>5</th>
+              <th>6</th>
+              <th>Total</th>
+              <th>Attended</th>
+            </tr>
+          </thead>
+          <tbody>
+            {Object.entries(attendance.dailySummary).map(([date, data], index) => (
+              <tr key={index}>
+                <td>{date}</td>
+                {[1, 2, 3, 4, 5, 6].map((period) => (
+                  <td key={period}>
+                    {data.periods[period] ? data.periods[period].subject : "-"}
+                  </td>
+                ))}
+                <td>{data.total}</td>
+                <td>{data.attended}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       {/* Internal CSS */}
       <style>
@@ -200,7 +193,7 @@ const StudentDashboard = () => {
             text-align: center;
             color: #333;
           }
-         
+
           table {
             width: 100%;
             margin: 20px 0;
@@ -208,7 +201,6 @@ const StudentDashboard = () => {
             background-color: #fff;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-
           }
 
           th, td {
@@ -220,14 +212,10 @@ const StudentDashboard = () => {
           th {
             background-color: #6495ED;
             color: white;
-
           }
-#total{
-color:red;
-}
 
-          td {
-            color: #555;
+          #total {
+            color: red;
           }
 
           img.student-image {
@@ -238,55 +226,15 @@ color:red;
             margin-left: 20px;
           }
 
-         
-
           /* Responsive Styles */
-          @media (max-width: 1024px) {
-            table {
-              font-size: 14px;
-            }
-
-            th, td {
-              padding: 8px;
-            }
-
-            img.student-image {
-              width: 120px;
-              height: 120px;
-            }
-          }
-
           @media (max-width: 768px) {
             table {
               font-size: 12px;
             }
 
-            th, td {
-              padding: 6px;
-            }
-
             img.student-image {
               width: 70px;
               height: 70px;
-            }
-
-            .student-details table, .attendance-summary table, .daily-attendance table {
-              font-size: 10px;
-            }
-          }
-
-          @media (max-width: 480px) {
-            table {
-              font-size: 10px;
-            }
-
-            th, td {
-              padding: 4px;
-            }
-
-            img.student-image {
-              width: 70px !important;
-              height: 70px !important;
             }
           }
         `}
