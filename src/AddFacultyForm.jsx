@@ -3,110 +3,103 @@ import axios from "axios";
 
 const AddFacultyForm = () => {
   const [formData, setFormData] = useState({
-    name: "",
-    facultyId: "",
-    role: "",
-    department: "",
-    subject: "",
-    designation: "",
-    qualification: "", // New field
-    experience: "", // New field
-    areaOfInterest: "", // New field (comma-separated)
-    jntuId: "", // New field
+    loginId: "",
     password: "",
-    timetable: "", // Store timetable as a raw JSON string
+    role: "",
+    designation: "",
+    department: "",
+    name: "",
+    qualification: "",
+    areaOfInterest: "",
+    jntuId: "",
+    yearsOfExperience: "",
   });
 
   const [image, setImage] = useState(null);
   const [responseMessage, setResponseMessage] = useState("");
-  const [timetableError, setTimetableError] = useState("");
+  const [loading, setLoading] = useState(false);
 
+  // Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
+  // Handle image upload
   const handleImageChange = (e) => {
     setImage(e.target.files[0]);
   };
 
+  // Submit form data
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
-      // Validate and parse the timetable
-      const parsedTimetable = JSON.parse(formData.timetable);
-      if (!Array.isArray(parsedTimetable)) {
-        setTimetableError("Timetable must be an array");
-        return;
-      }
-      setTimetableError(""); // Reset error if valid
-
-      // Prepare form data for submission
       const data = new FormData();
-      data.append("name", formData.name);
-      data.append("facultyId", formData.facultyId);
-      data.append("role", formData.role);
-      data.append("department", formData.department);
-      data.append("subject", formData.subject);
-      data.append("designation", formData.designation);
-      data.append("qualification", formData.qualification); // Added qualification field
-      data.append("experience", formData.experience); // Added experience field
-      data.append("areaOfInterest", formData.areaOfInterest); // Added areaOfInterest field
-      data.append("jntuId", formData.jntuId); // Added jntuId field
-      data.append("password", formData.password);
-      data.append("timetable", formData.timetable); // Send raw JSON string
+      Object.keys(formData).forEach((key) => data.append(key, formData[key]));
       if (image) data.append("image", image);
 
-      // Send data to the backend
-      const response = await axios.post("https://tkrcet-backend-g3zu.onrender.com/faculty/addfaculty", data, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      const response = await axios.post(
+        "https://tkrcet-backend-g3zu.onrender.com/faculty/addfacultyprofile",
+        data,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+
       setResponseMessage(response.data.message);
+      setFormData({
+        loginId: "",
+        password: "",
+        role: "",
+        designation: "",
+        department: "",
+        name: "",
+        qualification: "",
+        areaOfInterest: "",
+        jntuId: "",
+        yearsOfExperience: "",
+      });
+      setImage(null);
     } catch (error) {
-      if (error instanceof SyntaxError) {
-        setTimetableError("Invalid JSON format for timetable");
-      } else {
-        setResponseMessage(error.response?.data?.message || "Error adding faculty");
-      }
+      setResponseMessage(error.response?.data?.message || "Error adding faculty profile");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div>
-      <h2>Add Faculty</h2>
+      <h2>Add Faculty Profile</h2>
       <form onSubmit={handleSubmit}>
         <div>
-          <label>Name:</label>
-          <input type="text" name="name" value={formData.name} onChange={handleChange} required />
+          <label>Login ID:</label>
+          <input type="text" name="loginId" value={formData.loginId} onChange={handleChange} required />
         </div>
         <div>
-          <label>Faculty ID:</label>
-          <input type="text" name="facultyId" value={formData.facultyId} onChange={handleChange} required />
+          <label>Password:</label>
+          <input type="password" name="password" value={formData.password} onChange={handleChange} required />
         </div>
         <div>
           <label>Role:</label>
           <input type="text" name="role" value={formData.role} onChange={handleChange} required />
         </div>
         <div>
-          <label>Department:</label>
-          <input type="text" name="department" value={formData.department} onChange={handleChange} required />
-        </div>
-        <div>
-          <label>Subject:</label>
-          <input type="text" name="subject" value={formData.subject} onChange={handleChange} required />
-        </div>
-        <div>
           <label>Designation:</label>
           <input type="text" name="designation" value={formData.designation} onChange={handleChange} required />
         </div>
         <div>
-          <label>Qualification:</label>
-          <input type="text" name="qualification" value={formData.qualification} onChange={handleChange} required />
+          <label>Department:</label>
+          <input type="text" name="department" value={formData.department} onChange={handleChange} required />
         </div>
         <div>
-          <label>Experience:</label>
-          <input type="text" name="experience" value={formData.experience} onChange={handleChange} required />
+          <label>Name:</label>
+          <input type="text" name="name" value={formData.name} onChange={handleChange} required />
+        </div>
+        <div>
+          <label>Qualification:</label>
+          <input type="text" name="qualification" value={formData.qualification} onChange={handleChange} required />
         </div>
         <div>
           <label>Area of Interest (comma-separated):</label>
@@ -117,29 +110,18 @@ const AddFacultyForm = () => {
           <input type="text" name="jntuId" value={formData.jntuId} onChange={handleChange} required />
         </div>
         <div>
-          <label>Password:</label>
-          <input type="password" name="password" value={formData.password} onChange={handleChange} required />
-        </div>
-        <div>
-          <label>Timetable:</label>
-          <textarea
-            name="timetable"
-            value={formData.timetable}
-            onChange={handleChange}
-            placeholder='[{ "day": "Monday", "periods": [...] }, ...]'
-            required
-          />
-          {timetableError && <p style={{ color: "red" }}>{timetableError}</p>}
+          <label>Years of Experience:</label>
+          <input type="number" name="yearsOfExperience" value={formData.yearsOfExperience} onChange={handleChange} required />
         </div>
         <div>
           <label>Profile Image:</label>
           <input type="file" accept="image/*" onChange={handleImageChange} />
         </div>
-        <button type="submit" disabled={timetableError}>Add Faculty</button>
+        <button type="submit" disabled={loading}>{loading ? "Adding..." : "Add Faculty"}</button>
       </form>
       {responseMessage && <p>{responseMessage}</p>}
     </div>
   );
 };
 
-export default AddFacultyForm;
+export default AddFacultyProfileForm;
