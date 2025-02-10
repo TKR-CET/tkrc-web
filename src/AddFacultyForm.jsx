@@ -124,4 +124,4 @@ const AddFacultyForm = () => {
   );
 };
 
-export default AddFacultyProfileForm;
+export default AddFacultyForm;
