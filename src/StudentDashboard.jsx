@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import NavBar from "./Components/NavBar/NavBar";
 import MobileNav from "./Components/MobileNav/MobileNav";
 import Header from "./Components/Header/Header";
-import "./Styles/StudentDashboard.css"; // External CSS
+ External CSS
 
 const StudentDashboard = () => {
   const [student, setStudent] = useState(null);
@@ -57,7 +57,7 @@ const StudentDashboard = () => {
   return (
 <>
  <style>
-{'
+{`
 
 .student-dashboard {
   padding: 20px;
@@ -158,7 +158,7 @@ const StudentDashboard = () => {
     font-size: 10px;
   }
 }
-'}</style>
+`}</style>
     <div className="student-dashboard">
       <Header />
       <div className="navbar-container">
