@@ -246,7 +246,7 @@ td {
       @media (max-width: 1024px) {  
         table {  
           font-size: 14px;  
-           padding:10px !important;
+           padding:10px ;
         }  
 
         th, td {  
@@ -265,7 +265,7 @@ td {
         }  
 
         th, td {  
-          padding: 15px !important;  
+          padding: 10px ;  
         }  
 
         img.student-image {  
@@ -275,8 +275,10 @@ td {
 
         .student-details table, .attendance-summary table, .daily-attendance table {  
           font-size: 10px;  
-         padding:5px !important;
+         
         }  
+  .student-details{
+        padding:5px !important;
       }  
 
       @media (max-width: 480px) {  
