@@ -98,6 +98,47 @@ const StudentDashboard = () => {
           </tbody>
         </table>
       </div>
+     
+
+      {/* Attendance Summary */}  
+  <div className="attendance-summary">  
+    <h2>Attendance Summary</h2>  
+    <table>  
+      <thead>  
+        <tr>  
+          <th>Subject</th>  
+          <th>Classes Conducted</th>  
+          <th>Classes Attended</th>  
+          <th>Percentage</th>  
+        </tr>  
+      </thead>  
+      <tbody>  
+        {attendance.subjectSummary.map((subject, index) => (  
+          <tr key={index}>  
+            <td>{subject.subject}</td>  
+            <td>{subject.classesConducted}</td>  
+            <td>{subject.classesAttended}</td>  
+            <td>{subject.percentage}%</td>  
+          </tr>  
+        ))}  
+        <tr>  
+          <td><b>Total</b></td>  
+          <td><b>{attendance.subjectSummary.reduce((sum, sub) => sum + sub.classesConducted, 0)}</b></td>  
+          <td><b>{attendance.subjectSummary.reduce((sum, sub) => sum + sub.classesAttended, 0)}</b></td>  
+          <td id="total">  
+            <b>  
+              {(  
+                (attendance.subjectSummary.reduce((sum, sub) => sum + sub.classesAttended, 0) /  
+                  attendance.subjectSummary.reduce((sum, sub) => sum + sub.classesConducted, 0)) *  
+                100  
+              ).toFixed(2)}%  
+            </b>  
+          </td>  
+        </tr>  
+      </tbody>  
+    </table>  
+  </div>  
+
 
       {/* Daily Attendance Summary */}
       <div className="daily-attendance">
