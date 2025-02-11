@@ -16,7 +16,9 @@ const MenuItem = ({ label, onClick, active }) => (
 );
 
 const Dropdown = ({ children, isOpen }) => (
-  <div className={`dropdown ${isOpen ? "open" : ""}`}>{children}</div>
+  <div className={`dropdown ${isOpen ? "open" : ""}`}>
+    {isOpen && children}
+  </div>
 );
 
 const MobileNav = () => {
@@ -32,7 +34,7 @@ const MobileNav = () => {
   const studentId = localStorage.getItem("studentId");
   const navigate = useNavigate();
 
-  // Fetch user data based on role
+  // Fetch user data
   const fetchUserData = async () => {
     try {
       if (facultyId) {
@@ -51,7 +53,7 @@ const MobileNav = () => {
     }
   };
 
-  // Fetch faculty timetable dynamically
+  // Fetch faculty timetable
   const fetchClassOptions = async () => {
     if (!userData || userData.role !== "faculty") return;
 
@@ -62,7 +64,7 @@ const MobileNav = () => {
       );
       const classes = response.data.classes || [];
 
-      // Remove empty periods and duplicate classes
+      // Remove duplicates and empty periods
       const uniqueClasses = classes.filter((period, index, self) => {
         return (
           period.subject &&
@@ -89,7 +91,7 @@ const MobileNav = () => {
   const handleLogout = () => {
     localStorage.removeItem("facultyId");
     localStorage.removeItem("studentId");
-    navigate("/"); // Redirect to login page
+    navigate("/");
   };
 
   // Toggle main menu
@@ -98,14 +100,6 @@ const MobileNav = () => {
     setActiveMenu(null);
     setShowDynamicClasses(false);
     setAccountMenuOpen(false);
-  };
-
-  // Handle class selection for faculty
-  const handleClassSelect = (option) => {
-    const { programYear, department, section, subject } = option;
-    navigate(
-      `/attendance?programYear=${programYear}&department=${department}&section=${section}&subject=${subject}`
-    );
   };
 
   // Handle Attendance Click
@@ -117,12 +111,19 @@ const MobileNav = () => {
     }
   };
 
-  // Fetch user data on component mount
+  // Handle Class Selection
+  const handleClassSelect = (option) => {
+    const { programYear, department, section, subject } = option;
+    navigate(
+      `/attendance?programYear=${programYear}&department=${department}&section=${section}&subject=${subject}`
+    );
+  };
+
+  // Fetch data on mount
   useEffect(() => {
     fetchUserData();
   }, []);
 
-  // Fetch faculty's timetable once data is available
   useEffect(() => {
     if (userData?.role === "faculty") {
       fetchClassOptions();
@@ -144,19 +145,20 @@ const MobileNav = () => {
 
       {menuOpen && (
         <div className="menu">
-          <span className="user-welcome">Welcome, {userData?.name || "User"}</span>
+          <span className="user-welcome">
+            Welcome, {userData?.name || "User"}
+          </span>
 
           <Link id="h" to="/index">
             <MenuItem label="Home" />
           </Link>
 
           <Link id="h" to={studentId ? "/Schedule" : "/timetable"}>
-            <MenuItem  label="Timetable" />
+            <MenuItem label="Timetable" />
           </Link>
 
           <MenuItem label="Notifications" />
 
-          {/* Attendance Menu */}
           <MenuItem
             label="Attendance"
             onClick={handleAttendanceClick}
@@ -189,25 +191,22 @@ const MobileNav = () => {
                       )}
                     </Dropdown>
                   )}
-                  <Link id="h" to="/register">
-                    <MenuItem label="Register" />
-                  </Link>
-                  <Link id="h" to="/activity">
-                    <MenuItem label="Activity Diary" />
-                  </Link>
                 </>
               ) : (
-                <MenuItem label="Go to Attendance" onClick={() => navigate("/student")} />
+                <MenuItem
+                  label="Go to Attendance"
+                  onClick={() => navigate("/student")}
+                />
               )}
             </Dropdown>
           )}
 
-          {/* Account Menu */}
           <MenuItem
             label="Account"
             onClick={() => setAccountMenuOpen(!accountMenuOpen)}
             active={accountMenuOpen}
           />
+
           {accountMenuOpen && (
             <Dropdown isOpen>
               <MenuItem label="Settings" />
