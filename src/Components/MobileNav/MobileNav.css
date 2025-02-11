@@ -37,11 +37,19 @@
   color: white;
 }
 
-.dropdown {
+.side-dropdown {
+  position: absolute;
+  left: 100%;
+  top: 0;
+  width: 200px;
+  background: #ddd;
+  padding: 10px;
   display: none;
-  padding-left: 15px;
+  transition: transform 0.3s ease;
+  transform: translateX(20px);
 }
 
-.dropdown.open {
+.side-dropdown.open {
   display: block;
+  transform: translateX(0);
 }
