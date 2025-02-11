@@ -1,25 +1,23 @@
 /* General Styles */
 body {
   margin: 0;
-  font-family: 'Roboto', sans-serif;  /* Modern font */
-  background-color: #f4f4f9; /* Light background for the page */
+  font-family: 'Roboto', sans-serif;
+  background-color: #f4f4f9;
   color: #333;
 }
 
-#link {
+#link, #h {
   text-decoration: none;
 }
-#h{
-text-decoration:none;
-}
 
+/* Mobile Navigation Container */
 .mobile-nav-container {
-  width: 100%; /* Occupy full screen width */
+  width: 100%;
   margin: 0 auto;
   background-color: #fff;
-  border-radius: 0; /* Removed radius for straight edges */
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Soft shadow */
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   overflow: hidden;
+  position: relative;
 }
 
 /* Header */
@@ -28,7 +26,7 @@ text-decoration:none;
   justify-content: space-between;
   align-items: center;
   padding: 12px 20px;
-  background-color: red; /* Dark Blue for a professional look */
+  background-color: red;
   color: white;
   border-bottom: 2px solid #ecf0f1;
 }
@@ -54,9 +52,22 @@ text-decoration:none;
   background-color: #fff;
   padding: 10px;
   border-top: 1px solid #ddd;
-list-style:none;
+  list-style: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 250px;
+  box-shadow: 2px 5px 10px rgba(0, 0, 0, 0.2);
+  transform: translateX(-100%);
+  transition: transform 0.3s ease-in-out;
 }
 
+/* When menu is open */
+.menu.open {
+  transform: translateX(0);
+}
+
+/* Menu Items */
 .menu-item {
   text-align: center;
   padding: 14px;
@@ -69,100 +80,121 @@ list-style:none;
   margin: 5px 0;
   cursor: pointer;
   transition: background-color 0.3s ease, transform 0.3s ease;
-list-style:none;
+  list-style: none;
 }
 
+/* Hover and Active State */
 .menu-item:hover {
-  background-color: #2980B9; /* Professional hover color - Blue */
+  background-color: #2980B9;
   color: white;
-  transform: translateY(-3px); /* Slight lift effect */
+  transform: translateY(-3px);
 }
 
 .menu-item.active {
-  background-color: #1ABC9C; /* Active color - Teal */
+  background-color: #1ABC9C;
   color: white;
 }
 
-/* Dropdown */
+/* Dropdown Styles */
 .dropdown {
+  position: absolute;
+  top: 0;
+  left: 100%;
+  background-color: #fff;
+  width: 200px;
+  border-radius: 5px;
+  box-shadow: 2px 5px 10px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
   display: none;
-  background-color: #f9f9f9;
-  padding: 10px;
-  margin-left: 20px;
-  border-radius: 4px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Soft shadow */
 }
 
+/* When dropdown is open */
 .dropdown.open {
   display: block;
+  opacity: 1;
+  transform: translateX(0);
 }
 
-.dropdown-item {
+/* Dropdown Menu Items */
+.dropdown .menu-item {
   padding: 12px;
-  background-color: #fff;
+  font-size: 1em;
+  font-weight: 500;
   color: #333;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.3s ease;
-  border: 1px solid #ecf0f1;
+  border-bottom: 1px solid #eee;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+/* Dropdown Hover Effects */
+.dropdown .menu-item:hover {
+  background-color: #2980B9;
+  color: white;
+  transform: translateX(5px);
+}
+
+/* Active State */
+.dropdown .menu-item.active {
+  background-color: #1ABC9C;
+  color: white;
+}
+
+/* Nested Dropdowns */
+.submenu {
+  position: absolute;
+  left: 100%;
+  top: 0;
+  width: 180px;
+  background-color: #f9f9f9;
   border-radius: 5px;
-  margin-bottom: 5px;
+  box-shadow: 2px 5px 10px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  display: none;
 }
 
-.dropdown-item:hover {
-  background-color: #2980B9; /* Professional hover color - Blue */
-  color: white;
-  transform: translateY(-3px);
+.submenu.open {
+  display: block;
+  opacity: 1;
+  transform: translateX(0);
 }
 
-.dropdown-item.active {
-  background-color: #1ABC9C; /* Active color - Teal */
-  color: white;
-}
-
-/* Styling for when the dropdown is open */
-.dropdown.open .dropdown-item {
-  background-color: #e8f0fe;
-}
-
-.dropdown-item + .dropdown-item {
-  margin-top: 5px;
-}
-
-/* Submenu (Class, Register, Activity Diary) */
-.dropdown.open .submenu {
-  margin-left: 20px;
-}
-
-/* Style for Year dropdown */
-.dropdown .submenu-item {
-  background-color: #e6f7ff;
+/* Submenu Items */
+.submenu-item {
   padding: 12px;
-  border-radius: 5px;
-  margin: 5px 0;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.3s ease;
+  font-size: 1em;
+  font-weight: 500;
+  color: #333;
+  border-bottom: 1px solid #eee;
+  transition: background 0.3s ease, transform 0.2s ease;
 }
 
 .submenu-item:hover {
-  background-color: #b3e0ff;
-  transform: translateY(-3px);
+  background-color: #2980B9;
+  color: white;
+  transform: translateX(5px);
 }
 
+/* Active State for Submenu */
 .submenu-item.active {
-  background-color: #2980B9; /* Professional active hover color */
+  background-color: #1ABC9C;
   color: white;
 }
 
-/* Active State Styling */
-.submenu-item.active {
-  background-color: #1ABC9C; /* Active color - Teal */
-  color: white;
-}
-
-/* Make dropdowns responsive */
+/* Responsive Design */
 @media (max-width: 768px) {
   .header {
     padding: 10px;
+  }
+
+  .menu {
+    width: 200px;
+  }
+
+  .dropdown {
+    width: 180px;
   }
 
   .menu-item {
@@ -170,7 +202,7 @@ list-style:none;
     padding: 12px;
   }
 
-  .dropdown-item {
+  .dropdown .menu-item {
     font-size: 0.9em;
   }
-  }
+}
