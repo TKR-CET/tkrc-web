@@ -84,20 +84,17 @@ color: white;
 }
 
 /* Dropdown /
-/* Dropdown */
 .dropdown {
-  display: block;
-  max-height: 0;
-  overflow: hidden;
-  opacity: 0;
-  transform: translateY(-10px);
-  transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+display: none;
+background-color: #f9f9f9;
+padding: 10px;
+margin-left: 20px;
+border-radius: 4px;
+box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); / Soft shadow */
 }
 
 .dropdown.open {
-  max-height: 300px; /* Adjust according to content */
-  opacity: 1;
-  transform: translateY(0);
+display: block;
 }
 
 .dropdown-item {
