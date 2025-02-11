@@ -15,8 +15,8 @@ const MenuItem = ({ label, onClick, active }) => (
   </div>
 );
 
-const Dropdown = ({ children, isOpen }) => (
-  <div className={`dropdown ${isOpen ? "open" : ""}`}>
+const SideDropdown = ({ children, isOpen }) => (
+  <div className={`side-dropdown ${isOpen ? "open" : ""}`}>
     {isOpen && children}
   </div>
 );
@@ -165,41 +165,37 @@ const MobileNav = () => {
             active={activeMenu === "attendance"}
           />
 
-          {activeMenu === "attendance" && (
-            <Dropdown isOpen>
-              {userData?.role === "faculty" ? (
-                <>
-                  <MenuItem
-                    label="Class"
-                    onClick={() => setShowDynamicClasses(!showDynamicClasses)}
-                    active={showDynamicClasses}
-                  />
-                  {showDynamicClasses && (
-                    <Dropdown isOpen>
-                      {loading ? (
-                        <MenuItem label="Loading..." />
-                      ) : classOptions.length === 0 ? (
-                        <MenuItem label="No Classes Today" />
-                      ) : (
-                        classOptions.map((option, index) => (
-                          <MenuItem
-                            key={index}
-                            label={`${option.programYear} ${option.department}-${option.section} - ${option.subject}`}
-                            onClick={() => handleClassSelect(option)}
-                          />
-                        ))
-                      )}
-                    </Dropdown>
-                  )}
-                </>
-              ) : (
+          <SideDropdown isOpen={activeMenu === "attendance"}>
+            {userData?.role === "faculty" ? (
+              <>
                 <MenuItem
-                  label="Go to Attendance"
-                  onClick={() => navigate("/student")}
+                  label="Class"
+                  onClick={() => setShowDynamicClasses(!showDynamicClasses)}
+                  active={showDynamicClasses}
                 />
-              )}
-            </Dropdown>
-          )}
+                <SideDropdown isOpen={showDynamicClasses}>
+                  {loading ? (
+                    <MenuItem label="Loading..." />
+                  ) : classOptions.length === 0 ? (
+                    <MenuItem label="No Classes Today" />
+                  ) : (
+                    classOptions.map((option, index) => (
+                      <MenuItem
+                        key={index}
+                        label={`${option.programYear} ${option.department}-${option.section} - ${option.subject}`}
+                        onClick={() => handleClassSelect(option)}
+                      />
+                    ))
+                  )}
+                </SideDropdown>
+              </>
+            ) : (
+              <MenuItem
+                label="Go to Attendance"
+                onClick={() => navigate("/student")}
+              />
+            )}
+          </SideDropdown>
 
           <MenuItem
             label="Account"
@@ -207,12 +203,10 @@ const MobileNav = () => {
             active={accountMenuOpen}
           />
 
-          {accountMenuOpen && (
-            <Dropdown isOpen>
-              <MenuItem label="Settings" />
-              <MenuItem label="Logout" onClick={handleLogout} />
-            </Dropdown>
-          )}
+          <SideDropdown isOpen={accountMenuOpen}>
+            <MenuItem label="Settings" />
+            <MenuItem label="Logout" onClick={handleLogout} />
+          </SideDropdown>
         </div>
       )}
     </div>
