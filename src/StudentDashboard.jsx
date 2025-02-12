@@ -232,7 +232,8 @@ const StudentDashboard = () => {
 
       th {  
          background-color: #6495ED;
-        color:black;  
+        color:white;  
+        padding:3px 2px;
 
       }
 
