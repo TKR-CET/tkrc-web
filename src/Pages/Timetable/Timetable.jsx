@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { ToastContainer } from "react-toastify";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -73,6 +74,8 @@ const Timetable = () => {
 
     return (
         <>
+          <ToastContainer position="top-right" autoClose={3000} />
+      
             <Header />
             <div className="nav">
                 <NavBar facultyName={facultyDetails?.name || "Faculty"} />
