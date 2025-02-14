@@ -135,14 +135,18 @@ const Attendance = () => {
   };
 
   return (
-    <div className="attendance-container">
-  <Header />
+
+  <>
+
+     <Header />
   <div className="nav">
     <NavBar />
   </div>
   <div className="mob-nav">
     <MobileNav />
   </div>
+    <div className="attendance-container">
+ 
   
   <div className="attendance-header">
     <div className="date-selector-container">
@@ -215,6 +219,7 @@ const Attendance = () => {
     </div>
   )}
 </div>
+</>
   );
 };
 
