@@ -15,15 +15,16 @@ const Timetable = () => {
 
     useEffect(() => {
         const fetchFacultyDetails = async () => {
+            if (!facultyId) return;
+
+            toast.info("Fetching faculty details...", { theme: "colored", autoClose: 2000, transition: Slide });
+
             try {
-                if (facultyId) {
-                    const loadingToast = toast.loading("Fetching faculty details...");
-                    const response = await axios.get(`https://tkrcet-backend-g3zu.onrender.com/faculty/${facultyId}`);
-                    setFacultyDetails(response.data);
-                    toast.dismiss(loadingToast);
-                }
+                const response = await axios.get(`https://tkrcet-backend-g3zu.onrender.com/faculty/${facultyId}`);
+                setFacultyDetails(response.data);
+                toast.success("Faculty details loaded!", { theme: "colored", transition: Slide, autoClose: 1500 });
             } catch (error) {
-                toast.error("Error fetching faculty details.");
+                toast.error("Failed to fetch faculty details!", { theme: "colored", transition: Slide });
             }
         };
 
@@ -31,21 +32,23 @@ const Timetable = () => {
     }, [facultyId]);
 
     useEffect(() => {
-        const fetchTimetable = async () => {
-            if (!facultyDetails) return;
+        if (!facultyDetails) return;
 
+        toast.info("Fetching timetable...", { theme: "colored", autoClose: 2000, transition: Slide });
+
+        const fetchTimetable = async () => {
             try {
-                const loadingToast = toast.loading("Fetching timetable...");
                 const response = await axios.get(`https://tkrcet-backend-g3zu.onrender.com/faculty/${facultyId}/timetable`);
                 setTimetable(response?.data?.timetable || []);
-                toast.dismiss(loadingToast);
+                toast.success("Timetable loaded!", { theme: "colored", transition: Slide, autoClose: 1500 });
             } catch (error) {
-                toast.error("Error fetching timetable.");
+                toast.error("Failed to load timetable!", { theme: "colored", transition: Slide });
             }
         };
 
         fetchTimetable();
     }, [facultyDetails]);
+
 
     const handleImageError = (e) => {
         e.target.src = "/images/logo.png";
