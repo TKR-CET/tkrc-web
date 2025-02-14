@@ -80,7 +80,7 @@
 .attendance-table th, .attendance-table td {
   padding: 12px;
   text-align: left;
-  border: 2px solid black; /* Black border for each cell */
+  border: 1px solid black; /* Black border for each cell */
 }
 
 .attendance-table th {
