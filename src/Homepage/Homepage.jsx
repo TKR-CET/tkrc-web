@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 import './Homepage.css';
 
@@ -88,8 +90,11 @@ const Homepage = () => {
                 console.log("Faculty Login Success:", faculty);
 
                 localStorage.setItem("facultyId", faculty.id);
-                alert(`Login successful!\nName: ${faculty.name}\nRole: ${faculty.designation}\nDepartment: ${faculty.department}`);
-                navigate('/index');
+                toast.success(`Login Successful! Welcome, ${faculty.name}`, { position: "top-right" });
+                
+                setTimeout(() => {
+                    navigate('/index');
+                }, 2000);
                 return;
             }
         } catch (err) {
@@ -108,22 +113,25 @@ const Homepage = () => {
 
                 if (student && student.id) {
                     localStorage.setItem("studentId", student.rollNumber);
-                    alert(`Login successful!\nName: ${student.name}\nStored Student ID: ${localStorage.getItem("studentId")}`);
+                    toast.success(`Login Successful! Welcome, ${student.name}`, { position: "top-right" });
                 } else {
                     console.error("Student ID is undefined.");
                 }
 
-                navigate('/index');
+                setTimeout(() => {
+                    navigate('/index');
+                }, 2000);
                 return;
             }
         } catch (err) {
             console.error("Student Login Failed:", err);
-            setError("Invalid credentials. Please check your username/roll number and password.");
+            toast.error("Invalid credentials. Please check your username/roll number and password.", { position: "top-right" });
         }
     };
-
     return (
         <div>
+         <ToastContainer />
+
             {/* Header */}
             <header className="header1">
                 <div className="marquee-container">
