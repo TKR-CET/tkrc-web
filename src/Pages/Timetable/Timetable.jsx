@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "./Timetable.css";
 import Header from "../../Components/Header/Header";
 import NavBar from "../../Components/NavBar/NavBar";
@@ -10,70 +12,47 @@ const Timetable = () => {
     const [facultyDetails, setFacultyDetails] = useState(null);
     const facultyId = localStorage.getItem("facultyId");
 
-    // Fetch faculty details
+    // Show loading toast
+    const showLoadingToast = () => toast.info("Fetching timetable...", { autoClose: false, toastId: "loadingToast" });
+
+    // Dismiss loading toast
+    const dismissLoadingToast = () => toast.dismiss("loadingToast");
+
     useEffect(() => {
         const fetchFacultyDetails = async () => {
             try {
                 if (facultyId) {
+                    showLoadingToast();
                     const response = await axios.get(`https://tkrcet-backend-g3zu.onrender.com/faculty/${facultyId}`);
-                    console.log("Faculty details fetched:", response.data);
                     setFacultyDetails(response.data);
                 }
             } catch (error) {
-                console.error("Error fetching faculty details:", error);
+                toast.error("Error fetching faculty details.");
+            } finally {
+                dismissLoadingToast();
             }
         };
 
         fetchFacultyDetails();
     }, [facultyId]);
 
-    // Fetch faculty timetable
     useEffect(() => {
         const fetchTimetable = async () => {
             if (!facultyDetails) return;
-
+            
             try {
+                showLoadingToast();
                 const response = await axios.get(`https://tkrcet-backend-g3zu.onrender.com/faculty/${facultyId}/timetable`);
-                console.log("Timetable data fetched:", response?.data?.timetable);
                 setTimetable(response?.data?.timetable || []);
             } catch (error) {
-                console.error("Error fetching timetable:", error);
+                toast.error("Error fetching timetable.");
+            } finally {
+                dismissLoadingToast();
             }
         };
 
         fetchTimetable();
     }, [facultyDetails]);
-
-    // Handle image loading errors
-    const handleImageError = (e) => {
-        console.warn("Error loading user image. Using fallback image.");
-        e.target.src = "/images/logo.png";
-    };
-
-    // Merge consecutive periods with the same subject
-    const processPeriods = (periods) => {
-        const mergedPeriods = [];
-        let i = 0;
-
-        while (i < periods.length) {
-            let span = 1;
-            while (
-                i + span < periods.length &&
-                periods[i] &&
-                periods[i + span] &&
-                periods[i].subject === periods[i + span].subject
-            ) {
-                span++;
-            }
-
-            mergedPeriods.push({ period: periods[i], span });
-            i += span;
-        }
-
-        return mergedPeriods;
-    };
-
-    const currentYear = new Date().getFullYear(); // Get the current year
 
     return (
         <>
@@ -92,14 +71,6 @@ const Timetable = () => {
                             <tr>
                                 <td className="label">Name</td>
                                 <td>{facultyDetails?.name || "N/A"}</td>
-                                <td className="profile-image-cell" rowSpan={3}>
-                                    <img
-                                        src={facultyDetails?.image || "/images/logo.png"}
-                                        alt={`${facultyDetails?.name || "Faculty"} Profile`}
-                                        className="profile-image"
-                                        onError={handleImageError}
-                                    />
-                                </td>
                             </tr>
                             <tr>
                                 <td className="label">Department</td>
@@ -114,7 +85,7 @@ const Timetable = () => {
                 </section>
 
                 {/* Timetable Section */}
-                <h2 className="timetable-heading">Time Table - ODD Semester ({currentYear}-{currentYear + 1})</h2>
+                <h2 className="timetable-heading">Time Table</h2>
                 <section className="timetable-content">
                     {timetable.length === 0 ? (
                         <p className="no-data">No timetable data available.</p>
@@ -133,38 +104,16 @@ const Timetable = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {timetable.map((dayData, index) => {
-                                    const periods = [...Array(7)].map((_, i) =>
-                                        dayData.periods.find((p) => p.periodNumber === i + 1) || null
-                                    );
-
-                                    const periodsBeforeLunch = processPeriods(periods.slice(0, 3));
-                                    const periodsAfterLunch = processPeriods(periods.slice(4));
-
-                                    return (
-                                        <tr key={index}>
-                                            <td className="day-cell">{dayData.day || "N/A"}</td>
-
-                                            {periodsBeforeLunch.map((merged, i) => (
-                                                <td key={i} colSpan={merged.span} className="period-cell">
-                                                    {merged.period
-                                                        ? `${merged.period.subject} (${merged.period.year}, ${merged.period.section}, ${merged.period.department || "N/A"})`
-                                                        : ""}
-                                                </td>
-                                            ))}
-
-                                            <td className="lunch-cell">LUNCH</td>
-
-                                            {periodsAfterLunch.map((merged, i) => (
-                                                <td key={i + 4} colSpan={merged.span} className="period-cell">
-                                                    {merged.period
-                                                        ? `${merged.period.subject} (${merged.period.year}, ${merged.period.section}, ${merged.period.department || "N/A"})`
-                                                        : ""}
-                                                </td>
-                                            ))}
-                                        </tr>
-                                    );
-                                })}
+                                {timetable.map((dayData, index) => (
+                                    <tr key={index}>
+                                        <td className="day-cell">{dayData.day || "N/A"}</td>
+                                        {dayData.periods.map((period, i) => (
+                                            <td key={i} className="period-cell">
+                                                {period ? `${period.subject} (${period.year}, ${period.section})` : ""}
+                                            </td>
+                                        ))}
+                                    </tr>
+                                ))}
                             </tbody>
                         </table>
                     )}
