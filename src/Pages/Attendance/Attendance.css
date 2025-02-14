@@ -1,87 +1,71 @@
 /* General Styles */
-body {
-  font-family: "Poppins", sans-serif;
-  margin: 0;
-  padding: 0;
-  background-color: #f2f5fa;
-}
-
-.content {
-  max-width: 1200px;
-  margin: 20px auto;
+.attendance-container {
+  font-family: Arial, sans-serif;
   padding: 20px;
-  background: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+  background-color: #f5f5f5;
+  min-height: 100vh;
 }
 
-/* Header and Navigation */
 .nav, .mob-nav {
   margin-bottom: 20px;
 }
 
-/* Title Bar & Date Selector */
-.title-bar {
+/* Title Bar */
+.attendance-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, #1e3c72, #2a5298);
-  color: white;
-  padding: 16px;
-  border-radius: 10px;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
 }
 
-.batch-date-selectors {
+/* Date Selector Section */
+.date-selector-container {
   display: flex;
   align-items: center;
-  gap: 12px;
-}
-
-label {
-  font-weight: 600;
-  font-size: 14px;
-}
-
-/* Modern Date Picker */
-.date-selector {
-  padding: 10px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  font-size: 14px;
-  outline: none;
-  transition: border 0.3s ease-in-out;
+  justify-content: center;
+  gap: 10px;
   background-color: white;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-.date-selector:hover,
-.date-selector:focus {
-  border-color: #1e3c72;
-}
-
-/* New Stylish Go Button */
-.go {
-  background: linear-gradient(135deg, #28a745, #218838);
-  color: white;
+.date-label {
+  font-size: 16px;
   font-weight: bold;
-  padding: 10px 16px;
+}
+
+.date-input {
+  padding: 8px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: white;
+}
+
+/* Go Button */
+.go-button {
+  background-color: red;
+  color: white;
+  font-size: 16px;
   border: none;
-  border-radius: 6px;
+  padding: 8px 16px;
+  border-radius: 5px;
   cursor: pointer;
-  transition: all 0.3s ease-in-out;
-  font-size: 14px;
+  transition: background 0.3s ease;
 }
 
-.go:hover {
-  background: linear-gradient(135deg, #218838, #1e7e34);
-  transform: scale(1.05);
+.go-button:hover {
+  background-color: darkred;
 }
 
-/* Attendance Table */
+/* Attendance Table Wrapper */
 .attendance-table-wrapper {
-  margin-top: 20px;
-  overflow-x: auto;
+  background-color: white;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  overflow-x: auto; /* Allows horizontal scrolling on small screens */
 }
 
 .attendance-table {
@@ -90,74 +74,87 @@ label {
   margin-top: 10px;
 }
 
-.attendance-table th,
-.attendance-table td {
-  border: 1px solid #ddd;
+.attendance-table th, .attendance-table td {
   padding: 12px;
   text-align: left;
+  border-bottom: 1px solid #ddd;
 }
 
 .attendance-table th {
-  background: linear-gradient(135deg, #1e3c72, #2a5298);
+  background-color: #333;
   color: white;
-  font-weight: bold;
 }
 
-.attendance-table tbody tr:nth-child(even) {
-  background-color: #f9f9f9;
-}
-
-.attendance-table tbody tr:hover {
+.attendance-table tr:hover {
   background-color: #f1f1f1;
 }
 
 /* Edit Button */
-button {
-  padding: 8px 14px;
+.edit-button {
+  background-color: #007bff;
+  color: white;
   border: none;
-  border-radius: 6px;
-  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 5px;
   cursor: pointer;
+  transition: background 0.3s ease;
 }
 
-button:disabled {
+.edit-button:disabled {
   background-color: #ccc;
   cursor: not-allowed;
 }
 
-button:not(:disabled) {
-  background: linear-gradient(135deg, #ff9800, #e68900);
-  color: white;
-  transition: all 0.3s ease-in-out;
-}
-
-button:not(:disabled):hover {
-  background: linear-gradient(135deg, #e68900, #d67600);
-  transform: scale(1.05);
+.edit-button:hover:not(:disabled) {
+  background-color: #0056b3;
 }
 
 /* Error Message */
-.error {
+.error-message {
   color: red;
   font-weight: bold;
   text-align: center;
-  margin-top: 20px;
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  .title-bar {
+  .date-selector-container {
     flex-direction: column;
-    align-items: flex-start;
+    padding: 15px;
   }
 
-  .batch-date-selectors {
-    flex-direction: column;
-    gap: 8px;
+  .date-input {
+    width: 100%;
   }
 
-  .attendance-table th,
-  .attendance-table td {
+  .attendance-table-wrapper {
+    overflow-x: auto;
+  }
+
+  .attendance-table th, .attendance-table td {
+    font-size: 14px;
+    padding: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .date-selector-container {
+    width: 100%;
     padding: 10px;
+  }
+
+  .date-input {
+    font-size: 14px;
+    padding: 6px;
+  }
+
+  .go-button {
+    font-size: 14px;
+    padding: 6px 12px;
+  }
+
+  .attendance-table th, .attendance-table td {
+    font-size: 12px;
+    padding: 6px;
   }
 }
