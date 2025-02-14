@@ -6,6 +6,7 @@
   min-height: 100vh;
 }
 
+/* Navigation */
 .nav, .mob-nav {
   margin-bottom: 20px;
 }
@@ -38,7 +39,7 @@
 .date-input {
   padding: 8px;
   font-size: 16px;
-  border: 1px solid #ccc;
+  border: 1px solid #000; /* Black border */
   border-radius: 5px;
   background-color: white;
 }
@@ -65,24 +66,27 @@
   padding: 15px;
   border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  overflow-x: auto; /* Allows horizontal scrolling on small screens */
+  overflow-x: auto;
 }
 
+/* Attendance Table */
 .attendance-table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 10px;
+  border: 2px solid black; /* Black border around the table */
 }
 
 .attendance-table th, .attendance-table td {
   padding: 12px;
   text-align: left;
-  border-bottom: 1px solid #ddd;
+  border: 2px solid black; /* Black border for each cell */
 }
 
 .attendance-table th {
   background-color: #333;
   color: white;
+  font-weight: bold;
 }
 
 .attendance-table tr:hover {
