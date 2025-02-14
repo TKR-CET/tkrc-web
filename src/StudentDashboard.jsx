@@ -170,81 +170,144 @@ const StudentDashboard = () => {
         )}
       </div>
 
-      {/* CSS Styling */}
-      <style>
-        {`
-          .loading-text {
-            text-align: center;
-            font-size: 20px;
-            margin-top: 20px;
-          }
+       {/* Internal CSS */}    
+  <style>    
+    {`    
+         .loading-text {      
+    text-align: center;      
+    font-size: 20px;      
+    margin-top: 20px;      
+  }
 
-          .present-cell {
-            color: green !important;
-            font-weight: bold;
-          }
+/* Green for present, Red for absent */
+.present-cell {
 
-          .absent-cell {
-            color: red !important;
-            font-weight: bold;
-          }
+color: green !important; /* Dark green */    
+        font-weight: bold;    
+      }    
 
-          .student-details, .attendance-summary, .daily-attendance {
-            margin-top: 20px;
-            padding: 25px;
-            background-color: #f9f9f9;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-          }
+      .absent-cell {    
+           
+        color: red !important; /* Dark red */    
+        font-weight: bold;    
+      }    
 
-          h2 {
-            text-align: center;
-            color: #333;
-          }
+  .student-details, .attendance-summary, .daily-attendance {      
+    margin-top: 20px;      
+    padding: 25px;      
+    background-color: #f9f9f9;      
+    border-radius: 8px;      
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);      
+  }      
 
-          table {
-            width: 100%;
-            margin: 20px 0;
-            border-collapse: collapse;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-          }
+  h2 {      
+    text-align: center;      
+    color: #333;      
+  }      
+       
+  table {      
+    width: 100%;      
+    margin: 20px 0;      
+    border-collapse: collapse;      
+    background-color: #fff;      
+    border-radius: 8px;      
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);      
 
-          th, td {
-            padding: 12px;
-            text-align: center;
-            border-bottom: 1px solid #ddd;
-          }
+  }      
 
-          th {
-            background-color: #6495ED;
-            color: white;
-            padding: 3px 2px;
-          }
+  th, td {      
+    padding: 12px;      
+    text-align: center;      
+    border-bottom: 1px solid #ddd;      
+  }      
 
-          img.student-image {
-            width: 140px;
-            height: 140px;
-            object-fit: cover;
-            border-radius: 50%;
-            margin-left: 20px;
-          }
+  th {      
+     background-color: #6495ED;    
+    color:white;      
+    padding:3px 2px;    
 
-          @media (max-width: 768px) {
-            table {
-              font-size: 12px;
-            }
-            th, td {
-              padding: 10px;
-            }
-            img.student-image {
-              width: 80px;
-              height: 80px;
-            }
-          }
-        `}
-      </style>
+  }
+
+#total{
+color:red;
+}
+
+td {
+color: #555;
+}
+
+img.student-image {      
+    width: 140px !important;      
+    height: 140px !important;      
+    object-fit: cover;      
+    border-radius: 50%;      
+    margin-left: 20px;      
+  }      
+
+       
+
+  /* Responsive Styles */      
+  @media (max-width: 1024px) {      
+    table {      
+      font-size: 14px;      
+       padding:10px ;    
+    }      
+
+    th, td {      
+      padding: 8px;      
+    }      
+
+    img.student-image {      
+      width: 120px;      
+      height: 120px;      
+    }      
+  }      
+
+  @media (max-width: 768px) {      
+    table {      
+      font-size: 12px;      
+    }      
+
+    th, td {      
+      padding: 10px ;      
+    }      
+
+    img.student-image {      
+      width: 70px;      
+      height: 70px;      
+    }      
+
+    .student-details table, .attendance-summary table, .daily-attendance table {      
+      font-size: 10px;      
+         
+    }
+
+.student-details{
+padding:5px !important;
+}
+
+@media (max-width: 480px) {      
+    table {      
+      font-size: 10px;      
+    }      
+
+    th, td {      
+      padding: 4px;      
+    }      
+
+    img.student-image {      
+      width: 70px !important;      
+      height: 70px !important;      
+    }      
+  }      
+
+
+
+          
+
+          
+    `}    
+  </style>    
     </div>
   );
 };
