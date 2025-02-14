@@ -84,7 +84,11 @@ body {
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       margin-bottom: 30px;
     }
-
+    .loading-text{
+     font-size:bold;
+     justify-content:center;
+     
+     }
 
     .profile-title {
       font-size: 1.6em;
