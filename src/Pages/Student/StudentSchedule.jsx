@@ -85,8 +85,8 @@ body {
       margin-bottom: 30px;
     }
     .loading-text{
-     font-size:bold;
-     justify-content:center;
+     color:black;
+     text-align:center;
      
      }
 
