@@ -10,6 +10,19 @@ const StudentDashboard = () => {
   const [error, setError] = useState("");
   const studentId = localStorage.getItem("studentId");
 
+  const fetchWithRetry = async (url, retries = 3, delay = 1000) => {
+    for (let attempt = 1; attempt <= retries; attempt++) {
+      try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+        return await res.json();
+      } catch (err) {
+        if (attempt === retries) throw err;
+        await new Promise((resolve) => setTimeout(resolve, delay));
+      }
+    }
+  };
+
   useEffect(() => {
     if (!studentId) {
       setError("Student ID not found in local storage.");
@@ -17,35 +30,29 @@ const StudentDashboard = () => {
       return;
     }
 
-    // Fetch Student Details
-    fetch(`https://tkrcet-backend-g3zu.onrender.com/Section/${studentId}`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (!data || !data.student) {
-          setError("Failed to fetch student data.");
-          setLoading(false);
-          return;
-        }
-        setStudent(data.student);
-        setLoading(false);
-      })
-      .catch(() => {
-        setError("Error fetching student details.");
-        setLoading(false);
-      });
+    const fetchStudentDetails = fetchWithRetry(
+      `https://tkrcet-backend-g3zu.onrender.com/Section/${studentId}`
+    );
+    const fetchAttendanceDetails = fetchWithRetry(
+      `https://tkrcet-backend-g3zu.onrender.com/Attendance/student-record?rollNumber=${studentId}`
+    );
 
-    // Fetch Attendance Details
-    fetch(`https://tkrcet-backend-g3zu.onrender.com/Attendance/student-record?rollNumber=${studentId}`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (!data || !data.subjectSummary) {
-          setError("Failed to fetch attendance data.");
-          return;
+    Promise.all([fetchStudentDetails, fetchAttendanceDetails])
+      .then(([studentData, attendanceData]) => {
+        if (!studentData?.student) {
+          throw new Error("Failed to fetch student data.");
         }
-        setAttendance(data);
+        if (!attendanceData?.subjectSummary) {
+          throw new Error("Failed to fetch attendance data.");
+        }
+
+        setStudent(studentData.student);
+        setAttendance(attendanceData);
+        setLoading(false);
       })
-      .catch(() => {
-        setError("Error fetching attendance data.");
+      .catch((err) => {
+        setError(err.message);
+        setLoading(false);
       });
   }, [studentId]);
 
@@ -98,47 +105,45 @@ const StudentDashboard = () => {
           </tbody>
         </table>
       </div>
-     
 
-      {/* Attendance Summary */}  
-  <div className="attendance-summary">  
-    <h2>Attendance Summary</h2>  
-    <table>  
-      <thead>  
-        <tr>  
-          <th>Subject</th>  
-          <th>Classes Conducted</th>  
-          <th>Classes Attended</th>  
-          <th>Percentage</th>  
-        </tr>  
-      </thead>  
-      <tbody>  
-        {attendance.subjectSummary.map((subject, index) => (  
-          <tr key={index}>  
-            <td>{subject.subject}</td>  
-            <td>{subject.classesConducted}</td>  
-            <td>{subject.classesAttended}</td>  
-            <td>{subject.percentage}%</td>  
-          </tr>  
-        ))}  
-        <tr>  
-          <td><b>Total</b></td>  
-          <td><b>{attendance.subjectSummary.reduce((sum, sub) => sum + sub.classesConducted, 0)}</b></td>  
-          <td><b>{attendance.subjectSummary.reduce((sum, sub) => sum + sub.classesAttended, 0)}</b></td>  
-          <td id="total">  
-            <b>  
-              {(  
-                (attendance.subjectSummary.reduce((sum, sub) => sum + sub.classesAttended, 0) /  
-                  attendance.subjectSummary.reduce((sum, sub) => sum + sub.classesConducted, 0)) *  
-                100  
-              ).toFixed(2)}%  
-            </b>  
-          </td>  
-        </tr>  
-      </tbody>  
-    </table>  
-  </div>  
-
+      {/* Attendance Summary */}
+      <div className="attendance-summary">
+        <h2>Attendance Summary</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Subject</th>
+              <th>Classes Conducted</th>
+              <th>Classes Attended</th>
+              <th>Percentage</th>
+            </tr>
+          </thead>
+          <tbody>
+            {attendance.subjectSummary.map((subject, index) => (
+              <tr key={index}>
+                <td>{subject.subject}</td>
+                <td>{subject.classesConducted}</td>
+                <td>{subject.classesAttended}</td>
+                <td>{subject.percentage}%</td>
+              </tr>
+            ))}
+            <tr>
+              <td><b>Total</b></td>
+              <td><b>{attendance.subjectSummary.reduce((sum, sub) => sum + sub.classesConducted, 0)}</b></td>
+              <td><b>{attendance.subjectSummary.reduce((sum, sub) => sum + sub.classesAttended, 0)}</b></td>
+              <td id="total">
+                <b>
+                  {(
+                    (attendance.subjectSummary.reduce((sum, sub) => sum + sub.classesAttended, 0) /
+                      attendance.subjectSummary.reduce((sum, sub) => sum + sub.classesConducted, 0)) *
+                    100
+                  ).toFixed(2)}%
+                </b>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
       {/* Daily Attendance Summary */}
       <div className="daily-attendance">
@@ -179,143 +184,6 @@ const StudentDashboard = () => {
           </tbody>
         </table>
       </div>
-
-      {/* Internal CSS */}
-      <style>
-        {`
-             .loading-text {  
-        text-align: center;  
-        font-size: 20px;  
-        margin-top: 20px;  
-      }  
-/* Green for present, Red for absent */
-          .present-cell {
-            
-            color: green !important; /* Dark green */
-            font-weight: bold;
-          }
-
-          .absent-cell {
-           
-            color: red !important; /* Dark red */
-            font-weight: bold;
-          }
-
-      .student-details, .attendance-summary, .daily-attendance {  
-        margin-top: 20px;  
-        padding: 25px;  
-        background-color: #f9f9f9;  
-        border-radius: 8px;  
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);  
-      }  
-
-      h2 {  
-        text-align: center;  
-        color: #333;  
-      }  
-       
-      table {  
-        width: 100%;  
-        margin: 20px 0;  
-        border-collapse: collapse;  
-        background-color: #fff;  
-        border-radius: 8px;  
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);  
-
-      }  
-
-      th, td {  
-        padding: 12px;  
-        text-align: center;  
-        border-bottom: 1px solid #ddd;  
-      }  
-
-      th {  
-         background-color: #6495ED;
-        color:white;  
-        padding:3px 2px;
-
-      }
-
-#total{
-color:red;
-}
-
-td {  
-        color: #555;  
-      }  
-
-      img.student-image {  
-        width: 140px !important;  
-        height: 140px !important;  
-        object-fit: cover;  
-        border-radius: 50%;  
-        margin-left: 20px;  
-      }  
-
-       
-
-      /* Responsive Styles */  
-      @media (max-width: 1024px) {  
-        table {  
-          font-size: 14px;  
-           padding:10px ;
-        }  
-
-        th, td {  
-          padding: 8px;  
-        }  
-
-        img.student-image {  
-          width: 120px;  
-          height: 120px;  
-        }  
-      }  
-
-      @media (max-width: 768px) {  
-        table {  
-          font-size: 12px;  
-        }  
-
-        th, td {  
-          padding: 10px ;  
-        }  
-
-        img.student-image {  
-          width: 70px;  
-          height: 70px;  
-        }  
-
-        .student-details table, .attendance-summary table, .daily-attendance table {  
-          font-size: 10px;  
-         
-        }  
-  .student-details{
-        padding:5px !important;
-      }  
-
-      @media (max-width: 480px) {  
-        table {  
-          font-size: 10px;  
-        }  
-
-        th, td {  
-          padding: 4px;  
-        }  
-
-        img.student-image {  
-          width: 70px !important;  
-          height: 70px !important;  
-        }  
-      }  
-
-
-
-          
-
-          
-        `}
-      </style>
     </div>
   );
 };
