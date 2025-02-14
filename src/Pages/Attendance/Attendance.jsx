@@ -135,95 +135,86 @@ const Attendance = () => {
   };
 
   return (
-    <div>
-      <Header />
-      <div className="nav">
-        <NavBar />
-      </div>
-      <div className="mob-nav">
-        <MobileNav />
-      </div>
-      <div className="content">
-        <div className="title-bar">
-          <div className="batch-date-selectors">
-            <label htmlFor="date">Select Date: </label>
-            <input
-              type="date"
-              id="date"
-              className="date-selector"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-            />
-            <button onClick={handleGoClick} className="go">
-              Go
-            </button>
-          </div>
-        </div>
-
-        {loading ? (
-          <p>Loading attendance records...</p>
-        ) : error ? (
-          <p className="error">No Attendance record found </p>
-        ) : (
-          <div className="attendance-table-wrapper">
-            {attendanceData.length > 0 ? (
-              <table className="attendance-table">
-                <thead>
-                  <tr>
-                    <th>Class</th>
-                    <th>Subject</th>
-                    <th>Date</th>
-                    <th>Period</th>
-                    <th>Topic</th>
-                    <th>Remarks</th>
-                    <th>Absentees</th>
-                    <th>Edit</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {attendanceData.map((record, index) => {
-                    const canEdit =
-                      record.date === todayDate ||
-                      editPermissions[`${record.date}-${record.section}`] === true;
-
-                    return (
-                      <tr key={index}>
-                        <td>{record.classDetails}</td>
-                        <td>{record.subject}</td>
-                        <td>{record.date}</td>
-                        <td>{record.period}</td>
-                        <td>{record.topic}</td>
-                        <td>{record.remarks}</td>
-                        <td>
-                          {record.absentees.length > 0
-                            ? record.absentees.join(", ")
-                            : "None"}
-                        </td>
-                        <td>
-                          <button
-                            onClick={() => handleEdit(record)}
-                            disabled={!canEdit}
-                            title={
-                              !canEdit
-                                ? "Editing is restricted for this record."
-                                : ""
-                            }
-                          >
-                            Edit
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            ) : (
-              <p>No attendance records available for the selected date.</p>
-            )}
-          </div>
-        )}
-      </div>
+    <div className="attendance-container">
+  <Header />
+  <div className="nav">
+    <NavBar />
+  </div>
+  <div className="mob-nav">
+    <MobileNav />
+  </div>
+  
+  <div className="attendance-header">
+    <div className="date-selector-container">
+      <label htmlFor="date" className="date-label">Select Date: </label>
+      <input 
+        type="date" 
+        id="date" 
+        className="date-input"
+        value={date} 
+        onChange={(e) => setDate(e.target.value)} 
+      />
+      <button onClick={handleGoClick} className="go-button">Go</button>
     </div>
+  </div>
+
+  {loading ? (
+    <p>Loading attendance records...</p>
+  ) : error ? (
+    <p className="error-message">No Attendance record found</p>
+  ) : (
+    <div className="attendance-table-wrapper">
+      {attendanceData.length > 0 ? (
+        <table className="attendance-table">
+          <thead>
+            <tr>
+              <th>Class</th>
+              <th>Subject</th>
+              <th>Date</th>
+              <th>Period</th>
+              <th>Topic</th>
+              <th>Remarks</th>
+              <th>Absentees</th>
+              <th>Edit</th>
+            </tr>
+          </thead>
+          <tbody>
+            {attendanceData.map((record, index) => {
+              const canEdit =
+                record.date === todayDate || editPermissions[`${record.date}-${record.section}`] === true;
+
+              return (
+                <tr key={index}>
+                  <td>{record.classDetails}</td>
+                  <td>{record.subject}</td>
+                  <td>{record.date}</td>
+                  <td>{record.period}</td>
+                  <td>{record.topic}</td>
+                  <td>{record.remarks}</td>
+                  <td>
+                    {record.absentees.length > 0 ? record.absentees.join(", ") : "None"}
+                  </td>
+                  <td>
+                    <button 
+                      onClick={() => handleEdit(record)} 
+                      disabled={!canEdit} 
+                      className="edit-button"
+                      title={!canEdit ? "Editing is restricted for this record." : ""}
+                    >
+                      Edit
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      ) : (
+        <p>No attendance records available for the selected date.</p>
+      )}
+    </div>
+  )}
+</div>
   );
 };
 
