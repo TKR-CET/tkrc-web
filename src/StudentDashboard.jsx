@@ -6,6 +6,7 @@ import Header from "./Components/Header/Header";
 const StudentDashboard = () => {
   const [student, setStudent] = useState(null);
   const [attendance, setAttendance] = useState(null);
+  const [dailyAttendance, setDailyAttendance] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const studentId = localStorage.getItem("studentId");
@@ -27,11 +28,9 @@ const StudentDashboard = () => {
         }
         setStudent(data.student);
       })
-      .catch(() => {
-        setError("Error fetching student details.");
-      });
+      .catch(() => setError("Error fetching student details."));
 
-    // Fetch Attendance Details
+    // Fetch Attendance Summary
     fetch(`https://tkrcet-backend-g3zu.onrender.com/Attendance/student-record?rollNumber=${studentId}`)
       .then((res) => res.json())
       .then((data) => {
@@ -41,12 +40,20 @@ const StudentDashboard = () => {
         }
         setAttendance(data);
       })
-      .catch(() => {
-        setError("Error fetching attendance data.");
+      .catch(() => setError("Error fetching attendance data."));
+
+    // Fetch Daily Attendance
+    fetch(`https://tkrcet-backend-g3zu.onrender.com/Attendance/student-daily?rollNumber=${studentId}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (!data || !data.dailyRecords) {
+          setError("Failed to fetch daily attendance.");
+          return;
+        }
+        setDailyAttendance(data.dailyRecords);
       })
-      .finally(() => {
-        setLoading(false);
-      });
+      .catch(() => setError("Error fetching daily attendance."))
+      .finally(() => setLoading(false));
   }, [studentId]);
 
   return (
@@ -121,204 +128,123 @@ const StudentDashboard = () => {
                   <td>{subject.percentage}%</td>
                 </tr>
               ))}
-              <tr>
-                <td><b>Total</b></td>
-                <td><b>{attendance.subjectSummary.reduce((sum, sub) => sum + sub.classesConducted, 0)}</b></td>
-                <td><b>{attendance.subjectSummary.reduce((sum, sub) => sum + sub.classesAttended, 0)}</b></td>
-                <td id="total">
-                  <b>
-                    {(
-                      (attendance.subjectSummary.reduce((sum, sub) => sum + sub.classesAttended, 0) /
-                        attendance.subjectSummary.reduce((sum, sub) => sum + sub.classesConducted, 0)) *
-                      100
-                    ).toFixed(2)}%
-                  </b>
-                </td>
-              </tr>
             </tbody>
           </table>
         ) : (
           <h2 className="loading-text">Error loading attendance data.</h2>
         )}
       </div>
-{/* Daily Attendance Summary */}  
-  <div className="daily-attendance">  
-    <h2>Daily Attendance</h2>  
-    <table className="t2">  
-      <thead>  
-        <tr>  
-          <th>Date</th>  
-          <th>1</th>  
-          <th>2</th>  
-          <th>3</th>  
-          <th>4</th>  
-          <th>5</th>  
-          <th>6</th>  
-          <th>Total</th>  
-          <th>Attended</th>  
-        </tr>  
-      </thead>  
-      <tbody>  
-        {Object.entries(attendance.dailySummary).map(([date, data], index) => (  
-          <tr key={index}>  
-            <td>{date}</td>  
-            {[1, 2, 3, 4, 5, 6].map((period) => {  
-              const periodData = data.periods[period];  
-              return (  
-                <td  
-                  key={period}  
-                  className={periodData?.status === "present" ? "present-cell" : "absent-cell"}  
-                >  
-                  {periodData?.subject || "-"}  
-                </td>  
-              );  
-            })}  
-            <td>{data.total}</td>  
-            <td>{data.attended}</td>  
-          </tr>  
-        ))}  
-      </tbody>  
-    </table>  
-  </div>  
 
-      {/* Internal CSS */}
-      {/* Internal CSS */}  
-      <style>  
-        {`  
-             .loading-text {    
-        text-align: center;    
-        font-size: 20px;    
-        margin-top: 20px;    
-      }    
-/* Green for present, Red for absent */  
-          .present-cell {  
-              
-            color: green !important; /* Dark green */  
-            font-weight: bold;  
-          }  
-  
-          .absent-cell {  
-             
-            color: red !important; /* Dark red */  
-            font-weight: bold;  
-          }  
-  
-      .student-details, .attendance-summary, .daily-attendance {    
-        margin-top: 20px;    
-        padding: 25px;    
-        background-color: #f9f9f9;    
-        border-radius: 8px;    
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);    
-      }    
-  
-      h2 {    
-        text-align: center;    
-        color: #333;    
-      }    
-         
-      table {    
-        width: 100%;    
-        margin: 20px 0;    
-        border-collapse: collapse;    
-        background-color: #fff;    
-        border-radius: 8px;    
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);    
-  
-      }    
-  
-      th, td {    
-        padding: 12px;    
-        text-align: center;    
-        border-bottom: 1px solid #ddd;    
-      }    
-  
-      th {    
-         background-color: #6495ED;  
-        color:white;    
-        padding:3px 2px;  
-  
-      }  
-  
-#total{  
-color:red;  
-}  
-  
-td {    
-        color: #555;    
-      }    
-  
-      img.student-image {    
-        width: 140px !important;    
-        height: 140px !important;    
-        object-fit: cover;    
-        border-radius: 50%;    
-        margin-left: 20px;    
-      }    
-  
-         
-  
-      /* Responsive Styles */    
-      @media (max-width: 1024px) {    
-        table {    
-          font-size: 14px;    
-           padding:10px ;  
-        }    
-  
-        th, td {    
-          padding: 8px;    
-        }    
-  
-        img.student-image {    
-          width: 120px;    
-          height: 120px;    
-        }    
-      }    
-  
-      @media (max-width: 768px) {    
-        table {    
-          font-size: 12px;    
-        }    
-  
-        th, td {    
-          padding: 10px ;    
-        }    
-  
-        img.student-image {    
-          width: 70px;    
-          height: 70px;    
-        }    
-  
-        .student-details table, .attendance-summary table, .daily-attendance table {    
-          font-size: 10px;    
-           
-        }    
-  .student-details{  
-        padding:5px !important;  
-      }    
-  
-      @media (max-width: 480px) {    
-        table {    
-          font-size: 10px;    
-        }    
-  
-        th, td {    
-          padding: 4px;    
-        }    
-  
-        img.student-image {    
-          width: 70px !important;    
-          height: 70px !important;    
-        }    
-      }    
-  
-  
-  
-            
-  
-            
-        `}  
-      </style>   
-  
+      {/* Daily Attendance Summary */}
+      <div className="daily-attendance">
+        <h2>Daily Attendance Summary</h2>
+        {loading ? (
+          <h2 className="loading-text">Loading daily attendance...</h2>
+        ) : error ? (
+          <h2 className="loading-text">{error}</h2>
+        ) : dailyAttendance ? (
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Period</th>
+                <th>Subject</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {dailyAttendance.map((record, index) => (
+                <tr key={index}>
+                  <td>{record.date}</td>
+                  <td>{record.period}</td>
+                  <td>{record.subject}</td>
+                  <td className={record.status === "Present" ? "present-cell" : "absent-cell"}>
+                    {record.status}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <h2 className="loading-text">Error loading daily attendance data.</h2>
+        )}
+      </div>
+
+      {/* CSS Styling */}
+      <style>
+        {`
+          .loading-text {
+            text-align: center;
+            font-size: 20px;
+            margin-top: 20px;
+          }
+
+          .present-cell {
+            color: green !important;
+            font-weight: bold;
+          }
+
+          .absent-cell {
+            color: red !important;
+            font-weight: bold;
+          }
+
+          .student-details, .attendance-summary, .daily-attendance {
+            margin-top: 20px;
+            padding: 25px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+          }
+
+          h2 {
+            text-align: center;
+            color: #333;
+          }
+
+          table {
+            width: 100%;
+            margin: 20px 0;
+            border-collapse: collapse;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+          }
+
+          th, td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+          }
+
+          th {
+            background-color: #6495ED;
+            color: white;
+            padding: 3px 2px;
+          }
+
+          img.student-image {
+            width: 140px;
+            height: 140px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin-left: 20px;
+          }
+
+          @media (max-width: 768px) {
+            table {
+              font-size: 12px;
+            }
+            th, td {
+              padding: 10px;
+            }
+            img.student-image {
+              width: 80px;
+              height: 80px;
+            }
+          }
+        `}
+      </style>
     </div>
   );
 };
