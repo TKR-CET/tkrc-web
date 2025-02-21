@@ -21,46 +21,39 @@ const AddProject = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if (images.length < 3) {
-      alert("Please upload at least 3 images.");
-      return;
-    }
+  e.preventDefault();
 
-    const formData = new FormData();
-    formData.append("title", project.title);
-    formData.append("description", project.description);
-    formData.append("techStack", project.techStack);
-    formData.append("liveDemo", project.liveDemo);
-    formData.append("githubLink", project.githubLink);
-    
-    images.forEach((image) => {
-      formData.append("images", image); // Append images to FormData
+  if (images.length < 3) {
+    alert("Please upload at least 3 images.");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("title", project.title);
+  formData.append("description", project.description);
+  formData.append("techStack", project.techStack);
+  formData.append("liveDemo", project.liveDemo);
+  formData.append("githubLink", project.githubLink);
+  
+  images.forEach((image) => {
+    formData.append("images", image); // 🔥 Match the Multer field name: "images"
+  });
+
+  try {
+    const response = await axios.post("http://localhost:5000/api/projects/create", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
     });
 
-    try {
-      const response = await axios.post("http://localhost:5000/data/create", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+    alert("Project added successfully!");
+    console.log(response.data);
 
-      alert("Project added successfully!");
-      console.log(response.data);
-
-      setProject({
-        title: "",
-        description: "",
-        techStack: "",
-        liveDemo: "",
-        githubLink: "",
-      });
-
-      setImages([]);
-    } catch (error) {
-      console.error("Error adding project:", error);
-      alert("Failed to add project.");
-    }
-  };
+    setProject({ title: "", description: "", techStack: "", liveDemo: "", githubLink: "" });
+    setImages([]);
+  } catch (error) {
+    console.error("Error adding project:", error.response?.data || error.message);
+    alert("Failed to add project.");
+  }
+};
 
   return (
     <div>
