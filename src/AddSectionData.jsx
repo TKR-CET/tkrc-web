@@ -1,132 +1,71 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import axios from "axios";
 
-const AddStudentForm = () => {
-  const [formData, setFormData] = useState({
-    rollNumber: "",
-    name: "",
-    fatherName: "",
-    mobileNumber: "",
-    fatherMobileNumber: "",
-    password: "",
-    role: "student",
-    year: "B.Tech I",
-    department: "CSD",
-    section: "A",
+const AddProject = () => {
+  const [project, setProject] = useState({
+    title: "",
+    description: "",
+    images: ["", "", ""], // At least 3 image URLs required
+    techStack: "",
+    liveDemo: "",
+    githubLink: "",
   });
 
-  const [image, setImage] = useState(null);
-  const [responseMessage, setResponseMessage] = useState("");
-
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setProject({ ...project, [e.target.name]: e.target.value });
   };
 
-  const handleImageChange = (e) => {
-    setImage(e.target.files[0]);
+  const handleImageChange = (index, value) => {
+    const updatedImages = [...project.images];
+    updatedImages[index] = value;
+    setProject({ ...project, images: updatedImages });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
-      const data = new FormData();
-
-      const studentData = {
-        rollNumber: formData.rollNumber,
-        name: formData.name,
-        fatherName: formData.fatherName,
-        mobileNumber: formData.mobileNumber,
-        fatherMobileNumber: formData.fatherMobileNumber,
-        password: formData.password,
-        role: formData.role,
-      };
-
-      const studentsArray = [studentData];
-
-      // ✅ Send as a JSON string
-      data.append("students", JSON.stringify(studentsArray));
-
-      if (image) data.append("image", image);
-
-      const apiUrl = `https://tkrcet-backend-g3zu.onrender.com/Section/${formData.year}/${formData.department}/${formData.section}/students`;
-
-      alert("Sending data: " + JSON.stringify(studentsArray)); // Debugging alert
-
-      const response = await axios.post(apiUrl, data, {
-        headers: { "Content-Type": "multipart/form-data" },
+      const response = await axios.post("http://localhost:5000/data/create", {
+        ...project,
+        techStack: project.techStack.split(",").map((tech) => tech.trim()), // Convert tech stack to array
       });
 
-      alert("Success: " + response.data.message);
+      alert("Project added successfully!");
+      console.log(response.data);
+
+      setProject({
+        title: "",
+        description: "",
+        images: ["", "", ""],
+        techStack: "",
+        liveDemo: "",
+        githubLink: "",
+      });
     } catch (error) {
-      alert("Error: " + (error.response?.data?.message || "Failed to add student"));
+      console.error("Error adding project:", error);
+      alert("Failed to add project.");
     }
   };
 
   return (
     <div>
-      <h2>Add Student</h2>
+      <h2>Add New Project</h2>
       <form onSubmit={handleSubmit}>
-        <div>
-          <label>Year:</label>
-          <select name="year" value={formData.year} onChange={handleChange}>
-            <option value="B.Tech I">B.Tech I</option>
-            <option value="B.Tech II">B.Tech II</option>
-          </select>
-        </div>
-        <div>
-          <label>Department:</label>
-          <select name="department" value={formData.department} onChange={handleChange}>
-            <option value="CSD">CSD</option>
-            <option value="CSE">CSE</option>
-          </select>
-        </div>
-        <div>
-          <label>Section:</label>
-          <select name="section" value={formData.section} onChange={handleChange}>
-            <option value="A">A</option>
-            <option value="B">B</option>
-            <option value="C">C</option>
-          </select>
-        </div>
-        <div>
-          <label>Roll Number:</label>
-          <input type="text" name="rollNumber" value={formData.rollNumber} onChange={handleChange} required />
-        </div>
-        <div>
-          <label>Name:</label>
-          <input type="text" name="name" value={formData.name} onChange={handleChange} required />
-        </div>
-        <div>
-          <label>Father Name:</label>
-          <input type="text" name="fatherName" value={formData.fatherName} onChange={handleChange} required />
-        </div>
-        <div>
-          <label>Mobile Number:</label>
-          <input type="tel" name="mobileNumber" value={formData.mobileNumber} onChange={handleChange} required />
-        </div>
-        <div>
-          <label>Father's Mobile Number:</label>
-          <input type="tel" name="fatherMobileNumber" value={formData.fatherMobileNumber} onChange={handleChange} required />
-        </div>
-        <div>
-          <label>Password:</label>
-          <input type="password" name="password" value={formData.password} onChange={handleChange} required />
-        </div>
-        <div>
-          <label>Role:</label>
-          <input type="text" name="role" value={formData.role} onChange={handleChange} required />
-        </div>
-        <div>
-          <label>Profile Image:</label>
-          <input type="file" accept="image/*" onChange={handleImageChange} />
-        </div>
-        <button type="submit">Add Student</button>
+        <input type="text" name="title" placeholder="Project Title" value={project.title} onChange={handleChange} required />
+        <textarea name="description" placeholder="Project Description" value={project.description} onChange={handleChange} required />
+
+        {/* Image Inputs */}
+        {project.images.map((img, index) => (
+          <input key={index} type="text" placeholder={`Image ${index + 1} URL`} value={img} onChange={(e) => handleImageChange(index, e.target.value)} required />
+        ))}
+
+        <input type="text" name="techStack" placeholder="Tech Stack (comma-separated)" value={project.techStack} onChange={handleChange} required />
+        <input type="text" name="liveDemo" placeholder="Live Demo URL" value={project.liveDemo} onChange={handleChange} required />
+        <input type="text" name="githubLink" placeholder="GitHub Repo URL" value={project.githubLink} onChange={handleChange} required />
+
+        <button type="submit">Add Project</button>
       </form>
-      {responseMessage && <p>{responseMessage}</p>}
     </div>
   );
 };
 
-export default AddStudentForm;
+export default AddProject;
