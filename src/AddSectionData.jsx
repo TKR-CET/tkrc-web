@@ -40,7 +40,7 @@ const AddProject = () => {
   });
 
   try {
-    const response = await axios.post("http://localhost:5000/api/projects/create", formData, {
+    const response = await axios.post("http://localhost:5000/data/create", formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
 
