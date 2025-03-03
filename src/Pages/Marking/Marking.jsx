@@ -17,6 +17,10 @@ const Marking = () => {
   const editPeriod = query.get("editPeriod");
 
   const [studentsData, setStudentsData] = useState([]);
+
+const [facultyName, setFacultyName] = useState("User");
+
+
   const [topic, setTopic] = useState("");
   const [remarks, setRemarks] = useState("");
   const [attendance, setAttendance] = useState({});
@@ -56,6 +60,26 @@ const Marking = () => {
       setIsLoading(false);
     }
   };
+
+
+
+const fetchFacultyName = async () => {
+    const facultyId = localStorage.getItem("facultyId");
+    if (!facultyId) return;
+
+    try {
+      const response = await axios.get(
+        `https://tkrcet-backend-g3zu.onrender.com/faculty/${facultyId}`
+      );
+      setFacultyName(response.data.name || "User");
+    } catch (error) {
+      console.error("Error fetching faculty name:", error.message);
+    }
+  };
+
+
+
+
 
   const fetchMarkedSubjects = async () => {
     try {
@@ -120,6 +144,7 @@ const Marking = () => {
       topic,
       remarks,
       periods,
+      facultyName,
       attendance: studentsData.map((student) => ({
         rollNumber: student.rollNumber,
         name: student.name,
