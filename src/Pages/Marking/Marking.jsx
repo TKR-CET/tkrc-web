@@ -67,14 +67,16 @@ const facultyId = localStorage.getItem("facultyId"); // If stored in local stora
 
 useEffect(() => {
   const fetchFacultyName = async () => {
-    if (!facultyId) return;
+    if (!facultyId) return; // Prevents API call if facultyId is missing
 
     try {
-      const response = await axios.get(
+      const response = await fetch(
         `https://tkrcet-backend-g3zu.onrender.com/faculty/${facultyId}`
       );
-      if (response.data && response.data.name) {
-        setFacultyName(response.data.name);
+      const data = await response.json();
+
+      if (data && data.name) {
+        setFacultyName(data.name);
       }
     } catch (error) {
       console.error("Error fetching faculty name:", error.message);
@@ -82,8 +84,7 @@ useEffect(() => {
   };
 
   fetchFacultyName();
-}, [facultyId]); // Ensures it only runs when facultyId is available
-
+}, [facultyId]); // Runs when facultyId changes
 
 
 
