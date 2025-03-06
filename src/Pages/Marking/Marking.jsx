@@ -21,6 +21,8 @@ const Marking = () => {
 const [facultyName, setFacultyName] = useState("User");
 
 
+const facultyId = localStorage.getItem("facultyId"); // If stored in local storage
+
   const [topic, setTopic] = useState("");
   const [remarks, setRemarks] = useState("");
   const [attendance, setAttendance] = useState({});
