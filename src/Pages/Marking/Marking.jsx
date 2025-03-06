@@ -63,19 +63,24 @@ const [facultyName, setFacultyName] = useState("User");
 
 
 
-const fetchFacultyName = async () => {
-    const facultyId = localStorage.getItem("facultyId");
+useEffect(() => {
+  const fetchFacultyName = async () => {
     if (!facultyId) return;
 
     try {
       const response = await axios.get(
         `https://tkrcet-backend-g3zu.onrender.com/faculty/${facultyId}`
       );
-      setFacultyName(response.data.name || "User");
+      if (response.data && response.data.name) {
+        setFacultyName(response.data.name);
+      }
     } catch (error) {
       console.error("Error fetching faculty name:", error.message);
     }
   };
+
+  fetchFacultyName();
+}, [facultyId]); // Ensures it only runs when facultyId is available
 
 
 
