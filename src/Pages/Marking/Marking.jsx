@@ -20,6 +20,7 @@ const Marking = () => {
 
 const [facultyName, setFacultyName] = useState("User");
 
+const [phoneNumber, setPhoneNumber] = useState('Not available');
 
 const facultyId = localStorage.getItem("facultyId"); // If stored in local storage
 
@@ -66,8 +67,8 @@ const facultyId = localStorage.getItem("facultyId"); // If stored in local stora
 
 
 useEffect(() => {
-  const fetchFacultyName = async () => {
-    if (!facultyId) return; // Prevents API call if facultyId is missing
+  const  fetchFacultyDetails = async () => {
+    if (!facultyId) return;
 
     try {
       const response = await fetch(
@@ -75,17 +76,17 @@ useEffect(() => {
       );
       const data = await response.json();
 
-      if (data && data.name) {
-        setFacultyName(data.name);
+      if (data) {
+        if (data.name) setFacultyName(data.name);
+        if (data.phoneNumber) setPhoneNumber(data.phoneNumber);
       }
     } catch (error) {
-      console.error("Error fetching faculty name:", error.message);
+      console.error("Error fetching faculty details:", error.message);
     }
   };
 
-  fetchFacultyName();
-}, [facultyId]); // Runs when facultyId changes
-
+  fetchFacultyDetails();
+}, [facultyId]);
 
 
 
@@ -153,6 +154,7 @@ useEffect(() => {
       remarks,
       periods,
       facultyName,
+      phoneNumber,
       attendance: studentsData.map((student) => ({
         rollNumber: student.rollNumber,
         name: student.name,
