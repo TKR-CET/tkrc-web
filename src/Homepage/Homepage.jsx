@@ -16,7 +16,7 @@ const Homepage = () => {
         "./images/collage1.jpg"
     ];
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
-
+const [loading, setLoading] = useState(false);
     // Delegate Info Data
     const delegateInfo = {
                 chairman: {
@@ -78,56 +78,59 @@ const Homepage = () => {
     const [error, setError] = useState('');
 
     const handleLogin = async () => {
-        try {
-            console.log("Attempting Faculty Login...");
-            let facultyResponse = await axios.post('https://tkrc-backend.vercel.app/faculty/login', {
-                username,
-                password,
-            });
+    setLoading(true);
+    setError('');
 
-            if (facultyResponse.data.success) {
-                const faculty = facultyResponse.data.faculty;
-                console.log("Faculty Login Success:", faculty);
+    try {
+        console.log("Attempting Faculty Login...");
+        let facultyResponse = await axios.post('https://tkrc-backend.vercel.app/faculty/login', {
+            username,
+            password,
+        });
 
-                localStorage.setItem("facultyId", faculty.id);
-                toast.success(`Login Successful! Welcome, ${faculty.name}`, { position: "top-right" });
-                
+        if (facultyResponse.data.success) {
+            const faculty = facultyResponse.data.faculty;
+            console.log("Faculty Login Success:", faculty);
+
+            localStorage.setItem("facultyId", faculty.id);
+            toast.success(`Login Successful! Welcome, ${faculty.name}`, { position: "top-right" });
+
+            setTimeout(() => {
+                navigate('/index');
+            }, 2000);
+            return;
+        }
+    } catch (err) {
+        console.warn("Faculty Login Failed. Trying Student Login...");
+    }
+
+    try {
+        console.log("Attempting Student Login...");
+        let studentResponse = await axios.post('https://tkrcet-backend-g3zu.onrender.com/Section/login', {
+            rollNumber: username,
+            password,
+        });
+
+        if (studentResponse.data.success) {
+            const student = studentResponse.data.student;
+
+            if (student && student.id) {
+                localStorage.setItem("studentId", student.rollNumber);
+                toast.success(`Login Successful! Welcome, ${student.name}`, { position: "top-right" });
+
                 setTimeout(() => {
                     navigate('/index');
                 }, 2000);
                 return;
             }
-        } catch (err) {
-            console.warn("Faculty Login Failed. Trying Student Login...");
         }
-
-        try {
-            console.log("Attempting Student Login...");
-            let studentResponse = await axios.post('https://tkrcet-backend-g3zu.onrender.com/Section/login', {
-                rollNumber: username,
-                password,
-            });
-
-            if (studentResponse.data.success) {
-                const student = studentResponse.data.student;
-
-                if (student && student.id) {
-                    localStorage.setItem("studentId", student.rollNumber);
-                    toast.success(`Login Successful! Welcome, ${student.name}`, { position: "top-right" });
-                } else {
-                    console.error("Student ID is undefined.");
-                }
-
-                setTimeout(() => {
-                    navigate('/index');
-                }, 2000);
-                return;
-            }
-        } catch (err) {
-            console.error("Student Login Failed:", err);
-            toast.error("Invalid credentials. Please check your username/roll number and password.", { position: "top-right" });
-        }
-    };
+    } catch (err) {
+        console.error("Student Login Failed:", err);
+        toast.error("Invalid credentials. Please check your username/roll number and password.", { position: "top-right" });
+    } finally {
+        setLoading(false);
+    }
+};
     return (
         <div>
          <ToastContainer />
@@ -201,22 +204,26 @@ const Homepage = () => {
 
                     {/* Login Section */}
                     <div className="login">
-                        <h3>Login</h3>
-                        <input
-                            type="text"
-                            placeholder="Username / Roll Number"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                        />
-                        <input
-                            type="password"
-                            placeholder="Password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                        />
-                        {error && <p style={{ color: "red" }}>{error}</p>}
-                        <button id="menu" onClick={handleLogin}>Login</button>
-                    </div>
+    <h3>Login</h3>
+    <input
+        type="text"
+        placeholder="Username / Roll Number"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+        disabled={loading}
+    />
+    <input
+        type="password"
+        placeholder="Password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        disabled={loading}
+    />
+    {error && <p style={{ color: "red" }}>{error}</p>}
+    <button id="menu" onClick={handleLogin} disabled={loading}>
+        {loading ? 'Processing...' : 'Login'}
+    </button>
+</div>
                 </div>
             </div>
 
