@@ -21,7 +21,7 @@ const Timetable = () => {
                         theme: "colored", // Adds professional color
                     });
 
-                    const response = await axios.get(`https://tkrcet-backend-g3zu.onrender.com/faculty/${facultyId}`);
+                    const response = await axios.get(`https://tkrc-backend.vercel.app/faculty/${facultyId}`);
                     setFacultyDetails(response.data);
                     toast.dismiss(loadingToast);
                 }
@@ -42,7 +42,7 @@ const Timetable = () => {
                     theme: "colored",
                 });
 
-                const response = await axios.get(`https://tkrcet-backend-g3zu.onrender.com/faculty/${facultyId}/timetable`);
+                const response = await axios.get(`https://tkrc-backend.vercel.app/faculty/${facultyId}/timetable`);
                 setTimetable(response?.data?.timetable || []);
                 setLoading(false);
                 toast.dismiss(loadingToast);
