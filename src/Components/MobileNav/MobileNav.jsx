@@ -38,7 +38,7 @@ const MobileNav = () => {
     try {      
       if (facultyId) {      
         const response = await axios.get(      
-          `https://tkrcet-backend-g3zu.onrender.com/faculty/${facultyId}`      
+          `https://tkrc-backend.vercel.app/faculty/${facultyId}`      
         );      
         setUserData(response.data);      
       } else if (studentId) {      
@@ -59,7 +59,7 @@ const MobileNav = () => {
     setLoading(true);      
     try {      
       const response = await axios.get(      
-        `https://tkrcet-backend-g3zu.onrender.com/faculty/${userData.facultyId}/timetable-today`      
+        `https://tkrc-backend.vercel.app/faculty/${userData.facultyId}/timetable-today`      
       );      
       const classes = response.data.classes || [];      
   
