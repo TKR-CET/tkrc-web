@@ -80,7 +80,7 @@ const Homepage = () => {
     const handleLogin = async () => {
         try {
             console.log("Attempting Faculty Login...");
-            let facultyResponse = await axios.post('https://tkrcet-backend-g3zu.onrender.com/faculty/login', {
+            let facultyResponse = await axios.post('https://tkrc-backend.vercel.app/faculty/login', {
                 username,
                 password,
             });
