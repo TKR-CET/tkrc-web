@@ -73,8 +73,8 @@ const [loading, setLoading] = useState(false);
     const currentImage = imagesLoader[currentImageIndex];
 
     // Login Handling
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
+    const [username, setUsername] = useState('D600');
+    const [password, setPassword] = useState('D600');
     const [error, setError] = useState('');
 
     const handleLogin = async () => {
