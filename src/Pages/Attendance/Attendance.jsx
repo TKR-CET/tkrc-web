@@ -32,7 +32,7 @@ const Attendance = () => {
       try {
         if (facultyMongoId) {
           const response = await axios.get(
-            `https://tkrcet-backend-g3zu.onrender.com/faculty/${facultyMongoId}`
+            `https://tkrc-backend.vercel.app/faculty/${facultyMongoId}`
           );
           console.log("Faculty details fetched:", response.data);
           setFacultyId(response.data.facultyId); // Extract actual facultyId (e.g., D600)
@@ -55,7 +55,7 @@ const Attendance = () => {
 
     try {
       const response = await axios.get(
-        `https://tkrcet-backend-g3zu.onrender.com/Attendance/date?date=${date}`
+        `https://tkrc-backend.vercel.app/Attendance/date?date=${date}`
       );
 
       if (response.data && Array.isArray(response.data.data)) {
@@ -86,7 +86,7 @@ const Attendance = () => {
       console.log("Checking edit permission for:", record);
 
       const response = await axios.get(
-        `https://tkrcet-backend-g3zu.onrender.com/Attendance/checkEditPermission?facultyId=${facultyId}&year=${record.year}&department=${record.department}&section=${record.section}&date=${record.date}`
+        `https://tkrc-backend.vercel.app/Attendance/checkEditPermission?facultyId=${facultyId}&year=${record.year}&department=${record.department}&section=${record.section}&date=${record.date}`
       );
       const data = response.data;
 
