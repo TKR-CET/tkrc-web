@@ -17,7 +17,7 @@ const ActivityDiary = () => {
     const fetchProvidedFacultyId = async () => {
       try {
         const response = await axios.get(
-          `https://tkrcet-backend-g3zu.onrender.com/faculty/${mongoDbFacultyId}`
+          `https://tkrc-backend.vercel.app/faculty/${mongoDbFacultyId}`
         );
         setProvidedFacultyId(response.data); // Store the faculty object
       } catch (error) {
@@ -37,7 +37,7 @@ const ActivityDiary = () => {
 
       try {
         const response = await axios.get(
-          `https://tkrcet-backend-g3zu.onrender.com/faculty/${providedFacultyId.facultyId}/unique`
+          `https://tkrc-backend.vercel.app/faculty/${providedFacultyId.facultyId}/unique`
         );
         setCombinations(response.data.uniqueCombinations || []);
       } catch (error) {
@@ -58,7 +58,7 @@ const ActivityDiary = () => {
       try {
         const [year, department, section, subject] = selectedCombination.split("-");
         const response = await axios.get(
-          `https://tkrcet-backend-g3zu.onrender.com/Attendance/filters?year=B.Tech ${year}&department=${department}&section=${section}&subject=${subject}`
+          `https://tkrc-backend.vercel.app/Attendance/filters?year=B.Tech ${year}&department=${department}&section=${section}&subject=${subject}`
         );
         setAttendanceRecords(response.data.data || []);
       } catch (error) {
