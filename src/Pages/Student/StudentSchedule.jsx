@@ -17,7 +17,7 @@ const StudentTimetable = () => {
           setStudentInfo(data.student);
           const { year, department, section } = data.student;
           fetch(
-            `https://tkrcet-backend-g3zu.onrender.com/Section/${year}/${department}/${section}/timetable`
+            `https://tkrc-backend.vercel.app/Section/${year}/${department}/${section}/timetable`
           )
             .then((response) => response.json())
             .then((data) => {
