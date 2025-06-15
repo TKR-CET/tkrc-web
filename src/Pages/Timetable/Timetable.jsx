@@ -6,19 +6,20 @@ import "./Timetable.css";
 import Header from "../../Components/Header/Header";
 import NavBar from "../../Components/NavBar/NavBar";
 import MobileNav from "../../Components/MobileNav/MobileNav";
-
 const Timetable = () => {
     const [timetable, setTimetable] = useState(null);
     const [facultyDetails, setFacultyDetails] = useState(null);
     const [loading, setLoading] = useState(true);
     const facultyId = localStorage.getItem("facultyId");
 
+    const isStudent = facultyDetails?.designation === "Student"; // You can adjust this check as needed
+
     useEffect(() => {
         const fetchFacultyDetails = async () => {
             try {
                 if (facultyId) {
                     const loadingToast = toast.loading("Fetching faculty details...", {
-                        theme: "colored", // Adds professional color
+                        theme: "colored",
                     });
 
                     const response = await axios.get(`https://tkrc-backend.vercel.app/faculty/${facultyId}`);
@@ -55,10 +56,6 @@ const Timetable = () => {
         fetchTimetable();
     }, [facultyDetails]);
 
-    const handleImageError = (e) => {
-        e.target.src = "/images/logo.png";
-    };
-
     const processPeriods = (periods) => {
         const mergedPeriods = [];
         let i = 0;
@@ -91,7 +88,7 @@ const Timetable = () => {
                 <MobileNav />
             </div>
             <div className="timetable-container">
-                {loading ? null : ( // Hide everything until loading is complete
+                {loading ? null : (
                     <>
                         <section className="faculty-profile">
                             <table className="profile-table">
@@ -104,7 +101,7 @@ const Timetable = () => {
                                                 src={facultyDetails?.image || "/images/logo.png"}
                                                 alt={`${facultyDetails?.name || "Faculty"} Profile`}
                                                 className="profile-image"
-                                                onError={handleImageError}
+                                                onError={(e) => (e.target.src = "/images/logo.png")}
                                             />
                                         </td>
                                     </tr>
@@ -146,6 +143,7 @@ const Timetable = () => {
                                             );
 
                                             const periodsBeforeLunch = processPeriods(periods.slice(0, 3));
+                                            const lunchPeriod = periods[3]; // 12:40-1:20
                                             const periodsAfterLunch = processPeriods(periods.slice(4));
 
                                             return (
@@ -158,7 +156,16 @@ const Timetable = () => {
                                                                 : ""}
                                                         </td>
                                                     ))}
-                                                    <td className="lunch-cell">LUNCH</td>
+
+                                                    {/* Conditionally render lunch */}
+                                                    <td className="lunch-cell">
+                                                        {isStudent
+                                                            ? lunchPeriod?.subject
+                                                                ? `${lunchPeriod.subject} (${lunchPeriod.year}, ${lunchPeriod.section}, ${lunchPeriod.department || "N/A"})`
+                                                                : ""
+                                                            : "LUNCH"}
+                                                    </td>
+
                                                     {periodsAfterLunch.map((merged, i) => (
                                                         <td key={i + 4} colSpan={merged.span} className="period-cell">
                                                             {merged.period
