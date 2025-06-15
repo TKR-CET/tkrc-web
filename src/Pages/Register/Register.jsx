@@ -20,7 +20,7 @@ const Register = () => {
     const fetchFacultyId = async () => {
       try {
         const response = await axios.get(
-          `https://tkrcet-backend-g3zu.onrender.com/faculty/${mongoDbFacultyId}`
+          `https://tkrc-backend.vercel.app/faculty/${mongoDbFacultyId}`
         );
         setFacultyId(response.data.facultyId);
       } catch (error) {
@@ -38,7 +38,7 @@ const Register = () => {
     const fetchCombinations = async () => {
       try {
         const response = await axios.get(
-          `https://tkrcet-backend-g3zu.onrender.com/faculty/${facultyId}/unique`
+          `https://tkrc-backend.vercel.app/faculty/${facultyId}/unique`
         );
         setCombinations(response.data.uniqueCombinations || []);
       } catch (error) {
@@ -57,7 +57,7 @@ const Register = () => {
       try {
         const [year, department, section, subject] = selectedCombination.split("-");
         const response = await axios.get(
-          `https://tkrcet-backend-g3zu.onrender.com/Attendance/fetch-records?year=B.Tech ${year}&department=${department}&section=${section}&subject=${subject}`
+          `https://tkrc-backend.vercel.app/Attendance/fetch-records?year=B.Tech ${year}&department=${department}&section=${section}&subject=${subject}`
         );
 
         setAttendanceRecords(response.data.data || []);
