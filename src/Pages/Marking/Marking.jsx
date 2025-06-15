@@ -43,7 +43,7 @@ const facultyId = localStorage.getItem("facultyId"); // If stored in local stora
   const fetchStudents = async () => {
     try {
       const response = await fetch(
-        `https://tkrcet-backend-g3zu.onrender.com/Section/${programYear}/${department}/${section}/students`
+        `https://tkrc-backend.vercel.app/Section/${programYear}/${department}/${section}/students`
       );
       const result = await response.json();
       if (result.students && Array.isArray(result.students)) {
@@ -72,7 +72,7 @@ useEffect(() => {
 
     try {
       const response = await fetch(
-        `https://tkrcet-backend-g3zu.onrender.com/faculty/${facultyId}`
+        `https://tkrc-backend.vercel.app/faculty/${facultyId}`
       );
       const data = await response.json();
 
@@ -93,7 +93,7 @@ useEffect(() => {
   const fetchMarkedSubjects = async () => {
     try {
       const response = await fetch(
-        `https://tkrcet-backend-g3zu.onrender.com/Attendance/marked-subjects?date=${date}&year=${programYear}&department=${department}&section=${section}`
+        `https://tkrc-backend.vercel.app/Attendance/marked-subjects?date=${date}&year=${programYear}&department=${department}&section=${section}`
       );
       const result = await response.json();
       if (result.data && Array.isArray(result.data)) {
@@ -109,7 +109,7 @@ useEffect(() => {
   const fetchAttendanceRecord = async () => {
     try {
       const response = await fetch(
-        `https://tkrcet-backend-g3zu.onrender.com/Attendance/check?date=${date}&year=${programYear}&department=${department}&section=${section}&period=${editPeriod}`
+        `https://tkrc-backend.vercel.app/Attendance/check?date=${date}&year=${programYear}&department=${department}&section=${section}&period=${editPeriod}`
       );
       const result = await response.json();
       if (result && result.records && result.records.length > 0) {
@@ -167,7 +167,7 @@ useEffect(() => {
 
     try {
       const response = await fetch(
-        "https://tkrcet-backend-g3zu.onrender.com/Attendance/mark-attendance",
+        "https://tkrc-backend.vercel.app/Attendance/mark-attendance",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
