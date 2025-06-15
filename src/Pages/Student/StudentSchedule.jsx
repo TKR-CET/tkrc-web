@@ -60,143 +60,143 @@ const StudentTimetable = () => {
 
   return (
     <>
-     <style>{`
-    /* General Styles */
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+      <style>{`
+        * {
+          box-sizing: border-box;
+          margin: 0;
+          padding: 0;
+        }
 
-.day-column{ font-weight: bold; background: #f3f3f3; }
+        body {
+          font-family: 'Arial', sans-serif;
+          background-color: #f4f4f9;
+          color: #333;
+        }
 
-body {
-      font-family: 'Arial', sans-serif;
-      background-color: #f4f4f9;
-      color: #333;
-    }
+        .nav, .mob-nav {
+          margin-bottom: 20px;
+        }
 
-    /* Student Info Section */
-    .profile-container {
-      background-color: #fff;
-      border-radius: 10px;
-      padding: 20px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      margin-bottom: 30px;
-    }
-    .loading-text{
-     color:black;
-     text-align:center;
-     
-     }
+        .profile-container {
+          background-color: #fff;
+          border-radius: 10px;
+          padding: 20px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+          margin-bottom: 30px;
+        }
 
-    .profile-title {
-      font-size: 1.6em;
-      color: #333;
-      margin-bottom: 15px;
-    }
+        .profile-title {
+          font-size: 1.6em;
+          color: #333;
+          margin-bottom: 15px;
+        }
 
-    .profile-table {
-      width: 100%;
-      border-collapse: collapse;
-    }
+        .profile-table {
+          width: 100%;
+          border-collapse: collapse;
+        }
 
-    .profile-table th, .profile-table td {
-      padding: 12px;
-      border-bottom: 1px solid #ddd;
-    }
+        .profile-table th, .profile-table td {
+          padding: 12px;
+          border-bottom: 1px solid #ddd;
+        }
 
-    .profile-table th {
-      background-color: #6495ED;
-      color: white;
-    }
+        .profile-table th {
+          background-color: #6495ED;
+          color: white;
+        }
 
-    .profile-photo {
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
-      border: 2px solid white;
-    }
+        .profile-photo {
+          width: 100px;
+          height: 100px;
+          border-radius: 50%;
+          border: 2px solid white;
+        }
 
-    /* Timetable Section */
-    .schedule-container {
-      background-color: #fff;
-      border-radius: 10px;
-      padding: 20px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      overflow-x: auto;
-    }
+        .schedule-container {
+          background-color: #fff;
+          border-radius: 10px;
+          padding: 20px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+          overflow-x: auto;
+        }
 
-    .schedule-title {
-      font-size: 1.4em;
-      margin-bottom: 15px;
-      color: #333;
-    }
+        .schedule-title {
+          font-size: 1.4em;
+          margin-bottom: 15px;
+          color: #333;
+        }
 
-    .schedule-table {
-      width: 100%;
-      border-collapse: collapse;
-    }
+        .schedule-table {
+          width: 100%;
+          border-collapse: collapse;
+        }
 
-    .schedule-table th, .schedule-table td {
-      padding: 12px;
-      text-align: center;
-      border: 1px solid #ddd;
-    }
+        .schedule-table th, .schedule-table td {
+          padding: 12px;
+          text-align: center;
+          border: 1px solid #ddd;
+        }
 
-    .schedule-table th {
-      background-color: #6495ED;
-      color: white;
-    }
+        .schedule-table th {
+          background-color: #6495ED;
+          color: white;
+        }
 
-    .lunch-break {
-      background-color: #ffefc1;
-      font-weight: bold;
-    }
+        .lunch-break {
+          background-color: #ffefc1;
+          font-weight: bold;
+        }
 
-    /* Responsive */
-    @media (max-width: 768px) {
-      .profile-table th, .profile-table td, 
-      .schedule-table th, .schedule-table td {
-        font-size: 0.8em;
-        padding: 6px;
-      }
+        .day-column {
+          font-weight: bold;
+          background-color: #f3f3f3;
+        }
 
-      .profile-photo {
-        width: 80px;
-        height: 80px;
-      }
+        .loading-text, .error-text {
+          text-align: center;
+          font-size: 1.2em;
+          color: #333;
+          margin-top: 20px;
+        }
 
-      .schedule-table {
-        font-size: 0.8em;
-      }
+        @media (max-width: 768px) {
+          .profile-table th, .profile-table td,
+          .schedule-table th, .schedule-table td {
+            font-size: 0.8em;
+            padding: 6px;
+          }
 
-      .schedule-container {
-        padding: 10px;
-      }
+          .profile-photo {
+            width: 80px;
+            height: 80px;
+          }
 
-      .schedule-title {
-        font-size: 1.2em;
-      }
-    }
+          .schedule-container {
+            padding: 10px;
+          }
 
-    @media (max-width: 480px) {
-      .profile-photo {
-        width: 70px;
-        height: 70px;
-      }
+          .schedule-title {
+            font-size: 1.2em;
+          }
+        }
 
-      .profile-title, .schedule-title {
-        font-size: 1em;
-      }
+        @media (max-width: 480px) {
+          .profile-photo {
+            width: 70px;
+            height: 70px;
+          }
 
-      .schedule-table th, .schedule-table td {
-        font-size: 0.7em;
-        padding: 5px;
-      }
-    }
+          .profile-title, .schedule-title {
+            font-size: 1em;
+          }
 
-  `}</style>
+          .schedule-table th, .schedule-table td {
+            font-size: 0.7em;
+            padding: 5px;
+          }
+        }
+      `}</style>
 
       <Header />
       <div className="nav">
@@ -251,34 +251,28 @@ body {
               <thead>
                 <tr>
                   <th>Day</th>
-                  <th>9:40-10:40</th>
-                  <th>10:40-11:40</th>
-                  <th>11:40-12:40</th>
-                  <th>12:40-1:20</th>
-                  <th>1:20-2:20</th>
-                  <th>2:20-3:20</th>
-                  <th>3:20-4:20</th>
+                  {Array.from({ length: classSchedule[0]?.periods?.length || 7 }).map((_, i) => (
+                    <th key={i}>Period {i + 1}</th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
                 {classSchedule.map((day) => (
                   <tr key={day._id}>
                     <td className="day-column">{day.day}</td>
-                    {formatSchedule(day.periods.slice(0, 3)).map(
-                      (period, index) => (
-                        <td key={index} colSpan={period.colSpan}>
-                          {period.subject}
-                        </td>
-                      )
-                    )}
-                    <td className="lunch-break">LUNCH</td>
-                    {formatSchedule(day.periods.slice(3)).map(
-                      (period, index) => (
-                        <td key={index + 3} colSpan={period.colSpan}>
-                          {period.subject}
-                        </td>
-                      )
-                    )}
+                    {formatSchedule(day.periods).map((period, index) => (
+                      <td
+                        key={index}
+                        colSpan={period.colSpan}
+                        className={
+                          period.subject.toLowerCase().includes("lunch")
+                            ? "lunch-break"
+                            : ""
+                        }
+                      >
+                        {period.subject}
+                      </td>
+                    ))}
                   </tr>
                 ))}
               </tbody>
