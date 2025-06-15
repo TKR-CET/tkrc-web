@@ -20,7 +20,7 @@ const StudentDashboard = () => {
     }
 
     // Fetch Student Details
-    fetch(`https://tkrcet-backend-g3zu.onrender.com/Section/${studentId}`)
+    fetch(`https://tkrc-backend.vercel.app/Section/${studentId}`)
       .then((res) => res.json())
       .then((data) => {
         if (!data || !data.student) {
@@ -34,7 +34,7 @@ const StudentDashboard = () => {
 
     // Fetch Attendance Details
     fetch(
-      `https://tkrcet-backend-g3zu.onrender.com/Attendance/student-record?rollNumber=${studentId}`
+      `https://tkrc-backend.vercel.app/Attendance/student-record?rollNumber=${studentId}`
     )
       .then((res) => res.json())
       .then((data) => {
