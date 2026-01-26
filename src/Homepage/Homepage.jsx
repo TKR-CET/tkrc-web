@@ -230,7 +230,7 @@ const [loading, setLoading] = useState(false);
             {/* Footer */}
             <footer className="footer">
                 <p>Copyright © 2024 TKR College of Engineering & Technology. All Rights Reserved.</p>
-                <p>Designer, Developer & Maintenance - Mr. Md. Shakeel (TKRES)</p>
+                
             </footer>
         </div>
     );
