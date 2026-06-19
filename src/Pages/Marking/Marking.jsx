@@ -17,12 +17,11 @@ const Marking = () => {
   const editPeriod = query.get("editPeriod");
 
   const [studentsData, setStudentsData] = useState([]);
+  const [facultyName, setFacultyName] = useState("User");
+  const [phoneNumber, setPhoneNumber] = useState('Not available');
 
-const [facultyName, setFacultyName] = useState("User");
-
-const [phoneNumber, setPhoneNumber] = useState('Not available');
-
-const facultyId = localStorage.getItem("facultyId"); // If stored in local storage
+  const facultyId = localStorage.getItem("facultyId");
+  const token = localStorage.getItem("token"); // Retrieve JWT
 
   const [topic, setTopic] = useState("");
   const [remarks, setRemarks] = useState("");
@@ -43,14 +42,16 @@ const facultyId = localStorage.getItem("facultyId"); // If stored in local stora
   const fetchStudents = async () => {
     try {
       const response = await fetch(
-        `https://tkrc-backend.vercel.app/Section/${programYear}/${department}/${section}/students`
+        `https://tkrc-backend.vercel.app/Section/${programYear}/${department}/${section}/students`, {
+          headers: { "Authorization": `Bearer ${token}` } // Attach Token
+        }
       );
       const result = await response.json();
       if (result.students && Array.isArray(result.students)) {
         setStudentsData(result.students);
         setAttendance(
           result.students.reduce((acc, student) => {
-            acc[student.rollNumber] = "present"; // Default to "present"
+            acc[student.rollNumber] = "present"; 
             return acc;
           }, {})
         );
@@ -64,36 +65,36 @@ const facultyId = localStorage.getItem("facultyId"); // If stored in local stora
     }
   };
 
+  useEffect(() => {
+    const fetchFacultyDetails = async () => {
+      if (!facultyId) return;
 
+      try {
+        const response = await fetch(
+          `https://tkrc-backend.vercel.app/faculty/${facultyId}`, {
+            headers: { "Authorization": `Bearer ${token}` } // Attach Token
+          }
+        );
+        const data = await response.json();
 
-useEffect(() => {
-  const  fetchFacultyDetails = async () => {
-    if (!facultyId) return;
-
-    try {
-      const response = await fetch(
-        `https://tkrc-backend.vercel.app/faculty/${facultyId}`
-      );
-      const data = await response.json();
-
-      if (data) {
-        if (data.name) setFacultyName(data.name);
-        if (data.phoneNumber) setPhoneNumber(data.phoneNumber);
+        if (data) {
+          if (data.name) setFacultyName(data.name);
+          if (data.phoneNumber) setPhoneNumber(data.phoneNumber);
+        }
+      } catch (error) {
+        console.error("Error fetching faculty details:", error.message);
       }
-    } catch (error) {
-      console.error("Error fetching faculty details:", error.message);
-    }
-  };
+    };
 
-  fetchFacultyDetails();
-}, [facultyId]);
-
-
+    fetchFacultyDetails();
+  }, [facultyId, token]);
 
   const fetchMarkedSubjects = async () => {
     try {
       const response = await fetch(
-        `https://tkrc-backend.vercel.app/Attendance/marked-subjects?date=${date}&year=${programYear}&department=${department}&section=${section}`
+        `https://tkrc-backend.vercel.app/Attendance/marked-subjects?date=${date}&year=${programYear}&department=${department}&section=${section}`, {
+          headers: { "Authorization": `Bearer ${token}` } // Attach Token
+        }
       );
       const result = await response.json();
       if (result.data && Array.isArray(result.data)) {
@@ -109,7 +110,9 @@ useEffect(() => {
   const fetchAttendanceRecord = async () => {
     try {
       const response = await fetch(
-        `https://tkrc-backend.vercel.app/Attendance/check?date=${date}&year=${programYear}&department=${department}&section=${section}&period=${editPeriod}`
+        `https://tkrc-backend.vercel.app/Attendance/check?date=${date}&year=${programYear}&department=${department}&section=${section}&period=${editPeriod}`, {
+          headers: { "Authorization": `Bearer ${token}` } // Attach Token
+        }
       );
       const result = await response.json();
       if (result && result.records && result.records.length > 0) {
@@ -160,7 +163,7 @@ useEffect(() => {
         name: student.name,
         status: attendance[student.rollNumber],
       })),
-      editing: !!editPeriod, // Add editing flag
+      editing: !!editPeriod, 
     };
 
     setIsSubmitting(true);
@@ -170,7 +173,10 @@ useEffect(() => {
         "https://tkrc-backend.vercel.app/Attendance/mark-attendance",
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { 
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}` // Attach Token
+          },
           body: JSON.stringify(attendanceData),
         }
       );
@@ -197,203 +203,30 @@ useEffect(() => {
 
   return (
     <>
-
-     <style>{`
-    .attendanceMain {
-    padding: 20px;
-    background-color: #fff;
-    margin: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  }
-
-  .compulsoryText {
-    color: red;
-    font-weight: bold;
-  }
-
-  .attendanceHeading {
-    font-size: 19px;
-    font-weight: bold;
-    padding-top:5px;
-    margin-top:4px;
-    margin-bottom: 15px;
-    text-align: center;
-  }
-
-  .attendanceDetails {
-    margin-bottom: 20px;
-  }
-
-  .periodSelection {
-    margin-bottom: 15px;
-  }
-
-  .periodSelection label {
-    font-size: 14px;
-    margin-right: 10px;
-  }
-
-  .periodSelection input[type="checkbox"] {
-    margin-right: 6px;
-    width: 18px;
-    height: 18px;
-    cursor: pointer;
-    display: inline-block;
-  }
-
-  .subjectTopicEntry label {
-    font-size: 14px;
-    margin-top: 8px;
-    display: block;
-  }
-
-  .subjectTopicEntry input,
-  .subjectTopicEntry textarea {
-    font-size: 14px;
-    padding: 8px;
-    margin-top: 6px;
-    margin-bottom: 12px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    width: 100%;
-  }
-
-  .subjectTopicEntry textarea {
-    height: 80px;
-    resize: vertical;
-  }
-
-  #btn-submit {
-    background-color: #FF5733;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    position: relative;
-    top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    text-align: center;
-  }
-
-  #btn-submit:hover {
-    background-color: #ff704d;
-  }
-
-  button:disabled {
-    background-color: #dcdcdc;
-    cursor: not-allowed;
-  }
-
-  .attendanceList {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-  }
-
-  .attendanceList th,
-  .attendanceList td {
-    text-align: center;
-    padding: 10px;
-    border: 1.5px solid #ddd;
-  }
-
-  .attendanceList th {
-    background-color: #f7f7f7;
-    font-weight: bold;
-  }
-
-  .attendanceList td {
-    background-color: #fff;
-  }
-
-.attendanceList input[type="radio"] {
-  appearance: none;
-  -webkit-appearance: none; /* Safari */
-  width: 20px;
-  height: 20px;
-  border: 2px solid #aaa;
-  border-radius: 50%;
-  cursor: pointer;
-  background-color: white;
-}
-
-.attendanceList input[type="radio"]:checked {
-  background-color: #2ecc71; /* Green for Present */
-  border-color: #2ecc71;
-}
-
-.attendanceList input[type="radio"].absentStatus:checked {
-  background-color: #e74c3c; /* Red for Absent */
-  border-color: #e74c3c;
-}
-
-  @media (max-width: 768px) {
-    .attendanceMain {
-      margin: 15px;
-      padding: 20px;
-    }
-        .periodSelection label{
-        margin-right:4px;
-
-    .periodSelection input[type="checkbox"] {
-      margin-right: 0px !important;
-    }
-
-    .attendanceList th,
-    .attendanceList td {
-      font-size: 12px;
-      padding: 8px;
-    }
-
-    .subjectTopicEntry textarea {
-      height: 70px;
-    }
-
-    .subjectTopicEntry input,
-    .subjectTopicEntry textarea {
-      font-size: 12px;
-    }
-
-    #btn-submit {
-      font-size: 14px;
-      position:relative;
-      padding-top:5px !important;
-    }
-        .attendanceList input[type="radio"] {
-      width: 25px !important;
-      height: 25px !important;
-    }
-  }
-
-  @media (max-width: 480px) {
-    .attendanceList th,
-    .attendanceList td {
-      font-size: 11px;
-      padding: 6px;
-    }
-
-    .attendanceList input[type="radio"] {
-      width: 20px;
-      height: 20px;
-    }
-
-    .subjectTopicEntry textarea {
-      height: 60px;
-    }
-
-    #btn-submit {
-      font-size: 14px;
-      padding: 8px;
-      width: 100%;
-      left: 0;
-      transform: none;
-      top: 0;
-    }
-  }
+      {/* Existing CSS exactly as it was */}
+      <style>{`
+        .attendanceMain { padding: 20px; background-color: #fff; margin: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); }
+        .compulsoryText { color: red; font-weight: bold; }
+        .attendanceHeading { font-size: 19px; font-weight: bold; padding-top:5px; margin-top:4px; margin-bottom: 15px; text-align: center; }
+        .attendanceDetails { margin-bottom: 20px; }
+        .periodSelection { margin-bottom: 15px; }
+        .periodSelection label { font-size: 14px; margin-right: 10px; }
+        .periodSelection input[type="checkbox"] { margin-right: 6px; width: 18px; height: 18px; cursor: pointer; display: inline-block; }
+        .subjectTopicEntry label { font-size: 14px; margin-top: 8px; display: block; }
+        .subjectTopicEntry input, .subjectTopicEntry textarea { font-size: 14px; padding: 8px; margin-top: 6px; margin-bottom: 12px; border-radius: 4px; border: 1px solid #ccc; width: 100%; }
+        .subjectTopicEntry textarea { height: 80px; resize: vertical; }
+        #btn-submit { background-color: #FF5733; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; position: relative; top: 10px; left: 50%; transform: translateX(-50%); text-align: center; }
+        #btn-submit:hover { background-color: #ff704d; }
+        button:disabled { background-color: #dcdcdc; cursor: not-allowed; }
+        .attendanceList { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .attendanceList th, .attendanceList td { text-align: center; padding: 10px; border: 1.5px solid #ddd; }
+        .attendanceList th { background-color: #f7f7f7; font-weight: bold; }
+        .attendanceList td { background-color: #fff; }
+        .attendanceList input[type="radio"] { appearance: none; -webkit-appearance: none; width: 20px; height: 20px; border: 2px solid #aaa; border-radius: 50%; cursor: pointer; background-color: white; }
+        .attendanceList input[type="radio"]:checked { background-color: #2ecc71; border-color: #2ecc71; }
+        .attendanceList input[type="radio"].absentStatus:checked { background-color: #e74c3c; border-color: #e74c3c; }
+        @media (max-width: 768px) { .attendanceMain { margin: 15px; padding: 20px; } .periodSelection label{ margin-right:4px; } .periodSelection input[type="checkbox"] { margin-right: 0px !important; } .attendanceList th, .attendanceList td { font-size: 12px; padding: 8px; } .subjectTopicEntry textarea { height: 70px; } .subjectTopicEntry input, .subjectTopicEntry textarea { font-size: 12px; } #btn-submit { font-size: 14px; position:relative; padding-top:5px !important; } .attendanceList input[type="radio"] { width: 25px !important; height: 25px !important; } }
+        @media (max-width: 480px) { .attendanceList th, .attendanceList td { font-size: 11px; padding: 6px; } .attendanceList input[type="radio"] { width: 20px; height: 20px; } .subjectTopicEntry textarea { height: 60px; } #btn-submit { font-size: 14px; padding: 8px; width: 100%; left: 0; transform: none; top: 0; } }
       `}</style>
       <Header />
       <div className="nav">
