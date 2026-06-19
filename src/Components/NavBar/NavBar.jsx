@@ -15,23 +15,29 @@ function NavBar() {
   const navigate = useNavigate();
   const studentId = localStorage.getItem("studentId");
   const facultyId = localStorage.getItem("facultyId");
+  const token = localStorage.getItem("token"); // Get JWT token
 
   // Fetch user details based on ID
   const fetchUserData = async () => {
     try {
       if (facultyId) {
         const response = await axios.get(
-          `https://tkrc-backend.vercel.app/faculty/${facultyId}`
+          `https://tkrc-backend.vercel.app/faculty/${facultyId}`,
+          { headers: { Authorization: `Bearer ${token}` } } // Attach Token
         );
         setUserData(response.data);
       } else if (studentId) {
         const response = await axios.get(
-          `https://tkrcet-backend-g3zu.onrender.com/Section/${studentId}`
+          `https://tkrcet-backend-g3zu.onrender.com/Section/${studentId}`,
+          { headers: { Authorization: `Bearer ${token}` } } // Attach Token
         );
         setUserData(response.data.student);
       }
     } catch (error) {
       console.error("Error fetching user data:", error);
+      if (error.response && error.response.status === 401) {
+        handleLogout(); // Auto-logout if token is expired
+      }
     }
   };
 
@@ -42,7 +48,8 @@ function NavBar() {
     setLoading(true);
     try {
       const response = await axios.get(
-        `https://tkrc-backend.vercel.app/faculty/${userData.facultyId}/timetable-today`
+        `https://tkrc-backend.vercel.app/faculty/${userData.facultyId}/timetable-today`,
+        { headers: { Authorization: `Bearer ${token}` } } // Attach Token
       );
 
       let classes = response.data.classes || [];
@@ -75,6 +82,7 @@ function NavBar() {
   const handleLogout = () => {
     localStorage.removeItem("facultyId");
     localStorage.removeItem("studentId");
+    localStorage.removeItem("token"); // Clear Token
     navigate("/"); // Redirect to login page
   };
 
@@ -168,7 +176,7 @@ function NavBar() {
           </li>
         </ul>
       </div>
-      
+
       <div className="nav-user-profile">
         <span>Welcome, {userData?.name || "User"}</span>
         <div className="account-menu">
