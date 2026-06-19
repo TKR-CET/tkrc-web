@@ -6,20 +6,22 @@ import MobileNav from "../../Components/MobileNav/MobileNav.jsx";
 import "./Activitydiary.css";
 
 const ActivityDiary = () => {
-  const [combinations, setCombinations] = useState([]); // Dropdown options
-  const [attendanceRecords, setAttendanceRecords] = useState([]); // Attendance records for the table
-  const [selectedCombination, setSelectedCombination] = useState(""); // Selected dropdown value
-  const [providedFacultyId, setProvidedFacultyId] = useState(null); // Faculty object
-  const mongoDbFacultyId = localStorage.getItem("facultyId"); // Retrieve MongoDB _id from local storage
+  const [combinations, setCombinations] = useState([]); 
+  const [attendanceRecords, setAttendanceRecords] = useState([]); 
+  const [selectedCombination, setSelectedCombination] = useState(""); 
+  const [providedFacultyId, setProvidedFacultyId] = useState(null); 
+  const mongoDbFacultyId = localStorage.getItem("facultyId"); 
+  const token = localStorage.getItem("token"); // Retrieve JWT
 
   useEffect(() => {
-    // Fetch faculty-provided ID using MongoDB _id
     const fetchProvidedFacultyId = async () => {
       try {
         const response = await axios.get(
-          `https://tkrc-backend.vercel.app/faculty/${mongoDbFacultyId}`
+          `https://tkrc-backend.vercel.app/faculty/${mongoDbFacultyId}`, {
+            headers: { Authorization: `Bearer ${token}` } // Attach Token
+          }
         );
-        setProvidedFacultyId(response.data); // Store the faculty object
+        setProvidedFacultyId(response.data); 
       } catch (error) {
         console.error("Error fetching faculty-provided ID:", error);
       }
@@ -28,16 +30,17 @@ const ActivityDiary = () => {
     if (mongoDbFacultyId) {
       fetchProvidedFacultyId();
     }
-  }, [mongoDbFacultyId]);
+  }, [mongoDbFacultyId, token]);
 
   useEffect(() => {
-    // Fetch unique combinations using facultyId
     const fetchUniqueCombinations = async () => {
       if (!providedFacultyId) return;
 
       try {
         const response = await axios.get(
-          `https://tkrc-backend.vercel.app/faculty/${providedFacultyId.facultyId}/unique`
+          `https://tkrc-backend.vercel.app/faculty/${providedFacultyId.facultyId}/unique`, {
+            headers: { Authorization: `Bearer ${token}` } // Attach Token
+          }
         );
         setCombinations(response.data.uniqueCombinations || []);
       } catch (error) {
@@ -48,9 +51,8 @@ const ActivityDiary = () => {
     if (providedFacultyId) {
       fetchUniqueCombinations();
     }
-  }, [providedFacultyId]);
+  }, [providedFacultyId, token]);
 
-  // Fetch attendance records based on selected combination
   useEffect(() => {
     if (!selectedCombination) return;
 
@@ -58,20 +60,22 @@ const ActivityDiary = () => {
       try {
         const [year, department, section, subject] = selectedCombination.split("-");
         const response = await axios.get(
-          `https://tkrc-backend.vercel.app/Attendance/filters?year=B.Tech ${year}&department=${department}&section=${section}&subject=${subject}`
+          `https://tkrc-backend.vercel.app/Attendance/filters?year=B.Tech ${year}&department=${department}&section=${section}&subject=${subject}`, {
+            headers: { Authorization: `Bearer ${token}` } // Attach Token
+          }
         );
         setAttendanceRecords(response.data.data || []);
       } catch (error) {
         console.error("Error fetching attendance records:", error);
-        setAttendanceRecords([]); // Reset table if fetch fails
+        setAttendanceRecords([]); 
       }
     };
 
     fetchAttendanceRecords();
-  }, [selectedCombination]);
+  }, [selectedCombination, token]);
 
   const handleSelectionChange = (event) => {
-    setSelectedCombination(event.target.value); // Update selected combination
+    setSelectedCombination(event.target.value); 
   };
 
   return (
@@ -84,7 +88,6 @@ const ActivityDiary = () => {
         <MobileNav />
       </div>
       <div className="activity-container">
-        {/* Sidebar */}
         <div className="activity-sidebar">
           <select id="section-dropdown" onChange={handleSelectionChange}>
             <option value="">Select Section</option>
@@ -97,12 +100,8 @@ const ActivityDiary = () => {
               </option>
             ))}
           </select>
-          <a href="#" id="lab-link-btn">
-            
-          </a>
         </div>
 
-        {/* Main Content */}
         <div className="activity-content">
           <h2 id="activity-title">
             Activity Diary Section: {selectedCombination || "None"}
