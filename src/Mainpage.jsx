@@ -12,36 +12,34 @@ import AddSectionData from "./AddSectionData";
 import Register from "./Pages/Register/Register.jsx";
 import StudentDashboard from "./StudentDashboard";
 import StudentSchedule from "./Pages/Student/StudentSchedule";
+
 function Mainpage() {
   const location = useLocation();
 
-  // List of routes where the other components should be hidden
-  const hideComponentsPaths = ['/timetable', '/index','/attendance','/activity','/home','/mark','/register','/add','/student','/Schedule']; // Add more paths here
+  // List of routes where the Homepage should be hidden
+  const hideComponentsPaths = [
+    '/timetable', '/index','/attendance','/activity','/home',
+    '/mark','/register','/add','/student','/Schedule'
+  ];
 
   return (
     <div className="maindiv">
-      {/* Only show components if the current path is not in hideComponentsPaths */}
+      {/* Only show Homepage if current path is NOT in hideComponentsPaths */}
       {!hideComponentsPaths.includes(location.pathname) && (
-        <>
-          <Homepage/>
-
-     
-        </>
+        <Homepage/>
       )}
-     
-      <Routes>
-        <Route path="/register"  element={<Register/>}/>
- <Route path="/add" element={<AddSectionData/>}/>
-        <Route path="/timetable" element={<Timetable />} />
-<Route path="/Schedule" element={<StudentSchedule/>}/>
 
+      <Routes>
+        <Route path="/register" element={<Register/>}/>
+        <Route path="/add" element={<AddSectionData/>}/>
+        <Route path="/timetable" element={<Timetable />} />
+        <Route path="/Schedule" element={<StudentSchedule/>}/>
         <Route path="/student" element={<StudentDashboard/>}/>
         <Route path="/index" element={<Landingpage/>}/>
-                <Route path="/attendance" element={<Attendance/>}/>
-                  <Route path="/activity" element={<Activitydiary/>}/>
-  
-                  <Route path="/form" element={<AddFacultyForm/>}/>
-                  <Route path="/mark" element={<Marking/>}/>
+        <Route path="/attendance" element={<Attendance/>}/>
+        <Route path="/activity" element={<Activitydiary/>}/>
+        <Route path="/form" element={<AddFacultyForm/>}/>
+        <Route path="/mark" element={<Marking/>}/>
       </Routes>
     </div>
   );
