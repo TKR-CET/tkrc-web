@@ -27,8 +27,10 @@ function NavBar() {
         );
         setUserData(response.data);
       } else if (studentId) {
+        const cleanStudentId = studentId.trim();
+        // UPDATED TO VERCEL URL
         const response = await axios.get(
-          `https://tkrcet-backend-g3zu.onrender.com/Section/${studentId}`,
+          `https://tkrc-backend.vercel.app/Section/${encodeURIComponent(cleanStudentId)}`,
           { headers: { Authorization: `Bearer ${token}` } } // Attach Token
         );
         setUserData(response.data.student);
@@ -82,6 +84,7 @@ function NavBar() {
   const handleLogout = () => {
     localStorage.removeItem("facultyId");
     localStorage.removeItem("studentId");
+    localStorage.removeItem("loginId"); // Ensure admin loginId is cleared
     localStorage.removeItem("token"); // Clear Token
     navigate("/"); // Redirect to login page
   };
