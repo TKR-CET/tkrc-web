@@ -17,7 +17,7 @@ const Homepage = () => {
     ];
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [loading, setLoading] = useState(false);
-    
+
     // Delegate Info Data
     const delegateInfo = {
         chairman: {
@@ -78,10 +78,18 @@ const Homepage = () => {
     const [password, setPassword] = useState('D600');
     const [error, setError] = useState('');
 
+    // Helper to completely clear out ghost IDs before setting new ones
+    const clearOldSessions = () => {
+        localStorage.removeItem("facultyId");
+        localStorage.removeItem("studentId");
+        localStorage.removeItem("loginId");
+        localStorage.removeItem("token");
+    };
+
     const handleLogin = async () => {
         setLoading(true);
         setError('');
-        
+
         const cleanUsername = username.trim();
         const cleanPassword = password.trim();
 
@@ -93,19 +101,16 @@ const Homepage = () => {
             });
 
             if (facultyResponse.data.success) {
-                // Extract token and faculty data
                 const { faculty, token } = facultyResponse.data; 
                 console.log("Faculty Login Success:", faculty);
 
-                // Save ID and JWT Token
+                clearOldSessions(); // Clean the slate!
                 localStorage.setItem("facultyId", faculty.id);
                 localStorage.setItem("token", token); 
-                
+
                 toast.success(`Login Successful! Welcome, ${faculty.name}`, { position: "top-right" });
 
-                setTimeout(() => {
-                    navigate('/index');
-                }, 2000);
+                setTimeout(() => navigate('/index'), 2000);
                 return;
             }
         } catch (err) {
@@ -114,32 +119,28 @@ const Homepage = () => {
 
         try {
             console.log("Attempting Student Login...");
-            // UPDATED URL TO UNIFIED VERCEL BACKEND
             let studentResponse = await axios.post('https://tkrc-backend.vercel.app/Section/login', {
                 rollNumber: cleanUsername,
                 password: cleanPassword,
             });
 
             if (studentResponse.data.success) {
-                // Extract token and student data
                 const { student, token } = studentResponse.data;
 
                 if (student && student.id) {
-                    // Save ID and JWT Token
+                    clearOldSessions(); // Clean the slate!
                     localStorage.setItem("studentId", student.rollNumber);
                     localStorage.setItem("token", token);
 
                     toast.success(`Login Successful! Welcome, ${student.name}`, { position: "top-right" });
 
-                    setTimeout(() => {
-                        navigate('/index');
-                    }, 2000);
+                    setTimeout(() => navigate('/index'), 2000);
                     return;
                 }
             }
         } catch (err) {
             console.error("Student Login Failed:", err);
-            toast.error("Invalid credentials. Please check your username/roll number and password.", { position: "top-right" });
+            setError("Invalid credentials. Please check your username/roll number and password.");
         } finally {
             setLoading(false);
         }
@@ -233,7 +234,7 @@ const Homepage = () => {
                             onChange={(e) => setPassword(e.target.value)}
                             disabled={loading}
                         />
-                        {error && <p style={{ color: "red" }}>{error}</p>}
+                        {error && <p style={{ color: "red", marginTop: "10px", fontSize: "14px" }}>{error}</p>}
                         <button id="menu" onClick={handleLogin} disabled={loading}>
                             {loading ? 'Processing...' : 'Login'}
                         </button>
