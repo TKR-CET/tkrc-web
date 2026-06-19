@@ -9,7 +9,7 @@ import DelegatesInfo from "../Components/DelegatesInfo/DelegatesInfo.jsx"
 
 const Landingpage = () => {
 
-  // This hook forces the window to scroll to the top-left (0,0) when the page loads
+  // Forces the window to scroll to the top-left (0,0) when the page loads
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -30,7 +30,6 @@ const Landingpage = () => {
 
       <DelegatesInfo/>
       
-      {/* I added your Footer component here since it was imported but not used! */}
       <Footer /> 
     </div>
   );
