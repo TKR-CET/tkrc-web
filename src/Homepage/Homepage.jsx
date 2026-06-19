@@ -81,12 +81,15 @@ const Homepage = () => {
     const handleLogin = async () => {
         setLoading(true);
         setError('');
+        
+        const cleanUsername = username.trim();
+        const cleanPassword = password.trim();
 
         try {
             console.log("Attempting Faculty Login...");
             let facultyResponse = await axios.post('https://tkrc-backend.vercel.app/faculty/login', {
-                username,
-                password,
+                username: cleanUsername,
+                password: cleanPassword,
             });
 
             if (facultyResponse.data.success) {
@@ -111,9 +114,10 @@ const Homepage = () => {
 
         try {
             console.log("Attempting Student Login...");
-            let studentResponse = await axios.post('https://tkrcet-backend-g3zu.onrender.com/Section/login', {
-                rollNumber: username,
-                password,
+            // UPDATED URL TO UNIFIED VERCEL BACKEND
+            let studentResponse = await axios.post('https://tkrc-backend.vercel.app/Section/login', {
+                rollNumber: cleanUsername,
+                password: cleanPassword,
             });
 
             if (studentResponse.data.success) {
