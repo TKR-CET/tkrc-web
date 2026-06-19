@@ -10,12 +10,18 @@ const Register = () => {
   const [attendanceRecords, setAttendanceRecords] = useState([]);
   const [percentageData, setPercentageData] = useState([]);
   const [facultyId, setFacultyId] = useState(null);
+  
+  // NEW: State to track the loading status of the dropdown options
+  const [isLoadingDropdown, setIsLoadingDropdown] = useState(true);
 
   const mongoDbFacultyId = localStorage.getItem("facultyId");
   const token = localStorage.getItem("token"); // Retrieve JWT
 
   useEffect(() => {
-    if (!mongoDbFacultyId) return;
+    if (!mongoDbFacultyId) {
+      setIsLoadingDropdown(false);
+      return;
+    }
 
     const fetchFacultyId = async () => {
       try {
@@ -27,6 +33,7 @@ const Register = () => {
         setFacultyId(response.data.facultyId);
       } catch (error) {
         console.error("Error fetching faculty data:", error);
+        setIsLoadingDropdown(false); // Stop loading if there's an error
       }
     };
 
@@ -46,6 +53,8 @@ const Register = () => {
         setCombinations(response.data.uniqueCombinations || []);
       } catch (error) {
         console.error("Error fetching combinations:", error);
+      } finally {
+        setIsLoadingDropdown(false); // Stop loading once data is fetched
       }
     };
 
@@ -76,16 +85,31 @@ const Register = () => {
 
   return (
     <>
-      {/* Existing CSS exactly as it was */}
       <style>{`
         body { font-family: 'Arial', sans-serif; margin: 0; padding: 0; box-sizing: border-box; background-color: #f5f5f5; }
         .navbar-container, .mobile-navbar-container { background-color: #004d99; color: white; padding: 10px; text-align: center; }
         .navbar-container { display: block; }
         .mobile-navbar-container { display: none; }
         @media (max-width: 768px) { .navbar-container { display: none; } .mobile-navbar-container { display: block; } }
-        .dropdown-section { margin: 20px auto; text-align: center; padding: 0 20px; }
+        .dropdown-section { margin: 20px auto; text-align: center; padding: 0 20px; min-height: 50px; }
         .dropdown-menu { width: 100%; max-width: 300px; padding: 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); transition: border-color 0.3s; }
         .dropdown-menu:focus { border-color: #004d99; outline: none; }
+        
+        /* NEW: Spinner Animation Styles */
+        .spinner {
+          border: 4px solid rgba(0, 0, 0, 0.1);
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          border-left-color: #004d99;
+          animation: spin 1s linear infinite;
+          margin: 0 auto;
+        }
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        
         .table-header-title-container { text-align: center; margin-bottom: 20px; background-color: #ffffff; padding: 20px 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); border: 1px solid #d9d9d9; }
         .table-header-title { font-size: 22px; font-weight: 600; color: #2c3e50; text-transform: uppercase; margin: 0; letter-spacing: 1px; }
         .attendance-table-section { margin: 20px auto; width: 100%; max-width: 1200px; background-color: #fff; border-radius: 8px; box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); overflow-x: auto; }
@@ -112,21 +136,26 @@ const Register = () => {
       </div>
 
       <div className="dropdown-section">
-        <select
-          id="section-selector"
-          onChange={(e) => setSelectedCombination(e.target.value)}
-          className="dropdown-menu"
-        >
-          <option value="">Select Section</option>
-          {combinations.map((combo, index) => (
-            <option
-              key={index}
-              value={`${combo.year}-${combo.department}-${combo.section}-${combo.subject}`}
-            >
-              {combo.year} {combo.department}-{combo.section} ({combo.subject})
-            </option>
-          ))}
-        </select>
+        {/* NEW: Conditional rendering for the loading spinner or the dropdown */}
+        {isLoadingDropdown ? (
+          <div className="spinner"></div>
+        ) : (
+          <select
+            id="section-selector"
+            onChange={(e) => setSelectedCombination(e.target.value)}
+            className="dropdown-menu"
+          >
+            <option value="">Select Section</option>
+            {combinations.map((combo, index) => (
+              <option
+                key={index}
+                value={`${combo.year}-${combo.department}-${combo.section}-${combo.subject}`}
+              >
+                {combo.year} {combo.department}-{combo.section} ({combo.subject})
+              </option>
+            ))}
+          </select>
+        )}
       </div>
 
       <div className="attendance-table-section">
