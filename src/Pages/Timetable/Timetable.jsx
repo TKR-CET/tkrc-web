@@ -6,23 +6,25 @@ import "./Timetable.css";
 import Header from "../../Components/Header/Header";
 import NavBar from "../../Components/NavBar/NavBar";
 import MobileNav from "../../Components/MobileNav/MobileNav";
+
 const Timetable = () => {
     const [timetable, setTimetable] = useState(null);
     const [facultyDetails, setFacultyDetails] = useState(null);
     const [loading, setLoading] = useState(true);
     const facultyId = localStorage.getItem("facultyId");
+    const token = localStorage.getItem("token"); // Retrieve JWT
 
-    const isStudent = facultyDetails?.designation === "Student"; // You can adjust this check as needed
+    const isStudent = facultyDetails?.designation === "Student"; 
 
     useEffect(() => {
         const fetchFacultyDetails = async () => {
             try {
                 if (facultyId) {
-                    const loadingToast = toast.loading("Fetching faculty details...", {
-                        theme: "colored",
-                    });
+                    const loadingToast = toast.loading("Fetching faculty details...", { theme: "colored" });
 
-                    const response = await axios.get(`https://tkrc-backend.vercel.app/faculty/${facultyId}`);
+                    const response = await axios.get(`https://tkrc-backend.vercel.app/faculty/${facultyId}`, {
+                        headers: { Authorization: `Bearer ${token}` } // Attach Token
+                    });
                     setFacultyDetails(response.data);
                     toast.dismiss(loadingToast);
                 }
@@ -32,18 +34,18 @@ const Timetable = () => {
         };
 
         fetchFacultyDetails();
-    }, [facultyId]);
+    }, [facultyId, token]);
 
     useEffect(() => {
         const fetchTimetable = async () => {
             if (!facultyDetails) return;
 
             try {
-                const loadingToast = toast.loading("Fetching timetable...", {
-                    theme: "colored",
-                });
+                const loadingToast = toast.loading("Fetching timetable...", { theme: "colored" });
 
-                const response = await axios.get(`https://tkrc-backend.vercel.app/faculty/${facultyId}/timetable`);
+                const response = await axios.get(`https://tkrc-backend.vercel.app/faculty/${facultyId}/timetable`, {
+                    headers: { Authorization: `Bearer ${token}` } // Attach Token
+                });
                 setTimetable(response?.data?.timetable || []);
                 setLoading(false);
                 toast.dismiss(loadingToast);
@@ -54,7 +56,7 @@ const Timetable = () => {
         };
 
         fetchTimetable();
-    }, [facultyDetails]);
+    }, [facultyDetails, facultyId, token]);
 
     const processPeriods = (periods) => {
         const mergedPeriods = [];
@@ -157,7 +159,6 @@ const Timetable = () => {
                                                         </td>
                                                     ))}
 
-                                                    {/* Conditionally render lunch */}
                                                     <td className="lunch-cell">
                                                         {isStudent
                                                             ? lunchPeriod?.subject
