@@ -30,7 +30,7 @@ const Landingpage = () => {
 
       <DelegatesInfo/>
       
-      <Footer /> 
+      
     </div>
   );
 };
