@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Header from '../Components/Header/Header';
 import NavBar from '../Components/NavBar/NavBar.jsx';
 import VideoSection from '../Components/VideoSection/VideoSection.jsx';
@@ -6,23 +6,34 @@ import Footer from '../Components/Footer/Footer.jsx';
 import MobileNav from "../Components/MobileNav/MobileNav.jsx"
 import "./Landingpage.css"
 import DelegatesInfo from "../Components/DelegatesInfo/DelegatesInfo.jsx"
-const Landingpage=()=>{
+
+const Landingpage = () => {
+
+  // This hook forces the window to scroll to the top-left (0,0) when the page loads
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return(
     <div>
+      <Header />
+
+      <div className="nav">
+        <NavBar/>
+      </div>
       
-                <Header />
-                
-              <div class="nav">
-          <NavBar/>
-        </div>
-        <div class="mob-nav">
+      <div className="mob-nav">
         <MobileNav/>
-        </div>
-        
-        <VideoSection/>
-        
-          <DelegatesInfo/>
+      </div>
+
+      <VideoSection/>
+
+      <DelegatesInfo/>
+      
+      {/* I added your Footer component here since it was imported but not used! */}
+      <Footer /> 
     </div>
-    )
-}
+  );
+};
+
 export default Landingpage;
