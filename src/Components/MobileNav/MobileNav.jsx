@@ -1,9 +1,8 @@
-  
 import React, { useState, useEffect } from "react";      
 import "./MobileNav.css";      
 import { Link, useNavigate } from "react-router-dom";      
 import axios from "axios";      
-  
+
 const MenuItem = ({ label, onClick, active }) => (      
   <div      
     className={`menu-item ${active ? "active" : ""}`}      
@@ -15,11 +14,11 @@ const MenuItem = ({ label, onClick, active }) => (
     {label}      
   </div>      
 );      
-  
+
 const Dropdown = ({ children, isOpen }) => (      
   <div className={`dropdown ${isOpen ? "open" : ""}`}>{children}</div>      
 );      
-  
+
 const MobileNav = () => {      
   const [menuOpen, setMenuOpen] = useState(false);      
   const [activeMenu, setActiveMenu] = useState(null);      
@@ -28,41 +27,48 @@ const MobileNav = () => {
   const [loading, setLoading] = useState(false);      
   const [userData, setUserData] = useState(null);      
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);      
-  
+
   const facultyId = localStorage.getItem("facultyId");      
-  const studentId = localStorage.getItem("studentId");      
+  const studentId = localStorage.getItem("studentId");   
+  const token = localStorage.getItem("token"); // Get JWT token   
   const navigate = useNavigate();      
-  
+
   // Fetch user data based on role      
   const fetchUserData = async () => {      
     try {      
       if (facultyId) {      
         const response = await axios.get(      
-          `https://tkrc-backend.vercel.app/faculty/${facultyId}`      
+          `https://tkrc-backend.vercel.app/faculty/${facultyId}`,
+          { headers: { Authorization: `Bearer ${token}` } } // Attach Token
         );      
         setUserData(response.data);      
       } else if (studentId) {      
         const response = await axios.get(      
-          `https://tkrcet-backend-g3zu.onrender.com/Section/${studentId}`      
+          `https://tkrcet-backend-g3zu.onrender.com/Section/${studentId}`,
+          { headers: { Authorization: `Bearer ${token}` } } // Attach Token
         );      
         setUserData(response.data.student);      
       }      
     } catch (error) {      
-      console.error("Error fetching user data:", error);      
+      console.error("Error fetching user data:", error);  
+      if (error.response && error.response.status === 401) {
+        handleLogout(); // Auto-logout if token is expired
+      }    
     }      
   };      
-  
+
   // Fetch faculty timetable dynamically      
   const fetchClassOptions = async () => {      
     if (!userData || userData.role !== "faculty") return;      
-  
+
     setLoading(true);      
     try {      
       const response = await axios.get(      
-        `https://tkrc-backend.vercel.app/faculty/${userData.facultyId}/timetable-today`      
+        `https://tkrc-backend.vercel.app/faculty/${userData.facultyId}/timetable-today`,
+        { headers: { Authorization: `Bearer ${token}` } } // Attach Token
       );      
       const classes = response.data.classes || [];      
-  
+
       // Remove empty periods and duplicate classes      
       const uniqueClasses = classes.filter((period, index, self) => {      
         return (      
@@ -76,7 +82,7 @@ const MobileNav = () => {
           ) === index      
         );      
       });      
-  
+
       setClassOptions(uniqueClasses);      
     } catch (error) {      
       console.error("Error fetching class options:", error);      
@@ -85,14 +91,15 @@ const MobileNav = () => {
       setLoading(false);      
     }      
   };      
-  
+
   // Logout function      
   const handleLogout = () => {      
     localStorage.removeItem("facultyId");      
-    localStorage.removeItem("studentId");      
+    localStorage.removeItem("studentId");   
+    localStorage.removeItem("token"); // Clear Token   
     navigate("/"); // Redirect to login page      
   };      
-  
+
   // Toggle main menu      
   const toggleMenu = () => {      
     setMenuOpen(!menuOpen);      
@@ -100,7 +107,7 @@ const MobileNav = () => {
     setShowDynamicClasses(false);      
     setAccountMenuOpen(false);      
   };      
-  
+
   // Handle class selection for faculty      
   const handleClassSelect = (option) => {      
     const { programYear, department, section, subject } = option;      
@@ -108,7 +115,7 @@ const MobileNav = () => {
       `/attendance?programYear=${programYear}&department=${department}&section=${section}&subject=${subject}`      
     );      
   };      
-  
+
   // Handle Attendance Click      
   const handleAttendanceClick = () => {      
     if (userData?.role === "student") {      
@@ -117,19 +124,19 @@ const MobileNav = () => {
       setActiveMenu(activeMenu === "attendance" ? null : "attendance");      
     }      
   };      
-  
+
   // Fetch user data on component mount      
   useEffect(() => {      
     fetchUserData();      
   }, []);      
-  
+
   // Fetch faculty's timetable once data is available      
   useEffect(() => {      
     if (userData?.role === "faculty") {      
       fetchClassOptions();      
     }      
   }, [userData]);      
-  
+
   return (      
     <div className="mobile-nav-container">      
       <div className="header">      
@@ -142,28 +149,28 @@ const MobileNav = () => {
           {menuOpen ? "X" : "☰"}      
         </button>      
       </div>      
-  
+
       {menuOpen && (      
         <div className="menu">      
           <span className="user-welcome">Welcome, {userData?.name || "User"}</span>      
-  
+
           <Link id="h" to="/index">      
             <MenuItem label="Home" />      
           </Link>      
-  
+
           <Link id="h" to={studentId ? "/Schedule" : "/timetable"}>      
             <MenuItem  label="Timetable" />      
           </Link>      
-  
+
           <MenuItem label="Notifications" />      
-  
+
           {/* Attendance Menu */}      
           <MenuItem      
             label="Attendance"      
             onClick={handleAttendanceClick}      
             active={activeMenu === "attendance"}      
           />      
-  
+
           {activeMenu === "attendance" && (      
             <Dropdown isOpen>      
               {userData?.role === "faculty" ? (      
@@ -202,7 +209,7 @@ const MobileNav = () => {
               )}      
             </Dropdown>      
           )}      
-  
+
           {/* Account Menu */}      
           <MenuItem      
             label="Account"      
@@ -220,7 +227,5 @@ const MobileNav = () => {
     </div>      
   );      
 };      
-  
+
 export default MobileNav;      
-  
-  
