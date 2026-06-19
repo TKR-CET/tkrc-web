@@ -7,45 +7,66 @@ const StudentTimetable = () => {
   const [studentInfo, setStudentInfo] = useState(null);
   const [classSchedule, setClassSchedule] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState("");
 
   useEffect(() => {
-    const studentId = localStorage.getItem("studentId");
+    const rawStudentId = localStorage.getItem("studentId");
     const token = localStorage.getItem("token"); // Retrieve JWT
 
-    if (studentId) {
-      fetch(`https://tkrcet-backend-g3zu.onrender.com/Section/${studentId}`, {
+    if (rawStudentId) {
+      const studentId = rawStudentId.trim(); // Clean up any accidental spaces
+
+      // UPDATED TO VERCEL URL
+      fetch(`https://tkrc-backend.vercel.app/Section/${encodeURIComponent(studentId)}`, {
         headers: { Authorization: `Bearer ${token}` } // Attach Token
       })
-        .then((response) => response.json())
+        .then(async (response) => {
+          if (!response.ok) {
+            const errData = await response.json().catch(() => ({}));
+            throw new Error(errData.message || "Failed to fetch student data.");
+          }
+          return response.json();
+        })
         .then((data) => {
+          if (!data || !data.student) {
+            throw new Error("Student details not found!");
+          }
+          
           setStudentInfo(data.student);
           const { year, department, section } = data.student;
-          fetch(
+          
+          return fetch(
             `https://tkrc-backend.vercel.app/Section/${year}/${department}/${section}/timetable`, {
               headers: { Authorization: `Bearer ${token}` } // Attach Token
             }
-          )
-            .then((response) => response.json())
-            .then((data) => {
-              setClassSchedule(data.timetable);
-              setIsLoading(false);
-            })
-            .catch((error) => {
-              console.error("Error fetching timetable:", error);
-              setIsLoading(false);
-            });
+          );
+        })
+        .then(async (response) => {
+          if (!response.ok) {
+            const errData = await response.json().catch(() => ({}));
+            throw new Error(errData.message || "Failed to fetch timetable.");
+          }
+          return response.json();
+        })
+        .then((data) => {
+          setClassSchedule(data.timetable || []);
+          setIsLoading(false);
         })
         .catch((error) => {
-          console.error("Error fetching student details:", error);
+          console.error("Error:", error);
+          setErrorMsg(error.message);
           setIsLoading(false);
         });
     } else {
       console.error("No studentId found in localStorage");
+      setErrorMsg("Student ID missing. Please log in again.");
       setIsLoading(false);
     }
   }, []);
 
   const formatSchedule = (periods) => {
+    if (!periods) return [];
+    
     let mergedPeriods = [];
     let i = 0;
 
@@ -66,7 +87,6 @@ const StudentTimetable = () => {
 
   return (
     <>
-      {/* Your exact existing CSS logic goes here */}
       <style>{`
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Arial', sans-serif; background-color: #f4f4f9; color: #333; }
@@ -76,7 +96,7 @@ const StudentTimetable = () => {
         .profile-table { width: 100%; border-collapse: collapse; }
         .profile-table th, .profile-table td { padding: 12px; border-bottom: 1px solid #ddd; }
         .profile-table th { background-color: #6495ED; color: white; }
-        .profile-photo { width: 100px; height: 100px; border-radius: 50%; border: 2px solid white; }
+        .profile-photo { width: 100px; height: 100px; border-radius: 50%; border: 2px solid white; object-fit: cover; }
         .schedule-container { background-color: #fff; border-radius: 10px; padding: 20px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); overflow-x: auto; }
         .schedule-title { font-size: 1.4em; margin-bottom: 15px; color: #333; }
         .schedule-table { width: 100%; border-collapse: collapse; }
@@ -85,6 +105,7 @@ const StudentTimetable = () => {
         .lunch-break { background-color: #ffefc1; font-weight: bold; }
         .day-column { font-weight: bold; background-color: #f3f3f3; }
         .loading-text, .error-text { text-align: center; font-size: 1.2em; color: #333; margin-top: 20px; }
+        .error-text { color: red; }
         @media (max-width: 768px) { .profile-table th, .profile-table td, .schedule-table th, .schedule-table td { font-size: 0.8em; padding: 6px; } .profile-photo { width: 80px; height: 80px; } .schedule-container { padding: 10px; } .schedule-title { font-size: 1.2em; } }
         @media (max-width: 480px) { .profile-photo { width: 70px; height: 70px; } .profile-title, .schedule-title { font-size: 1em; } .schedule-table th, .schedule-table td { font-size: 0.7em; padding: 5px; } }
       `}</style>
@@ -99,6 +120,8 @@ const StudentTimetable = () => {
 
       {isLoading ? (
         <div className="loading-text">Loading...</div>
+      ) : errorMsg ? (
+        <div className="error-text">{errorMsg}</div>
       ) : !studentInfo ? (
         <div className="error-text">Student details not found!</div>
       ) : (
@@ -111,7 +134,7 @@ const StudentTimetable = () => {
                   <th>Roll No.</th>
                   <td>{studentInfo.rollNumber}</td>
                   <td rowSpan="4">
-                    <img src={studentInfo.image} alt="Student" className="profile-photo" />
+                    <img src={studentInfo.image || "/images/logo.png"} alt="Student" className="profile-photo" />
                   </td>
                 </tr>
                 <tr>
@@ -132,32 +155,36 @@ const StudentTimetable = () => {
 
           <div className="schedule-container">
             <h1 className="schedule-title">Class Timetable</h1>
-            <table className="schedule-table">
-              <thead>
-                <tr>
-                  <th>Day</th>
-                  {Array.from({ length: classSchedule[0]?.periods?.length || 7 }).map((_, i) => (
-                    <th key={i}>Period {i + 1}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {classSchedule.map((day) => (
-                  <tr key={day._id}>
-                    <td className="day-column">{day.day}</td>
-                    {formatSchedule(day.periods).map((period, index) => (
-                      <td
-                        key={index}
-                        colSpan={period.colSpan}
-                        className={period.subject.toLowerCase().includes("lunch") ? "lunch-break" : ""}
-                      >
-                        {period.subject}
-                      </td>
+            {classSchedule.length === 0 ? (
+              <p className="loading-text" style={{fontSize: "1rem"}}>No timetable configured for this section yet.</p>
+            ) : (
+              <table className="schedule-table">
+                <thead>
+                  <tr>
+                    <th>Day</th>
+                    {Array.from({ length: classSchedule[0]?.periods?.length || 7 }).map((_, i) => (
+                      <th key={i}>Period {i + 1}</th>
                     ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {classSchedule.map((day) => (
+                    <tr key={day._id || day.day}>
+                      <td className="day-column">{day.day}</td>
+                      {formatSchedule(day.periods).map((period, index) => (
+                        <td
+                          key={index}
+                          colSpan={period.colSpan}
+                          className={period.subject.toLowerCase().includes("lunch") ? "lunch-break" : ""}
+                        >
+                          {period.subject}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
         </>
       )}
