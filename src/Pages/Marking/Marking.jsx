@@ -47,14 +47,19 @@ const Marking = () => {
         }
       );
       const result = await response.json();
+      
       if (result.students && Array.isArray(result.students)) {
         setStudentsData(result.students);
-        setAttendance(
-          result.students.reduce((acc, student) => {
-            acc[student.rollNumber] = "present"; 
-            return acc;
-          }, {})
-        );
+        
+        // FIX: Only set default "present" if we are NOT editing an existing record
+        if (!editPeriod) {
+          setAttendance(
+            result.students.reduce((acc, student) => {
+              acc[student.rollNumber] = "present"; 
+              return acc;
+            }, {})
+          );
+        }
       } else {
         throw new Error("Failed to fetch students.");
       }
@@ -203,7 +208,6 @@ const Marking = () => {
 
   return (
     <>
-      {/* Existing CSS exactly as it was */}
       <style>{`
         .attendanceMain { padding: 20px; background-color: #fff; margin: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); }
         .compulsoryText { color: red; font-weight: bold; }
