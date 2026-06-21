@@ -11,6 +11,7 @@ const Timetable = () => {
     const [timetable, setTimetable] = useState(null);
     const [facultyDetails, setFacultyDetails] = useState(null);
     const [loading, setLoading] = useState(true);
+    
     const facultyId = localStorage.getItem("facultyId");
     const token = localStorage.getItem("token"); // Retrieve JWT
 
@@ -43,9 +44,11 @@ const Timetable = () => {
             try {
                 const loadingToast = toast.loading("Fetching timetable...", { theme: "colored" });
 
-                const response = await axios.get(`https://tkrc-backend.vercel.app/faculty/${facultyId}/timetable`, {
+                // Added a timestamp cache-buster to force the browser to get fresh data
+                const response = await axios.get(`https://tkrc-backend.vercel.app/faculty/${facultyId}/timetable?t=${new Date().getTime()}`, {
                     headers: { Authorization: `Bearer ${token}` } // Attach Token
                 });
+                
                 setTimetable(response?.data?.timetable || []);
                 setLoading(false);
                 toast.dismiss(loadingToast);
@@ -58,16 +61,21 @@ const Timetable = () => {
         fetchTimetable();
     }, [facultyDetails, facultyId, token]);
 
+    // FIXED: Now checks if Subject, Year, Department, AND Section match before merging!
     const processPeriods = (periods) => {
         const mergedPeriods = [];
         let i = 0;
+        
         while (i < periods.length) {
             let span = 1;
             while (
                 i + span < periods.length &&
                 periods[i] &&
                 periods[i + span] &&
-                periods[i].subject === periods[i + span].subject
+                periods[i].subject === periods[i + span].subject &&
+                periods[i].year === periods[i + span].year && 
+                periods[i].department === periods[i + span].department && 
+                periods[i].section === periods[i + span].section
             ) {
                 span++;
             }
@@ -140,9 +148,12 @@ const Timetable = () => {
                                     </thead>
                                     <tbody>
                                         {timetable.map((dayData, index) => {
-                                            const periods = [...Array(7)].map((_, i) =>
-                                                dayData.periods.find((p) => p.periodNumber === i + 1) || null
-                                            );
+                                            // Safely map 7 periods, taking the LAST valid one to override old manual data
+                                            const periods = [...Array(7)].map((_, i) => {
+                                                const matchingPeriods = dayData.periods.filter((p) => p.periodNumber === i + 1);
+                                                // Grabs the newest period in the array (the auto-synced one)
+                                                return matchingPeriods.length > 0 ? matchingPeriods[matchingPeriods.length - 1] : null;
+                                            });
 
                                             const periodsBeforeLunch = processPeriods(periods.slice(0, 3));
                                             const lunchPeriod = periods[3]; // 12:40-1:20
@@ -154,7 +165,7 @@ const Timetable = () => {
                                                     {periodsBeforeLunch.map((merged, i) => (
                                                         <td key={i} colSpan={merged.span} className="period-cell">
                                                             {merged.period
-                                                                ? `${merged.period.subject} (${merged.period.year}, ${merged.period.section}, ${merged.period.department || "N/A"})`
+                                                                ? `${merged.period.subject} (${merged.period.year || ""}, ${merged.period.department || ""}-${merged.period.section || ""})`
                                                                 : ""}
                                                         </td>
                                                     ))}
@@ -162,7 +173,7 @@ const Timetable = () => {
                                                     <td className="lunch-cell">
                                                         {isStudent
                                                             ? lunchPeriod?.subject
-                                                                ? `${lunchPeriod.subject} (${lunchPeriod.year}, ${lunchPeriod.section}, ${lunchPeriod.department || "N/A"})`
+                                                                ? `${lunchPeriod.subject} (${lunchPeriod.year || ""}, ${lunchPeriod.department || ""}-${lunchPeriod.section || ""})`
                                                                 : ""
                                                             : "LUNCH"}
                                                     </td>
@@ -170,7 +181,7 @@ const Timetable = () => {
                                                     {periodsAfterLunch.map((merged, i) => (
                                                         <td key={i + 4} colSpan={merged.span} className="period-cell">
                                                             {merged.period
-                                                                ? `${merged.period.subject} (${merged.period.year}, ${merged.period.section}, ${merged.period.department || "N/A"})`
+                                                                ? `${merged.period.subject} (${merged.period.year || ""}, ${merged.period.department || ""}-${merged.period.section || ""})`
                                                                 : ""}
                                                         </td>
                                                     ))}
