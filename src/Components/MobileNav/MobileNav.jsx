@@ -193,7 +193,7 @@ const MobileNav = () => {
                         classOptions.map((option, index) => (      
                           <MenuItem      
                             key={index}      
-                            label={`${option.programYear} ${option.department}-${option.section} - ${option.subject}`}      
+                            label={`${option.programYear} ${option.department}-${option.section} - ${option.subject}`.replace(/B\.Tech\s+B\.Tech/gi, 'B.Tech')}      
                             onClick={() => handleClassSelect(option)}      
                           />      
                         ))      
@@ -231,4 +231,4 @@ const MobileNav = () => {
   );      
 };      
 
-export default MobileNav;      
+export default MobileNav;
