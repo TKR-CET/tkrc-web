@@ -242,7 +242,7 @@ const Marking = () => {
       <div className="attendanceMain">
         <h2>{editPeriod ? `Editing Attendance for Period ${editPeriod}` : "Mark Attendance"}</h2>
         <p>
-          Year: {programYear} | Department: {department} | Section: {section} |
+          Year: {(programYear || "").replace(/B\.Tech\s+B\.Tech/gi, 'B.Tech')} | Department: {department} | Section: {section} |
           Subject: {subject}
         </p>
         <div className="periodSelection">
