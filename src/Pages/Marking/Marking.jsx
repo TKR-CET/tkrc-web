@@ -10,10 +10,14 @@ const Marking = () => {
   const query = new URLSearchParams(location.search);
 
   const date = query.get("date") || new Date().toISOString().split("T")[0];
-  const programYear = query.get("programYear");
-  const department = query.get("department");
-  const section = query.get("section");
-  const subject = query.get("subject");
+  
+  // FIX: Clean the program year immediately so the API call uses the correct string
+  const rawProgramYear = query.get("programYear") || "";
+  const programYear = rawProgramYear.replace(/B\.Tech\s+B\.Tech/gi, 'B.Tech');
+  
+  const department = query.get("department") || "";
+  const section = query.get("section") || "";
+  const subject = query.get("subject") || "";
   const editPeriod = query.get("editPeriod");
 
   const [studentsData, setStudentsData] = useState([]);
@@ -41,11 +45,17 @@ const Marking = () => {
 
   const fetchStudents = async () => {
     try {
+      // FIX: Added encodeURIComponent to handle spaces in "B.Tech I" properly in the URL
       const response = await fetch(
-        `https://tkrc-backend.vercel.app/Section/${programYear}/${department}/${section}/students`, {
+        `https://tkrc-backend.vercel.app/Section/${encodeURIComponent(programYear)}/${encodeURIComponent(department)}/${encodeURIComponent(section)}/students`, {
           headers: { "Authorization": `Bearer ${token}` } // Attach Token
         }
       );
+      
+      if (!response.ok) {
+         throw new Error("Failed to fetch students. Server returned " + response.status);
+      }
+      
       const result = await response.json();
 
       if (result.students && Array.isArray(result.students)) {
@@ -61,7 +71,7 @@ const Marking = () => {
           );
         }
       } else {
-        throw new Error("Failed to fetch students.");
+        throw new Error("Invalid data format received from server.");
       }
     } catch (error) {
       alert(`Error: ${error.message}`);
@@ -97,7 +107,7 @@ const Marking = () => {
   const fetchMarkedSubjects = async () => {
     try {
       const response = await fetch(
-        `https://tkrc-backend.vercel.app/Attendance/marked-subjects?date=${date}&year=${programYear}&department=${department}&section=${section}`, {
+        `https://tkrc-backend.vercel.app/Attendance/marked-subjects?date=${date}&year=${encodeURIComponent(programYear)}&department=${encodeURIComponent(department)}&section=${encodeURIComponent(section)}`, {
           headers: { "Authorization": `Bearer ${token}` } // Attach Token
         }
       );
@@ -115,7 +125,7 @@ const Marking = () => {
   const fetchAttendanceRecord = async () => {
     try {
       const response = await fetch(
-        `https://tkrc-backend.vercel.app/Attendance/check?date=${date}&year=${programYear}&department=${department}&section=${section}&period=${editPeriod}`, {
+        `https://tkrc-backend.vercel.app/Attendance/check?date=${date}&year=${encodeURIComponent(programYear)}&department=${encodeURIComponent(department)}&section=${encodeURIComponent(section)}&period=${editPeriod}`, {
           headers: { "Authorization": `Bearer ${token}` } // Attach Token
         }
       );
@@ -242,7 +252,8 @@ const Marking = () => {
       <div className="attendanceMain">
         <h2>{editPeriod ? `Editing Attendance for Period ${editPeriod}` : "Mark Attendance"}</h2>
         <p>
-          Year: {(programYear || "").replace(/B\.Tech\s+B\.Tech/gi, 'B.Tech')} | Department: {department} | Section: {section} |
+          {/* Since we cleaned programYear at the top, we just use the variable here */}
+          Year: {programYear} | Department: {department} | Section: {section} |
           Subject: {subject}
         </p>
         <div className="periodSelection">
