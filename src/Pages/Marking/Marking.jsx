@@ -10,14 +10,10 @@ const Marking = () => {
   const query = new URLSearchParams(location.search);
 
   const date = query.get("date") || new Date().toISOString().split("T")[0];
-  
-  // FIX: Extract the raw year and strip out "B.Tech" to get just the year value (e.g., "III")
-  const rawProgramYear = query.get("programYear") || "";
-  const programYear = rawProgramYear.replace(/B\.?Tech\s*/gi, "").trim(); 
-  
+  const programYear = query.get("programYear");
   const department = query.get("department");
   const section = query.get("section");
-  const subject = query.get("subject") || "";
+  const subject = query.get("subject");
   const editPeriod = query.get("editPeriod");
 
   const [studentsData, setStudentsData] = useState([]);
@@ -158,7 +154,7 @@ const Marking = () => {
 
     const attendanceData = {
       date,
-      year: programYear, // Now purely the year string
+      year: programYear,
       department,
       section,
       subject,
