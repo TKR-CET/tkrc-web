@@ -150,7 +150,7 @@ function NavBar() {
                               key={index}
                               onClick={() => handleClassSelect(option)}
                             >
-                              {`${option.programYear} ${option.department}-${option.section} - ${option.subject}`}
+                              {`${option.programYear} ${option.department}-${option.section} - ${option.subject}`.replace(/B\.Tech\s+B\.Tech/gi, 'B.Tech')}
                             </li>
                           ))
                         )
