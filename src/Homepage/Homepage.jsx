@@ -36,9 +36,9 @@ const Homepage = () => {
             description: "The motive of TKRES is to develop a global perspective to cope - up with the fast changing technology scenario. In addition to this, values with discipline are the hallmark of our college, besides, ensuring quality of the students; here the emphasis is not only on academic excellence but the development of the overall total personality of a student.We take special care to ensure that new ideas are not merely discussed here but executed.We are confident that in due course, promises will become 'Achievements' in their respective fields. I am delighted that TKRES has published the College Souvenir-2011."
         },
         principal: {
-            name: "Dr. D. V. Ravi Shankar",
-            photo: "../images/tkr-principal.webp",
-            description: "Dr. D. V. Ravi Shankar, Principal, TKR College of Engineering & Technology had obtained his AMIE from Institution of Engineers in the year 1987. He completed his M.Tech in Materials Engineering from Regional Engineering College (REC) presently NIT, Suratkal in the year 1994. He presented his M.Tech thesis paper at ISRO, Bangalore. He obtained is Ph.D in the branch of Mechanical Engineering in the year 2010 from JNT University, Hyderabad under the guidance of Dr.P. Rami Reddy, former Registrar, JNTUH. He has totally 23 years of experience which."
+            name: "Dr. A. Ramaswami Reddy",
+            photo: "https://res.cloudinary.com/dppiuypop/image/upload/v1782124735/uploads/hn4wnavdthp4tiwba5or.webp",
+            description: "Dr. A. Ramaswami Reddy is the Principal of TKRCET and an eminent academician with more than 25 years of experience in teaching, research, and academic administration. He obtained his Ph.D. in Computer Science and Engineering from JNTU Kakinada. Over the years, he has served in various prestigious positions such as Professor, Principal, Dean, Vice Chancellor, and Controller of Examinations. He is known for his strong leadership qualities, administrative excellence, and dedication to academic standards. He has published more than 75 research papers, delivered over 35 guest lectures, and organized more than 25 workshops. In recognition of his outstanding contributions to education, innovation, and research, Dr. Ramaswami Reddy has received several prestigious awards including the Dr. S. Radhakrishnan Bharat Shiksha Award, Faculty Excellence Award, and Outstanding Leadership Award, and has secured notable grants such as the Microsoft AI for Earth Grant."
         },
         dean: {
             name: "Dr. A. Suresh Rao",
@@ -173,7 +173,7 @@ const Homepage = () => {
 
                         The person puts in all his efforts to see the students excelling themselves and takes great pride in watching them carve out a niche for themselves is none other than Dr. T. Harinath Reddy, the Secretary of the college. A calm and serene countenance with sharp, twinkling eyes, he is the pivotal of encouragement and is always on the look out for avenues, which would provide the wherewithal for developing a cutting edge to their capabilities and potentialities.
 
-                        The college is headed by eminent principal Dr. D. V. Ravi Shankar. He obtained his AMIE in Mechanical Engineering, M.Tech and Ph.D from JNT University, Hyderabad. He published various research papers in national and international journals.
+                        The college is headed by eminent principal Dr. A. Ramaswami Reddy. He obtained his Ph.D. in Computer Science and Engineering from Jawaharlal Nehru Technological University Kakinada. He has published more than 75 research papers in reputed international journals and received several prestigious awards for his outstanding contributions to education, innovation, and research.
 
                         The College is affiliated to Jawaharlal Nehru Technological University Kukatpally, Hyderabd. It has been approved by AICTE, New Delhi and the State Government of Telangana and has been sanctioned seven UG courses - Civil Engineering, Electrical & Electronics Engineering, Computer Science & Engineering, Electronics & Communication Engineering, Mechanical Engineering and PG Courses - M.Tech in CSE, PE & MBA. In addition the College is running second shift Polytechnic in the branches - CIVIL, EEE, MECH, ECE & CSE.</p>
                     </div>
