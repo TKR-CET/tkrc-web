@@ -10,10 +10,14 @@ const Marking = () => {
   const query = new URLSearchParams(location.search);
 
   const date = query.get("date") || new Date().toISOString().split("T")[0];
-  const programYear = query.get("programYear");
+  
+  // FIX: Extract the raw year and strip out "B.Tech" to get just the year value (e.g., "III")
+  const rawProgramYear = query.get("programYear") || "";
+  const programYear = rawProgramYear.replace(/B\.?Tech\s*/gi, "").trim(); 
+  
   const department = query.get("department");
   const section = query.get("section");
-  const subject = query.get("subject");
+  const subject = query.get("subject") || "";
   const editPeriod = query.get("editPeriod");
 
   const [studentsData, setStudentsData] = useState([]);
@@ -47,10 +51,10 @@ const Marking = () => {
         }
       );
       const result = await response.json();
-      
+
       if (result.students && Array.isArray(result.students)) {
         setStudentsData(result.students);
-        
+
         // FIX: Only set default "present" if we are NOT editing an existing record
         if (!editPeriod) {
           setAttendance(
@@ -154,7 +158,7 @@ const Marking = () => {
 
     const attendanceData = {
       date,
-      year: programYear,
+      year: programYear, // Now purely the year string
       department,
       section,
       subject,
