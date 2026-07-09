@@ -11,8 +11,11 @@ const Register = () => {
   const [percentageData, setPercentageData] = useState([]);
   const [facultyId, setFacultyId] = useState(null);
 
-  // NEW: State to track the loading status of the dropdown options
+  // State to track the loading status of the dropdown options
   const [isLoadingDropdown, setIsLoadingDropdown] = useState(true);
+  
+  // NEW: State to track if the table data is currently being fetched
+  const [isFetchingTableData, setIsFetchingTableData] = useState(false);
 
   const mongoDbFacultyId = localStorage.getItem("facultyId");
   const token = localStorage.getItem("token"); // Retrieve JWT
@@ -33,7 +36,7 @@ const Register = () => {
         setFacultyId(response.data.facultyId);
       } catch (error) {
         console.error("Error fetching faculty data:", error);
-        setIsLoadingDropdown(false); // Stop loading if there's an error
+        setIsLoadingDropdown(false); 
       }
     };
 
@@ -54,7 +57,7 @@ const Register = () => {
       } catch (error) {
         console.error("Error fetching combinations:", error);
       } finally {
-        setIsLoadingDropdown(false); // Stop loading once data is fetched
+        setIsLoadingDropdown(false); 
       }
     };
 
@@ -65,14 +68,13 @@ const Register = () => {
     if (!selectedCombination) return;
 
     const fetchAttendanceRecords = async () => {
+      // NEW: Start the loading spinner inside the table
+      setIsFetchingTableData(true);
+      
       try {
-        // FIX 1: Split using the new safe '|' delimiter
         const [year, department, section, subject] = selectedCombination.split("|");
-        
-        // FIX 2: Prevent duplicating "B.Tech" if it's already in the string
         const formattedYear = year.includes("B.Tech") ? year : `B.Tech ${year}`;
 
-        // FIX 3: Encode the URI components to handle spaces safely
         const response = await axios.get(
           `https://tkrc-backend.vercel.app/Attendance/fetch-records?year=${encodeURIComponent(formattedYear)}&department=${encodeURIComponent(department)}&section=${encodeURIComponent(section)}&subject=${encodeURIComponent(subject)}`, {
             headers: { Authorization: `Bearer ${token}` } // Attach Token
@@ -83,6 +85,12 @@ const Register = () => {
         setPercentageData(response.data.percentageData || []);
       } catch (error) {
         console.error("Error fetching attendance records:", error);
+        // If there's an error, clear the table data so old data doesn't sit there
+        setAttendanceRecords([]);
+        setPercentageData([]);
+      } finally {
+        // NEW: Stop the loading spinner once the request completes
+        setIsFetchingTableData(false);
       }
     };
 
@@ -101,7 +109,6 @@ const Register = () => {
         .dropdown-menu { width: 100%; max-width: 300px; padding: 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); transition: border-color 0.3s; }
         .dropdown-menu:focus { border-color: #004d99; outline: none; }
         
-        /* NEW: Spinner Animation Styles */
         .spinner {
           border: 4px solid rgba(0, 0, 0, 0.1);
           width: 36px;
@@ -154,7 +161,6 @@ const Register = () => {
             {combinations.map((combo, index) => (
               <option
                 key={index}
-                // FIX 1: Changing this value to use '|' instead of '-'
                 value={`${combo.year}|${combo.department}|${combo.section}|${combo.subject}`}
               >
                 {combo.year} {combo.department}-{combo.section} ({combo.subject})
@@ -167,7 +173,6 @@ const Register = () => {
       <div className="attendance-table-section">
         <div className="table-header-title-container">
           <h3 className="table-header-title">
-            {/* Replaces the pipes with a hyphen for a cleaner display title */}
             Attendance Register ({selectedCombination ? selectedCombination.replace(/\|/g, " - ") : "None"}) - {new Date().getFullYear()}
           </h3>
         </div>
@@ -199,9 +204,17 @@ const Register = () => {
               </tr>
             </thead>
             <tbody>
-              {percentageData.length === 0 ? (
+              {/* NEW: 3-way conditional rendering: Loading -> Empty -> Data */}
+              {isFetchingTableData ? (
                 <tr>
-                  <td className="no-attendance-data" colSpan={attendanceRecords.length + 4}>
+                  {/* Using a high colSpan to ensure it spans across the entire table width */}
+                  <td colSpan="100" style={{ padding: "40px 0" }}>
+                    <div className="spinner"></div>
+                  </td>
+                </tr>
+              ) : percentageData.length === 0 ? (
+                <tr>
+                  <td className="no-attendance-data" colSpan="100">
                     No attendance records found
                   </td>
                 </tr>
