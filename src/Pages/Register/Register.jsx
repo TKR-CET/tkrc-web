@@ -10,7 +10,7 @@ const Register = () => {
   const [attendanceRecords, setAttendanceRecords] = useState([]);
   const [percentageData, setPercentageData] = useState([]);
   const [facultyId, setFacultyId] = useState(null);
-  
+
   // NEW: State to track the loading status of the dropdown options
   const [isLoadingDropdown, setIsLoadingDropdown] = useState(true);
 
@@ -66,9 +66,15 @@ const Register = () => {
 
     const fetchAttendanceRecords = async () => {
       try {
-        const [year, department, section, subject] = selectedCombination.split("-");
+        // FIX 1: Split using the new safe '|' delimiter
+        const [year, department, section, subject] = selectedCombination.split("|");
+        
+        // FIX 2: Prevent duplicating "B.Tech" if it's already in the string
+        const formattedYear = year.includes("B.Tech") ? year : `B.Tech ${year}`;
+
+        // FIX 3: Encode the URI components to handle spaces safely
         const response = await axios.get(
-          `https://tkrc-backend.vercel.app/Attendance/fetch-records?year=B.Tech ${year}&department=${department}&section=${section}&subject=${subject}`, {
+          `https://tkrc-backend.vercel.app/Attendance/fetch-records?year=${encodeURIComponent(formattedYear)}&department=${encodeURIComponent(department)}&section=${encodeURIComponent(section)}&subject=${encodeURIComponent(subject)}`, {
             headers: { Authorization: `Bearer ${token}` } // Attach Token
           }
         );
@@ -136,7 +142,6 @@ const Register = () => {
       </div>
 
       <div className="dropdown-section">
-        {/* NEW: Conditional rendering for the loading spinner or the dropdown */}
         {isLoadingDropdown ? (
           <div className="spinner"></div>
         ) : (
@@ -149,7 +154,8 @@ const Register = () => {
             {combinations.map((combo, index) => (
               <option
                 key={index}
-                value={`${combo.year}-${combo.department}-${combo.section}-${combo.subject}`}
+                // FIX 1: Changing this value to use '|' instead of '-'
+                value={`${combo.year}|${combo.department}|${combo.section}|${combo.subject}`}
               >
                 {combo.year} {combo.department}-{combo.section} ({combo.subject})
               </option>
@@ -161,7 +167,8 @@ const Register = () => {
       <div className="attendance-table-section">
         <div className="table-header-title-container">
           <h3 className="table-header-title">
-            Attendance Register ({selectedCombination || "None"}) - {new Date().getFullYear()}
+            {/* Replaces the pipes with a hyphen for a cleaner display title */}
+            Attendance Register ({selectedCombination ? selectedCombination.replace(/\|/g, " - ") : "None"}) - {new Date().getFullYear()}
           </h3>
         </div>
 
